@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Régie Spectacle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .section {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        h2 {
+            margin-top: 0;
+            color: #ff9800;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:disabled {
+            background-color: #555;
+        }
+        .slider {
+            width: 100%;
+        }
+        .status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .video-container {
+            background-color: #000;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+        .audio-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .volume, .equalizer {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .indicator-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #f44336;
+        }
+        .indicator-light.on {
+            background-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard Régie Spectacle</h1>
+    <div class="dashboard">
+        <div class="section">
+            <h2>Contrôle Vidéo</h2>
+            <div class="video-container">
+                <video id="videoPlayer" controls>
+                    <source src="https://example.com/video.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la vidéo HTML5.
+                </video>
+            </div>
+            <div class="controls">
+                <button id="playPause">Lecture</button>
+                <button id="stop">Arrêt</button>
+                <input type="range" id="videoVolume" class="slider" min="0" max="1" step="0.1" value="0.7">
+                <div class="status">
+                    <span>Volume : <span id="volumeValue">70%</span></span>
+                    <span id="videoStatus">Prêt</span>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Contrôle Audio</h2>
+            <div class="audio-controls">
+                <div class="indicator">
+                    <span>Microphone 1</span>
+                    <div class="indicator-light on"></div>
+                </div>
+                <input type="range" class="slider" min="0" max="100" value="50">
+                <div class="indicator">
+                    <span>Microphone 2</span>
+                    <div class="indicator-light"></div>
+                </div>
+                <input type="range" class="slider" min="0" max="100" value="30">
+                <div class="indicator">
+                    <span>Musique</span>
+                    <div class="indicator-light on"></div>
+                </div>
+                <input type="range" class="slider" min="0" max="100" value="70">
+            </div>
+            <div class="equalizer">
+                <h3>Égaliseur</h3>
+                <input type="range" class="slider" min="0" max="100" value="50">
+                <input type="range" class="slider" min="0" max="100" value="50">
+                <input type="range" class="slider" min="0" max="100" value="50">
+            </div>
+        </div>
+    </div>
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const playPauseBtn = document.getElementById('playPause');
+        const stopBtn = document.getElementById('stop');
+        const videoVolume = document.getElementById('videoVolume');
+        const volumeValue = document.getElementById('volumeValue');
+        const videoStatus = document.getElementById('videoStatus');
+
+        playPauseBtn.addEventListener('click', () => {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                playPauseBtn.textContent = 'Pause';
+                videoStatus.textContent = 'En lecture';
+            } else {
+                videoPlayer.pause();
+                playPauseBtn.textContent = 'Lecture';
+                videoStatus.textContent = 'En pause';
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            videoPlayer.pause();
+            videoPlayer.currentTime = 0;
+            playPauseBtn.textContent = 'Lecture';
+            videoStatus.textContent = 'Arrêté';
+        });
+
+        videoVolume.addEventListener('input', () => {
+            videoPlayer.volume = videoVolume.value;
+            volumeValue.textContent = Math.round(videoVolume.value * 100) + '%';
+        });
+    </script>
+</body>
+</html>

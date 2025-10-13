@@ -1,0 +1,29 @@
+{
+    "app": {
+        "name": "Kaeros"
+    },
+    "nav":{
+        "dubbing":"Doublage",
+        "time":"Time"
+    },
+    "time":{
+        "name":"Time",
+        "form":{
+            "number":"Nombre d'impro",
+            "minutes":"Nombre de minutes",
+            "submit": "Commencer"
+        },
+        "state":{
+            "pending": "Présentation",
+            "presentation": "Vidéo d'intro",
+            "running": "Compteur"
+        },
+        "controller":{
+            "play": "Play",
+            "pause": "Pause",
+            "increment": "Incrémenter",
+            "decrement": "Décrémenter",
+            "close": "Fermer la session"
+        }
+    }
+}

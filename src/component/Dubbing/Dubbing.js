@@ -6,15 +6,42 @@ import PresentationDubbing from './PresentationDubbing'
 import RunningDubbing from './RunningDubbing';
 
 function Dubbing() {
-    const [dubbing, setDubbing]= useState()
-    console.log('dubbing', dubbing)
+    const [dubbing, setDubbing] = useState()
 
-    function dispatchDubbing(changes){
-        electronAPI.dubbingOnChange({...dubbing, ...changes})
+    function dispatchDubbing(changes) {
+        electronAPI.dubbingOnChange({ ...dubbing, ...changes })
     }
 
-    function handleDubbing(event){
+    function handleDubbing(event) {
         setDubbing(event.detail)
+    }
+
+    function nextStep() {
+        if (dubbing.state === DUBBING_STATE.PENDING) {
+            electronAPI.dubbingOnChange({
+                ...dubbing,
+                state: DUBBING_STATE.PRESENTATION,
+                paused: true
+            })
+        } else if (dubbing.state === DUBBING_STATE.PRESENTATION) {
+            electronAPI.dubbingOnChange({
+                ...dubbing,
+                state: DUBBING_STATE.INTRODUCTION,
+                paused: false
+            })
+        } else if (dubbing.state === DUBBING_STATE.INTRODUCTION) {
+            electronAPI.dubbingOnChange({ ...dubbing, state: DUBBING_STATE.RUNNING })
+        } else {
+            toVideo(dubbing, dubbing.index + 1)
+        }
+    }
+
+    function toVideo(dubbing, index) {
+        if (index >= dubbing.videos.length || index < 0) {
+            electronAPI.dubbingOnChange({ ...dubbing, index: 0, state: DUBBING_STATE.PENDING, paused: true })
+        } else {
+            electronAPI.dubbingOnChange({ ...dubbing, index, state: DUBBING_STATE.PRESENTATION, paused: true })
+        }
     }
 
     useEffect(() => {
@@ -26,41 +53,26 @@ function Dubbing() {
 
     useEffect(() => {
 
-        function handleKeyboard(event){
-            switch(event.key){
+        function handleKeyboard(event) {
+            console.log(event.key)
+            switch (event.key) {
                 case ' ':
-                    if(dubbing.state === DUBBING_STATE.PENDING){
-                        dispatchDubbing({
-                            state: DUBBING_STATE.PRESENTATION,
-                            paused: true
-                        })
-                    }else if(dubbing.state === DUBBING_STATE.PRESENTATION){
-                        dispatchDubbing({
-                            state: DUBBING_STATE.INTRODUCTION,
-                            paused: false
-                        })
-                    }else{
+                    if ([DUBBING_STATE.PENDING, DUBBING_STATE.PRESENTATION].includes(dubbing.state)) {
+                        nextStep()
+                    } else {
                         dispatchDubbing({
                             paused: !dubbing.paused
                         })
-                    } 
-                  break;
+                    }
+                    break;
                 case 'ArrowRight':
-                    if(dubbing.state === DUBBING_STATE.RUNNING){
-                        dispatchDubbing({
-                            index: dubbing.index + 1 > dubbing.videos.length ? 0 : dubbing.index + 1
-                        })
-                    } 
+                    toVideo(dubbing, dubbing.index + 1)
                     break;
                 case 'ArrowLeft':
-                    if(dubbing.state === DUBBING_STATE.RUNNING){
-                        dispatchDubbing({
-                            index: dubbing.index - 1 > 0 ? dubbing.index - 1: dubbing.videos.length
-                        })
-                    }
-                  break;
+                    toVideo(dubbing, dubbing.index - 1)
+                    break;
             }
-            return 
+            return
         }
 
         document.addEventListener('keydown', handleKeyboard)
@@ -68,14 +80,14 @@ function Dubbing() {
             document.removeEventListener('keydown', handleKeyboard)
         }
     }, [dubbing]);
-  
+
     return (
-      <div className="with-full height-full bg-black">
-          {dubbing?.state === DUBBING_STATE.PENDING && <PendingDubbing />}
-          {dubbing?.state === DUBBING_STATE.PRESENTATION && <PresentationDubbing dubbing={dubbing}/>}
-          {dubbing?.state === DUBBING_STATE.INTRODUCTION && <IntroductionDubbing dubbing={dubbing} onEnded={() => dispatchDubbing({state:DUBBING_STATE.RUNNING})} />}
-          {dubbing?.state === DUBBING_STATE.RUNNING && <RunningDubbing dubbing={dubbing} onEnded={() => dispatchDubbing({state:DUBBING_STATE.PRESENTATION, index: dubbing.index + 1})}/>}
-      </div>
+        <div className="with-full height-full bg-black">
+            {dubbing?.state === DUBBING_STATE.PENDING && <PendingDubbing />}
+            {dubbing?.state === DUBBING_STATE.PRESENTATION && <PresentationDubbing dubbing={dubbing} />}
+            {dubbing?.state === DUBBING_STATE.INTRODUCTION && <IntroductionDubbing dubbing={dubbing} onEnded={nextStep} />}
+            {dubbing?.state === DUBBING_STATE.RUNNING && <RunningDubbing dubbing={dubbing} onEnded={nextStep} />}
+        </div>
     );
 }
 

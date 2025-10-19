@@ -4,16 +4,19 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Dashboard from './component/Dashboard/Dashboard';
 import Time from './component/Time/Time';
 import Dubbing from './component/Dubbing/Dubbing';
+import Gallery from './component/Gallery/Gallery';
 
 function App() {
 
   switch (window.electronAPI.mode) {
     case 'main':
-      return <Dashboard/>;
+      return <Dashboard />;
     case 'time':
-      return <Time/>;
+      return <Time />;
     case 'dubbing':
-      return <Dubbing/>;
+      return <Dubbing />;
+    case 'gallery':
+      return <Gallery />;
     default:
       return 'loading...';
   }

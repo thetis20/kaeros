@@ -4,7 +4,7 @@ function PendingDubbing() {
 
     return (
         <div className='d-flex height-full width-full align-items-center justify-content-center'>
-            <img src="image/pending-time.png" className='width-full'/>
+            <img src="image/pending-dubbing.png" className='width-full' />
         </div>
     );
 }

@@ -2,28 +2,58 @@
     "app": {
         "name": "Kaeros"
     },
-    "nav":{
-        "dubbing":"Doublage",
-        "time":"Time"
+    "nav": {
+        "dubbing": "Doublage",
+        "time": "Time",
+        "gallery": "Images"
     },
-    "time":{
-        "name":"Time",
-        "form":{
-            "number":"Nombre d'impro",
-            "minutes":"Nombre de minutes",
+    "time": {
+        "name": "Time",
+        "form": {
+            "number": "Nombre d'impro",
+            "minutes": "Nombre de minutes",
+            "type": {
+                "label": "Type",
+                "option": {
+                    "time": "Time",
+                    "spinoff": "Time Spinoff"
+                }
+            },
             "submit": "Commencer"
         },
-        "state":{
+        "state": {
             "pending": "Présentation",
             "presentation": "Vidéo d'intro",
             "running": "Compteur"
         },
-        "controller":{
+        "controller": {
             "play": "Play",
             "pause": "Pause",
             "increment": "Incrémenter",
             "decrement": "Décrémenter",
             "close": "Fermer la session"
         }
+    },
+    "dubbing": {
+        "name": "Doublage",
+        "create": "Créer une nouvelle session",
+        "start": "Démarrer la session",
+        "form": {
+            "title": "Créer une session de doublage",
+            "add": "Ajouter une vidéo"
+        },
+        "controller": {
+            "play": "Play",
+            "close": "Fermer la session",
+            "pause": "Pause"
+        },
+        "state": {
+            "pending": "Présentation Doublage"
+        }
+    },
+    "gallery": {
+        "name": "Images",
+        "open": "Ouvrire",
+        "black": "Noir"
     }
 }

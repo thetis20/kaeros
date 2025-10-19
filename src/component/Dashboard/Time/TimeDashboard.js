@@ -6,28 +6,28 @@ import ControllerTimeDashboard from './ControllerTimeDashboard';
 function Time() {
 
   const { t } = useTranslation();
-  const [time, setTime]= useState()
+  const [time, setTime] = useState()
 
-  function handleTime(event){
-      setTime(event.detail)
+  function handleTime(event) {
+    setTime(event.detail)
   }
-  
+
   useEffect(() => {
-        document.addEventListener('time-onchange', handleTime);
-        return () => {
-            document.removeEventListener('time-onchange', handleTime);
-        }
+    document.addEventListener('time-onchange', handleTime);
+    return () => {
+      document.removeEventListener('time-onchange', handleTime);
+    }
   }, []);
 
-  function onSubmit(minutes, number){
-    window.electronAPI.timeOpen(minutes, number)
+  function onSubmit(time) {
+    window.electronAPI.timeOpen(time)
   }
 
   return (
     <div className="p-4">
-        <h1>{t('time.name')}</h1>
-        {!time === true && <FormTimeDashboard onSubmit={onSubmit}/>}
-        {time && <ControllerTimeDashboard time={time}/>}
+      <h1>{t('time.name')}</h1>
+      {!time === true && <FormTimeDashboard onSubmit={onSubmit} />}
+      {time && <ControllerTimeDashboard time={time} />}
     </div>
   );
 }

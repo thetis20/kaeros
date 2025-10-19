@@ -1,7 +1,7 @@
 const DUBBING_STATE = {
-  PENDING:'pending',
-  PRESENTATION:'presentation',
-  INTRODUCTION:'introduction',
+  PENDING: 'pending',
+  PRESENTATION: 'presentation',
+  INTRODUCTION: 'introduction',
   RUNNING: 'running'
 };
 

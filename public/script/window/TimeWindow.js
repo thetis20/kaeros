@@ -2,22 +2,24 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const TIME_STATE = require('../enum/TIME_STATE')
 
-class TimeWindow{
-  constructor({minutes, number, mainWindow, onClose}){
+class TimeWindow {
+  constructor({ minutes, number, type, mainWindow, onClose }) {
     this.minutes = minutes
     this.number = number
+    this.type = type
     this.mainWindow = mainWindow
     this.onClose = onClose
     this.time = {
       secondes: minutes * 60,
       number,
+      type,
       state: TIME_STATE.PENDING,
       paused: true
     }
     this.handleTimeOnChange = this.handleTimeOnChange.bind(this)
   }
 
-  start(){
+  start() {
     this.window = new BrowserWindow({
       fullscreen: true,
       webPreferences: {
@@ -35,24 +37,24 @@ class TimeWindow{
     });
 
     this.window.webContents.once('dom-ready', () => {
-        this.mainWindow.webContents.send('time-onchange', this.time);
-        this.window.webContents.send('time-onchange', this.time);
+      this.mainWindow.webContents.send('time-onchange', this.time);
+      this.window.webContents.send('time-onchange', this.time);
     });
 
     this.initHandle()
   }
 
-  initHandle(){
+  initHandle() {
     ipcMain.addListener('time-onchange', this.handleTimeOnChange)
   }
 
-  handleTimeOnChange(event, argv){
+  handleTimeOnChange(event, argv) {
     this.time = argv;
     this.mainWindow.webContents.send('time-onchange', this.time);
     this.window.webContents.send('time-onchange', argv);
   }
 
-  close(){
+  close() {
     ipcMain.removeListener('time-onchange', this.handleTimeOnChange)
     this.window = null;
     this.onClose();

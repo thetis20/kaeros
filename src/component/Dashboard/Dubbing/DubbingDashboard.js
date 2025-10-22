@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import ControllerDubbingDashboard from './ControllerDubbingDashboard';
 
@@ -18,16 +18,11 @@ function DubbingDashboard() {
     }
   }, []);
 
-  function onCreate() {
-    window.electronAPI.dubbingOpen()
-  }
-
   return (
-    <div className="p-4">
-      <h1>{t('dubbing.name')}</h1>
-      {!dubbing && <button className="btn btn-danger" onClick={onCreate}>{t('dubbing.start')}</button>}
+    <Fragment>
+      <h5>{t('dubbing.name')}</h5>
       {dubbing && <ControllerDubbingDashboard dubbing={dubbing} />}
-    </div>
+    </Fragment >
   );
 }
 

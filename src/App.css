@@ -1,39 +1,49 @@
-#root{
+#root {
   height: 100vh;
   width: 100vw;
+  font-family: 'Lato', self;
 }
 
-.height-full{
-    height: 100%;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'LeagueSpartan', self;
 }
 
-.width-full{
+.height-full {
+  height: 100%;
+}
+
+.width-full {
   width: 100%;
 }
 
-.cursor-pointer{
+.cursor-pointer {
   cursor: pointer;
 }
 
 /* Time components */
 
 .counter-time {
-    height: 100%;
-    width: 100%;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    font-family: sans-serif;
+  height: 100%;
+  width: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
 }
 
 .counter-time__number {
-    font-size: 230px;
+  font-size: 230px;
 }
 
 .counter-time__timer {
-    font-size: 80px;
-    font-weight: bold;
+  font-size: 80px;
+  font-weight: bold;
 }

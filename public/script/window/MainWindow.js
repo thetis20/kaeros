@@ -2,26 +2,22 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const TimeWindow = require('./TimeWindow.js')
 const DubbingWindow = require('./DubbingWindow.js')
-const Store = require('electron-store').default
-const store = new Store({
-  migrations: {
-    '0.0.1': store => {
-      store.set('dubbings', []);
-    }
-  }
-});
-const { v4: uuidv4 } = require('uuid');
-const GalleryWindow = require('./GalleryWindow.js');
+const store = require('../service/store.js')
+const PlaylistWindow = require('./PlaylistWindow.js');
 
 class MainWindow {
   constructor() {
     this.timeClose = this.timeClose.bind(this)
+    this.timeFetch = this.timeFetch.bind(this)
     this.timeOpen = this.timeOpen.bind(this)
     this.dubbingClose = this.dubbingClose.bind(this)
     this.dubbingOpen = this.dubbingOpen.bind(this)
     this.dubbingFetch = this.dubbingFetch.bind(this)
-    this.galleryOpen = this.galleryOpen.bind(this)
-    this.galleryClose = this.galleryClose.bind(this)
+    this.playlistOpen = this.playlistOpen.bind(this)
+    this.playlistFetch = this.playlistFetch.bind(this)
+    this.playlistClose = this.playlistClose.bind(this)
+    this.playlistRemove = this.playlistRemove.bind(this)
+    this.playlistPlay = this.playlistPlay.bind(this)
   }
 
   open() {
@@ -46,6 +42,14 @@ class MainWindow {
     // Emitted when the window is closed.
     this.window.on('closed', () => {
       this.window = null;
+      ipcMain.removeListener('time-open', this.timeOpen)
+      ipcMain.removeListener('time-fetch', this.timeFetch)
+      ipcMain.removeListener('dubbing-open', this.dubbingOpen)
+      ipcMain.removeListener('dubbing-fetch', this.dubbingFetch)
+      ipcMain.removeListener('playlist-open', this.playlistOpen)
+      ipcMain.removeListener('playlist-fetch', this.playlistFetch)
+      ipcMain.removeListener('playlist-remove', this.playlistRemove)
+      ipcMain.removeListener('playlist-play', this.playlistPlay)
     });
 
     this.initHandle()
@@ -54,12 +58,19 @@ class MainWindow {
   initHandle() {
     ipcMain.addListener('time-open', this.timeOpen)
     ipcMain.addListener('dubbing-open', this.dubbingOpen)
-    ipcMain.addListener('dubbing-open-create', this.dubbingOpenCreate)
-    ipcMain.addListener('dubbing-fetch', this.dubbingFetch)
-    ipcMain.addListener('gallery-open', this.galleryOpen)
+    ipcMain.addListener('playlist-open', this.playlistOpen)
+    ipcMain.addListener('playlist-fetch', this.playlistFetch)
+    ipcMain.addListener('playlist-remove', this.playlistRemove)
+    ipcMain.addListener('playlist-play', this.playlistPlay)
   }
 
-  timeOpen(event, argv) {
+  async timeOpen(event, argv) {
+    if (this.timeWindow) {
+      this.timeWindow.window.close()
+    }
+    if (this.dubbingWindow) {
+      this.dubbingWindow.window.close()
+    }
     this.timeWindow = new TimeWindow({
       minutes: argv.minutes,
       number: argv.number,
@@ -67,42 +78,83 @@ class MainWindow {
       mainWindow: this.window,
       onClose: this.timeClose
     })
-    this.timeWindow.start()
+    await this.timeWindow.start()
+    ipcMain.addListener('time-fetch', this.timeFetch)
+  }
+
+  timeFetch() {
+    this.timeWindow.fetch();
   }
 
   timeClose() {
     this.window.webContents.send('time-onchange', undefined);
     this.timeWindow = null;
+    this.setRunning(null)
+    ipcMain.removeListener('time-fetch', this.timeFetch)
   }
 
-  dubbingOpen(event, argv) {
+  async dubbingOpen(event, dubbing) {
+    if (this.timeWindow) {
+      this.timeWindow.window.close()
+    }
+    if (this.dubbingWindow) {
+      this.dubbingWindow.window.close()
+    }
     this.dubbingWindow = new DubbingWindow({
       mainWindow: this.window,
-      onClose: this.dubbingClose
+      onClose: this.dubbingClose,
+      videos: dubbing.videos
     })
-    this.dubbingWindow.start()
+    await this.dubbingWindow.start()
+    ipcMain.addListener('dubbing-fetch', this.dubbingFetch)
   }
 
   dubbingClose() {
     this.window.webContents.send('dubbing-onchange', undefined);
     this.dubbingWindow = null;
+    this.setRunning(null)
+    ipcMain.removeListener('dubbing-fetch', this.dubbingFetch)
   }
 
   dubbingFetch() {
-    this.window.webContents.send('dubbing-onchange', store.get('dubbings'));
+    this.dubbingWindow.fetch();
   }
 
-  galleryOpen(event, argv) {
-    this.galleryWindow = new GalleryWindow({
+  playlistOpen(event, value) {
+    this.playlistWindow = new PlaylistWindow({
       mainWindow: this.window,
-      onClose: this.galleryClose
+      value,
+      onClose: this.playlistClose
     })
-    this.galleryWindow.start()
+    this.playlistWindow.start()
   }
 
-  galleryClose() {
-    this.window.webContents.send('gallery-onchange', undefined);
-    this.galleryWindow = null;
+  playlistFetch() {
+    this.window.webContents.send('playlist-onchange', store.get('playlists'));
+  }
+
+  playlistRemove(event, id) {
+    const playlists = store.get('playlists').filter(playlist => playlist.id !== id)
+    store.set('playlists', playlists)
+    this.window.webContents.send('playlist-onchange', playlists);
+  }
+
+  async playlistPlay(event, playlist) {
+    if (playlist.type === 'time') {
+      await this.timeOpen(event, playlist)
+    } else if (playlist.type === 'dubbing') {
+      await this.dubbingOpen(event, playlist)
+    }
+    this.setRunning(playlist.type)
+  }
+
+  playlistClose() {
+    this.playlistWindow = null;
+  }
+
+  setRunning(value) {
+    this.running = value
+    this.window.webContents.send('running-onchange', this.running);
   }
 
   reload() {

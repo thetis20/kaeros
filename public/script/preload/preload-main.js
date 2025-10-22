@@ -2,7 +2,8 @@ const { contextBridge, ipcRenderer } = require('electron')
 const events = [
   'time-onchange',
   'dubbing-onchange',
-  'gallery-onchange'
+  'playlist-onchange',
+  'running-onchange'
 ]
 
 
@@ -21,8 +22,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dubbingOpen: () => ipcRenderer.send('dubbing-open'),
   dubbingOnChange: (status) => ipcRenderer.send('dubbing-onchange', status),
   timeOpen: (time) => ipcRenderer.send('time-open', time),
+  timeFetch: () => ipcRenderer.send('time-fetch'),
   timeOnChange: (status) => ipcRenderer.send('time-onchange', status),
-  galleryOpen: () => ipcRenderer.send('gallery-open'),
-  galleryOnChange: (gallery) => ipcRenderer.send('gallery-onchange', gallery),
+  playlistOpen: (value) => ipcRenderer.send('playlist-open', value),
+  playlistFetch: () => ipcRenderer.send('playlist-fetch'),
+  playlistPlay: (playlist) => ipcRenderer.send('playlist-play', playlist),
+  playlistRemove: (id) => ipcRenderer.send('playlist-remove', id),
   argv: process.argv
 })

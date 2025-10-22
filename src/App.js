@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Dashboard from './component/Dashboard/Dashboard';
 import Time from './component/Time/Time';
 import Dubbing from './component/Dubbing/Dubbing';
-import Gallery from './component/Gallery/Gallery';
+import Playlist from './component/Playlist/Playlist';
 
 function App() {
 
@@ -15,8 +15,8 @@ function App() {
       return <Time />;
     case 'dubbing':
       return <Dubbing />;
-    case 'gallery':
-      return <Gallery />;
+    case 'playlist':
+      return <Playlist />;
     default:
       return 'loading...';
   }

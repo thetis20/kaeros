@@ -15,7 +15,19 @@ function PresentationDubbing({ dubbing }) {
                 justifyContent: 'center'
             }}
         >
-            <div style={{ position: 'absolute', padding: 20, backgroundColor: white, color: blue }}>{video?.description}</div>
+            <div style={{
+                position: 'absolute',
+                padding: 20,
+                backgroundColor: white,
+                color: blue,
+                whiteSpace: 'break-spaces',
+                minWidth: 800,
+                minHeight: 300,
+                fontSize: '2.5em'
+            }}>
+                <div style={{ textAlign: 'right' }}>{video?.time}</div>
+                <div>{video?.description}</div>
+            </div>
             <img src="image/presentation-dubbing.png" className='width-full' />
         </div>
     );

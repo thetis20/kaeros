@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Dash, Pause, Play, Plus, X } from 'react-bootstrap-icons';
+import React, { Fragment, useState } from 'react';
+import { ArrowLeft, ArrowRight, ChevronBarLeft, ChevronBarRight, Dash, Pause, Play, Plus, Square, X } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import DUBBING_STATE from '../../../enum/DUBBING_STATE';
+import { white } from '../../../enum/COLOR'
 
 function ControllerDubbingDashboard({ dubbing }) {
   const { t } = useTranslation();
-
-  function close() {
-    electronAPI.dubbingOnChange()
-  }
 
   function nextStep() {
     if (dubbing.state === DUBBING_STATE.PENDING) {
@@ -28,6 +25,10 @@ function ControllerDubbingDashboard({ dubbing }) {
     } else {
       toVideo(dubbing, dubbing.index + 1)
     }
+  }
+
+  function previousStep() {
+    toVideo(dubbing, dubbing.index - 1)
   }
 
   function toVideo(dubbing, index) {
@@ -50,9 +51,72 @@ function ControllerDubbingDashboard({ dubbing }) {
     electronAPI.dubbingOnChange({ ...dubbing, paused: true })
   }
 
+  const hasNext = dubbing.videos.length - 1 >= dubbing.index
+  const hasPrevious = dubbing.state !== DUBBING_STATE.PENDING
+
   return (
-    <section style={{ display: 'flex', gap: 20, padding: 20, alignItems: 'start' }}>
-      <ul className="list-group">
+    <Fragment>
+      <div style={{ width: '100%', display: 'flex' }}>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {hasPrevious && <button
+            style={{
+              fontSize: 25,
+              border: 'none',
+              color: white,
+              background: 'none'
+            }}
+            onClick={previousStep}><ChevronBarLeft /></button>}
+        </div>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {dubbing.paused === true && <button
+            style={{
+              fontSize: 50,
+              border: 'none',
+              color: white,
+              background: 'none'
+            }}
+            onClick={handlePlay}><Play /></button>}
+          {dubbing.paused === false && <button
+            style={{
+              fontSize: 50,
+              border: 'none',
+              color: white,
+              background: 'none'
+            }}
+            onClick={handlePause}><Pause /></button>}
+        </div>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {hasNext && <button
+            style={{
+              fontSize: 25,
+              border: 'none',
+              color: white,
+              background: 'none'
+            }}
+            onClick={nextStep}><ChevronBarRight /></button>}
+        </div>
+      </div>
+      <ul className="list-group" style={{
+        margin: '0 -1em',
+        width: 280,
+        borderRadius: 0,
+        overflowY: 'auto'
+      }}>
         <li
           style={{ cursor: 'pointer' }}
           onClick={() => toVideo(dubbing, -1)}
@@ -67,15 +131,10 @@ function ControllerDubbingDashboard({ dubbing }) {
             className={'list-group-item ' + ((dubbing.state !== DUBBING_STATE.PENDING && dubbing.index === index) ? 'list-group-item-primary' : (dubbing.index <= index ? '' : 'list-group-item-secondary'))}
             key={index}
           >
-            {video.title}
+            {video.name}
           </li>)}
       </ul>
-      <div className="btn-group-vertical">
-        {dubbing.paused === true && <button type="button" onClick={handlePlay} className="btn btn-primary d-flex align-items-center justify-content-between"><span>{t('dubbing.controller.play')}</span><Play /></button>}
-        {dubbing.paused === false && <button type="button" onClick={handlePause} className="btn btn-primary d-flex align-items-center justify-content-between">{t('dubbing.controller.pause')}<Pause /></button>}
-        <button type="button" onClick={close} className="btn btn-danger d-flex align-items-center justify-content-between">{t('dubbing.controller.close')}<X /></button>
-      </div>
-    </section >
+    </Fragment >
   );
 }
 

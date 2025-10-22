@@ -5,7 +5,7 @@
     "nav": {
         "dubbing": "Doublage",
         "time": "Time",
-        "gallery": "Images"
+        "playlist": "Bibliothèque"
     },
     "time": {
         "name": "Time",
@@ -19,7 +19,13 @@
                     "spinoff": "Time Spinoff"
                 }
             },
-            "submit": "Commencer"
+            "image": {
+                "label": "Image de présentation",
+                "option": {
+                    "time": "Time",
+                    "spinoff": "Time Spinoff"
+                }
+            }
         },
         "state": {
             "pending": "Présentation",
@@ -52,8 +58,41 @@
         }
     },
     "gallery": {
-        "name": "Images",
-        "open": "Ouvrire",
+        "name": "Bibliothèque",
+        "create": "Créer un projet",
         "black": "Noir"
+    },
+    "playlist": {
+        "name": "Bibliothèque",
+        "create": "Créer un projet",
+        "time": {
+            "description": "{{image}}, {{number}} impros en {{minutes}} minutes"
+        },
+        "dubbing": {
+            "description": "Doublage"
+        },
+        "form": {
+            "title": "Créer une session",
+            "title_edition": "Modifier une session",
+            "name": "Nom de la session",
+            "type": {
+                "label": "Type de la session"
+            },
+            "option": {
+                "images": "Images",
+                "time": "Time",
+                "dubbing": "Doublage"
+            },
+            "submit": "Enregistrer"
+        }
+    },
+    "video": {
+        "form": {
+            "name": "Nom de la vidéo",
+            "label": "Vidéo",
+            "placeholder": "Rechercher dans mes fichiers",
+            "time": "Nombre de minutes (exemple: \"2min\")",
+            "description": "Description de la vidéo"
+        }
     }
 }

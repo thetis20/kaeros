@@ -58,7 +58,7 @@ function RunningDubbing({ dubbing, onEnded }) {
             justifyContent: 'center'
         }}>
             <video onEnded={onEnded} autoPlay ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} muted={true}>
-                <source src={video.url} type="video/mp4" />
+                <source src={'file://' + video.src} type="video/mp4" />
             </video>
             <ProgressBar currentTime={time.currentTime} duration={time.duration} />
         </div>

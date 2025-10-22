@@ -54,7 +54,6 @@ function Dubbing() {
     useEffect(() => {
 
         function handleKeyboard(event) {
-            console.log(event.key)
             switch (event.key) {
                 case ' ':
                     if ([DUBBING_STATE.PENDING, DUBBING_STATE.PRESENTATION].includes(dubbing.state)) {

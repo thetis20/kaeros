@@ -3,9 +3,8 @@
         "name": "Kaeros"
     },
     "nav": {
-        "dubbing": "Doublage",
-        "time": "Time",
-        "playlist": "Bibliothèque"
+        "playlists": "Sessions",
+        "folders": "Musique"
     },
     "time": {
         "name": "Time",
@@ -57,13 +56,8 @@
             "pending": "Présentation Doublage"
         }
     },
-    "gallery": {
-        "name": "Bibliothèque",
-        "create": "Créer un projet",
-        "black": "Noir"
-    },
     "playlist": {
-        "name": "Bibliothèque",
+        "name": "Sessions",
         "create": "Créer un projet",
         "time": {
             "description": "{{image}}, {{number}} impros en {{minutes}} minutes"
@@ -93,6 +87,30 @@
             "placeholder": "Rechercher dans mes fichiers",
             "time": "Nombre de minutes (exemple: \"2min\")",
             "description": "Description de la vidéo"
+        }
+    },
+    "folder": {
+        "name": "Musique",
+        "create": "Ajouter un dossier de musique",
+        "form": {
+            "title": "Ajouter un dossier de musique",
+            "name": "Nom du dossier",
+            "color": "Couleur du dossier",
+            "submit": "Enregistrer"
+        },
+        "back": "Retour aux dossiers",
+        "remove": "Supprimer le dossier",
+        "edit": "Modifier le dossier"
+    },
+    "audio": {
+        "create": "Ajouter un fichier audio",
+        "form": {
+            "title": "Ajouter un fichier audio",
+            "name": "Nom du fichier audio",
+            "color": "Couleur du fichier audio",
+            "src": "Fichier audio",
+            "placeholder": "Rechercher dans mes fichiers",
+            "submit": "Enregistrer"
         }
     }
 }

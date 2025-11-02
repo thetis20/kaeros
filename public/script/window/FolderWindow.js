@@ -1,15 +1,19 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const DUBBING_STATE = require('../enum/DUBBING_STATE')
+const DUBBING_STATE = require('../enum/DUBBING_STATE.js')
 const store = require('../infrastructure/repository/store.js');
+const Folder = require('../application/entity/Folder.js');
+const { v4: uuidv4 } = require('uuid');
+const { createFolderUseCase, updateFolderUseCase, listFolderUseCase } = require('../infrastructure/useCase.js');
 
-class PlaylistWindow {
+class FolderWindow {
   constructor({ mainWindow, onClose, value }) {
     this.mainWindow = mainWindow
     this.onClose = onClose
     this.close = this.close.bind(this)
     this.value = value
-    this.sessionSave = this.sessionSave.bind(this)
+    this.folderSave = this.folderSave.bind(this)
+
   }
 
   start() {
@@ -18,7 +22,7 @@ class PlaylistWindow {
         width: 500,
         height: 400,
         webPreferences: {
-          preload: path.join(__dirname, '../preload/preload-playlist.js'),
+          preload: path.join(__dirname, '../preload/preload-folder.js'),
           nodeIntegration: true
         },
       });
@@ -31,7 +35,7 @@ class PlaylistWindow {
 
       this.window.webContents.once('dom-ready', () => {
         if (this.value) {
-          this.window.webContents.send('session-onchange', this.value);
+          this.window.webContents.send('folder-onchange', this.value);
         }
         resolve()
       });
@@ -41,34 +45,27 @@ class PlaylistWindow {
   }
 
   initHandle() {
-    ipcMain.addListener('session-save', this.sessionSave)
+    ipcMain.addListener('folder-save', this.folderSave)
   }
 
-  sessionSave(event, session) {
-    let sessions = store.get('playlists')
+  async folderSave(event, folder) {
 
-    if (sessions.some(s => s.id === session.id)) {
-      // Edition
-
-      session.updatedAt = Date.now()
-      store.set('playlists', sessions.map(s => s.id === session.id ? session : s))
+    if (undefined === folder.createdAt) {
+      folder = new Folder(folder.id, folder.name, folder.color);
+      createFolderUseCase.execute(folder)
     } else {
-      // Creation
-
-      session.createdAt = Date.now()
-      session.updatedAt = Date.now()
-      store.appendToArray('playlists', session)
+      updateFolderUseCase.execute(folder)
     }
 
-    this.mainWindow.webContents.send('playlist-onchange', store.get('playlists'));
+    this.mainWindow.webContents.send('folder-onchange', await listFolderUseCase.execute());
     this.window.close();
   }
 
   close() {
-    ipcMain.removeListener('session-save', this.sessionSave)
+    ipcMain.removeListener('folder-save', this.folderSave)
     this.window = null;
     this.onClose();
   }
 }
 
-module.exports = PlaylistWindow
+module.exports = FolderWindow

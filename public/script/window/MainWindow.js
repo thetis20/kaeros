@@ -2,8 +2,11 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const TimeWindow = require('./TimeWindow.js')
 const DubbingWindow = require('./DubbingWindow.js')
-const store = require('../service/store.js')
+const store = require('../infrastructure/repository/store.js');
 const PlaylistWindow = require('./PlaylistWindow.js');
+const { listFolderUseCase, deleteFolderUseCase, listAudioByFolderUseCase, deleteAudioUseCase } = require('../infrastructure/useCase.js');
+const FolderWindow = require('./FolderWindow.js');
+const AudioWindow = require('./AudioWindow.js');
 
 class MainWindow {
   constructor() {
@@ -18,6 +21,13 @@ class MainWindow {
     this.playlistClose = this.playlistClose.bind(this)
     this.playlistRemove = this.playlistRemove.bind(this)
     this.playlistPlay = this.playlistPlay.bind(this)
+    this.folderFetch = this.folderFetch.bind(this)
+    this.folderOpen = this.folderOpen.bind(this)
+    this.folderClose = this.folderClose.bind(this)
+    this.folderRemove = this.folderRemove.bind(this)
+    this.audioFetch = this.audioFetch.bind(this)
+    this.audioOpen = this.audioOpen.bind(this)
+    this.audioRemove = this.audioRemove.bind(this)
   }
 
   open() {
@@ -50,6 +60,12 @@ class MainWindow {
       ipcMain.removeListener('playlist-fetch', this.playlistFetch)
       ipcMain.removeListener('playlist-remove', this.playlistRemove)
       ipcMain.removeListener('playlist-play', this.playlistPlay)
+      ipcMain.removeListener('folder-fetch', this.folderFetch)
+      ipcMain.removeListener('folder-open', this.folderOpen)
+      ipcMain.removeListener('folder-remove', this.folderRemove)
+      ipcMain.removeListener('audio-fetch', this.audioFetch)
+      ipcMain.removeListener('audio-open', this.audioOpen)
+      ipcMain.removeListener('audio-remove', this.audioRemove)
     });
 
     this.initHandle()
@@ -62,6 +78,12 @@ class MainWindow {
     ipcMain.addListener('playlist-fetch', this.playlistFetch)
     ipcMain.addListener('playlist-remove', this.playlistRemove)
     ipcMain.addListener('playlist-play', this.playlistPlay)
+    ipcMain.addListener('folder-fetch', this.folderFetch)
+    ipcMain.addListener('folder-open', this.folderOpen)
+    ipcMain.addListener('folder-remove', this.folderRemove)
+    ipcMain.addListener('audio-fetch', this.audioFetch)
+    ipcMain.addListener('audio-open', this.audioOpen)
+    ipcMain.addListener('audio-remove', this.audioRemove)
   }
 
   async timeOpen(event, argv) {
@@ -103,7 +125,6 @@ class MainWindow {
   }
 
   async dubbingClose() {
-    console.log('CLOSE DUBBING')
     this.window.webContents.send('dubbing-onchange', undefined);
     this.dubbingWindow = null;
     this.setRunning(null)
@@ -145,6 +166,48 @@ class MainWindow {
 
   playlistClose() {
     this.playlistWindow = null;
+  }
+
+  async folderFetch() {
+    this.window.webContents.send('folder-onchange', await listFolderUseCase.execute());
+  }
+
+  folderOpen(event, value) {
+    this.folderWindow = new FolderWindow({
+      mainWindow: this.window,
+      value,
+      onClose: this.folderClose
+    })
+    this.folderWindow.start()
+  }
+
+  folderClose() {
+    this.folderWindow = null;
+  }
+
+  async folderRemove(event, id) {
+    await deleteFolderUseCase.execute(id);
+    this.window.webContents.send('folder-onchange', await listFolderUseCase.execute());
+  }
+
+  async audioFetch(event, folderId) {
+    this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
+  }
+
+  audioOpen(event, folderId, value) {
+    this.audioWindow = new AudioWindow({
+      mainWindow: this.window,
+      value,
+      onClose: this.audioClose,
+      folderId
+    })
+    this.audioWindow.start()
+  }
+
+  async audioRemove(event, folderId, id) {
+    console.log('MainWindow audioRemove', folderId, id);
+    await deleteAudioUseCase.execute(folderId, id);
+    this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
   }
 
   setRunning(value) {

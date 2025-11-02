@@ -74,7 +74,6 @@ function TimeController({ display }) {
       paused: true
     })
   }
-  console.log(time)
 
   useEffect(() => {
     window.electronAPI.timeFetch()

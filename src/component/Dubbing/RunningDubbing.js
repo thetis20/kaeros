@@ -39,7 +39,6 @@ function RunningDubbing({ dubbing, onEnded }) {
 
         if (dubbing.paused !== ref.current.paused) {
             if (ref.current.paused) {
-                console.log(dubbing, ref.current)
                 ref.current.play()
             } else {
                 ref.current.pause()

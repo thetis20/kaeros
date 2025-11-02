@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmojiSunglassesFill, Film, Images } from 'react-bootstrap-icons';
 import PlaylistDashboard from './PlaylistDashboard';
+import FolderDashboard from './FolderDashboard';
 import DubbingController from '../Controller/DubbingController';
 import TimeController from '../Controller/TimeController';
 
@@ -12,7 +13,6 @@ function Dashboard() {
 
   function handleRunning(event) {
     setRunning(event.detail)
-    setStatus(event.detail ?? status)
   }
 
   useEffect(() => {
@@ -30,11 +30,29 @@ function Dashboard() {
           <span className="fs-4">{t('app.name')}</span>
         </header>
         <hr style={{ marginBottom: '2em' }} />
+        <button
+          style={{ borderRadius: 0 }}
+          type="button"
+          className={`btn btn-light ${status === 'playlists' ? 'active' : ''}`}
+          onClick={() => setStatus('playlists')}
+        >
+          {t('nav.playlists')}
+        </button>
+        <button
+          style={{ borderRadius: 0 }}
+          type="button"
+          className={`btn btn-light ${status === 'folders' ? 'active' : ''}`}
+          onClick={() => setStatus('folders')}
+        >
+          {t('nav.folders')}
+        </button>
+        <hr style={{ marginBottom: '2em' }} />
         {running === 'dubbing' && <DubbingController />}
         {running === 'time' && <TimeController />}
       </div>
       <main style={{ maxHeight: '100%', overflowY: 'auto', flex: 1 }}>
-        <PlaylistDashboard />
+        {status === 'playlists' && <PlaylistDashboard />}
+        {status === 'folders' && <FolderDashboard />}
       </main>
     </div>
   );

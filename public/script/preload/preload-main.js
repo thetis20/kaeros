@@ -3,7 +3,9 @@ const events = [
   'time-onchange',
   'dubbing-onchange',
   'playlist-onchange',
-  'running-onchange'
+  'running-onchange',
+  'folder-onchange',
+  'audio-onchange',
 ]
 
 
@@ -28,5 +30,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   playlistFetch: () => ipcRenderer.send('playlist-fetch'),
   playlistPlay: (playlist) => ipcRenderer.send('playlist-play', playlist),
   playlistRemove: (id) => ipcRenderer.send('playlist-remove', id),
+  folderFetch: () => ipcRenderer.send('folder-fetch'),
+  folderOpen: (value) => ipcRenderer.send('folder-open', value),
+  folderRemove: (id) => ipcRenderer.send('folder-remove', id),
+  audioFetch: (folderId) => ipcRenderer.send('audio-fetch', folderId),
+  audioOpen: (folderId, audio) => ipcRenderer.send('audio-open', folderId, audio),
+  audioRemove: (folderId, id) => ipcRenderer.send('audio-remove', folderId, id),
   argv: process.argv
 })

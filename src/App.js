@@ -5,6 +5,8 @@ import Dashboard from './component/Dashboard/Dashboard';
 import Time from './component/Time/Time';
 import Dubbing from './component/Dubbing/Dubbing';
 import Playlist from './component/Playlist/Playlist';
+import Folder from './component/Folder/Folder';
+import Audio from './component/Audio/Audio';
 
 function App() {
 
@@ -17,6 +19,10 @@ function App() {
       return <Dubbing />;
     case 'playlist':
       return <Playlist />;
+    case 'folder':
+      return <Folder />;
+    case 'audio':
+      return <Audio />;
     default:
       return 'loading...';
   }

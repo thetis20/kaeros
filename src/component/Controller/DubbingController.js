@@ -1,11 +1,18 @@
-import React, { Fragment, useState } from 'react';
-import { ArrowLeft, ArrowRight, ChevronBarLeft, ChevronBarRight, Dash, Pause, Play, Plus, Square, X } from 'react-bootstrap-icons';
+import 'react';
+import { useState, useEffect, Fragment } from 'react';
+import { ChevronBarLeft, ChevronBarRight, Pause, Play } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
-import DUBBING_STATE from '../../../enum/DUBBING_STATE';
-import { white } from '../../../enum/COLOR'
+import DUBBING_STATE from '../../enum/DUBBING_STATE';
+import { white } from '../../enum/COLOR'
 
-function ControllerDubbingDashboard({ dubbing }) {
+function DubbingController({ display }) {
+  display = display === undefined ? true : display
   const { t } = useTranslation();
+  const [dubbing, setDubbing] = useState()
+
+  function handleDubbing(event) {
+    setDubbing(event.detail)
+  }
 
   function nextStep() {
     if (dubbing.state === DUBBING_STATE.PENDING) {
@@ -43,12 +50,43 @@ function ControllerDubbingDashboard({ dubbing }) {
     if ([DUBBING_STATE.PENDING, DUBBING_STATE.PRESENTATION].includes(dubbing.state)) {
       nextStep()
     } else {
-      electronAPI.dubbingOnChange({ ...dubbing, paused: false })
+      electronAPI.dubbingOnChange({ ...dubbing, paused: !dubbing.paused })
     }
   }
 
-  function handlePause() {
-    electronAPI.dubbingOnChange({ ...dubbing, paused: true })
+  useEffect(() => {
+    window.electronAPI.dubbingFetch()
+    document.addEventListener('dubbing-onchange', handleDubbing);
+    return () => {
+      document.removeEventListener('dubbing-onchange', handleDubbing);
+    }
+  }, []);
+
+  useEffect(() => {
+
+    function handleKeyboard(event) {
+      switch (event.key) {
+        case ' ':
+          handlePlay()
+          break;
+        case 'ArrowRight':
+          toVideo(dubbing, dubbing.index + 1)
+          break;
+        case 'ArrowLeft':
+          toVideo(dubbing, dubbing.index - 1)
+          break;
+      }
+      return
+    }
+
+    document.addEventListener('keydown', handleKeyboard)
+    return () => {
+      document.removeEventListener('keydown', handleKeyboard)
+    }
+  }, [dubbing]);
+
+  if (!dubbing || !display) {
+    return null
   }
 
   const hasNext = dubbing.videos.length - 1 >= dubbing.index
@@ -56,6 +94,7 @@ function ControllerDubbingDashboard({ dubbing }) {
 
   return (
     <Fragment>
+      <h5>{t('dubbing.name')}</h5>
       <div style={{ width: '100%', display: 'flex' }}>
         <div style={{
           flex: 1,
@@ -93,7 +132,7 @@ function ControllerDubbingDashboard({ dubbing }) {
               color: white,
               background: 'none'
             }}
-            onClick={handlePause}><Pause /></button>}
+            onClick={handlePlay}><Pause /></button>}
         </div>
         <div style={{
           flex: 1,
@@ -138,4 +177,4 @@ function ControllerDubbingDashboard({ dubbing }) {
   );
 }
 
-export default ControllerDubbingDashboard;
+export default DubbingController;

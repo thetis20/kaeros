@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import TimeDashboard from './Time/TimeDashboard';
-import DubbingDashboard from './Dubbing/DubbingDashboard';
-import { Alarm, EmojiSunglassesFill, Film, Images } from 'react-bootstrap-icons';
-import PlaylistDashboard from './Playlist/PlaylistDashboard';
+import { EmojiSunglassesFill, Film, Images } from 'react-bootstrap-icons';
+import PlaylistDashboard from './PlaylistDashboard';
+import DubbingController from '../Controller/DubbingController';
+import TimeController from '../Controller/TimeController';
 
 function Dashboard() {
   const { t } = useTranslation();
@@ -30,8 +30,8 @@ function Dashboard() {
           <span className="fs-4">{t('app.name')}</span>
         </header>
         <hr style={{ marginBottom: '2em' }} />
-        {running === 'dubbing' && <DubbingDashboard />}
-        {running === 'time' && <TimeDashboard />}
+        {running === 'dubbing' && <DubbingController />}
+        {running === 'time' && <TimeController />}
       </div>
       <main style={{ maxHeight: '100%', overflowY: 'auto', flex: 1 }}>
         <PlaylistDashboard />

@@ -5,8 +5,6 @@ function ProgressBar({ currentTime, duration }) {
     const percent = currentTime / duration * 100
     const restTime = duration - currentTime
 
-    const isRed = restTime < 10
-
     return <div class="progress" style={{
         position: 'absolute',
         width: '80%',
@@ -41,6 +39,7 @@ function RunningDubbing({ dubbing, onEnded }) {
 
         if (dubbing.paused !== ref.current.paused) {
             if (ref.current.paused) {
+                console.log(dubbing, ref.current)
                 ref.current.play()
             } else {
                 ref.current.pause()

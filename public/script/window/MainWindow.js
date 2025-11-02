@@ -65,12 +65,9 @@ class MainWindow {
   }
 
   async timeOpen(event, argv) {
-    if (this.timeWindow) {
-      this.timeWindow.window.close()
-    }
-    if (this.dubbingWindow) {
-      this.dubbingWindow.window.close()
-    }
+
+    await this.closeSecondaryWindows()
+
     this.timeWindow = new TimeWindow({
       minutes: argv.minutes,
       number: argv.number,
@@ -94,12 +91,8 @@ class MainWindow {
   }
 
   async dubbingOpen(event, dubbing) {
-    if (this.timeWindow) {
-      this.timeWindow.window.close()
-    }
-    if (this.dubbingWindow) {
-      this.dubbingWindow.window.close()
-    }
+    await this.closeSecondaryWindows()
+
     this.dubbingWindow = new DubbingWindow({
       mainWindow: this.window,
       onClose: this.dubbingClose,
@@ -109,7 +102,8 @@ class MainWindow {
     ipcMain.addListener('dubbing-fetch', this.dubbingFetch)
   }
 
-  dubbingClose() {
+  async dubbingClose() {
+    console.log('CLOSE DUBBING')
     this.window.webContents.send('dubbing-onchange', undefined);
     this.dubbingWindow = null;
     this.setRunning(null)
@@ -117,6 +111,7 @@ class MainWindow {
   }
 
   dubbingFetch() {
+    if (!this.dubbingWindow) return;
     this.dubbingWindow.fetch();
   }
 
@@ -161,6 +156,20 @@ class MainWindow {
     if (this.window === null) {
       this.open()
     }
+  }
+
+  async closeSecondaryWindows() {
+
+    if (this.timeWindow) {
+      this.timeWindow.window.close()
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    if (this.dubbingWindow) {
+      this.dubbingWindow.window.close()
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
   }
 }
 

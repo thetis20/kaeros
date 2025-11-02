@@ -10,6 +10,7 @@ class TimeWindow {
     this.mainWindow = mainWindow
     this.onClose = onClose
     this.time = {
+      minutes: this.minutes,
       secondes: minutes * 60,
       number: 1,
       maxNumber: number,

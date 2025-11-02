@@ -4,13 +4,10 @@ import IntroductionDubbing from './IntroductionDubbing'
 import PendingDubbing from './PendingDubbing'
 import PresentationDubbing from './PresentationDubbing'
 import RunningDubbing from './RunningDubbing';
+import DubbingController from '../Controller/DubbingController';
 
 function Dubbing() {
     const [dubbing, setDubbing] = useState()
-
-    function dispatchDubbing(changes) {
-        electronAPI.dubbingOnChange({ ...dubbing, ...changes })
-    }
 
     function handleDubbing(event) {
         setDubbing(event.detail)
@@ -51,37 +48,9 @@ function Dubbing() {
         }
     }, []);
 
-    useEffect(() => {
-
-        function handleKeyboard(event) {
-            switch (event.key) {
-                case ' ':
-                    if ([DUBBING_STATE.PENDING, DUBBING_STATE.PRESENTATION].includes(dubbing.state)) {
-                        nextStep()
-                    } else {
-                        dispatchDubbing({
-                            paused: !dubbing.paused
-                        })
-                    }
-                    break;
-                case 'ArrowRight':
-                    toVideo(dubbing, dubbing.index + 1)
-                    break;
-                case 'ArrowLeft':
-                    toVideo(dubbing, dubbing.index - 1)
-                    break;
-            }
-            return
-        }
-
-        document.addEventListener('keydown', handleKeyboard)
-        return () => {
-            document.removeEventListener('keydown', handleKeyboard)
-        }
-    }, [dubbing]);
-
     return (
         <div className="with-full height-full bg-black">
+            <DubbingController display={false} />
             {dubbing?.state === DUBBING_STATE.PENDING && <PendingDubbing />}
             {dubbing?.state === DUBBING_STATE.PRESENTATION && <PresentationDubbing dubbing={dubbing} />}
             {dubbing?.state === DUBBING_STATE.INTRODUCTION && <IntroductionDubbing dubbing={dubbing} onEnded={nextStep} />}

@@ -18,7 +18,8 @@ class DubbingWindow {
   start() {
     return new Promise(resolve => {
       this.window = new BrowserWindow({
-        fullscreen: true,
+        width: 1000,
+        height: 800,
         webPreferences: {
           preload: path.join(__dirname, '../preload/preload-dubbing.js'),
           nodeIntegration: true,

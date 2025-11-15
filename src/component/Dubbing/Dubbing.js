@@ -54,7 +54,7 @@ function Dubbing() {
             {dubbing?.state === DUBBING_STATE.PENDING && <PendingDubbing />}
             {dubbing?.state === DUBBING_STATE.PRESENTATION && <PresentationDubbing dubbing={dubbing} />}
             {dubbing?.state === DUBBING_STATE.INTRODUCTION && <IntroductionDubbing dubbing={dubbing} onEnded={nextStep} />}
-            {dubbing?.state === DUBBING_STATE.RUNNING && <RunningDubbing dubbing={dubbing} onEnded={nextStep} />}
+            {dubbing?.state === DUBBING_STATE.RUNNING && <RunningDubbing dubbing={dubbing} />}
         </div>
     );
 }

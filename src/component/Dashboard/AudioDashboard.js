@@ -41,7 +41,6 @@ function AudioDashboard({ folderId }) {
     }
 
     function remove(audio) {
-        console.log('AudioDashboard remove', folderId, audio.id);
         window.electronAPI.audioRemove(folderId, audio.id)
     }
 

@@ -6,6 +6,8 @@ const events = [
   'running-onchange',
   'folder-onchange',
   'audio-onchange',
+  'workflow-onchange',
+  'step-onchange',
 ]
 
 
@@ -36,5 +38,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   audioFetch: (folderId) => ipcRenderer.send('audio-fetch', folderId),
   audioOpen: (folderId, audio) => ipcRenderer.send('audio-open', folderId, audio),
   audioRemove: (folderId, id) => ipcRenderer.send('audio-remove', folderId, id),
+  workflowFetch: () => ipcRenderer.send('workflow-fetch'),
+  workflowOpen: (value) => ipcRenderer.send('workflow-open', value),
+  workflowRemove: (id) => ipcRenderer.send('workflow-remove', id),
+  stepOpen: ({ workflowId, value, afterIndex }) => ipcRenderer.send('step-open', { workflowId, value, afterIndex }),
+  stepFetch: (workflowId) => ipcRenderer.send('step-fetch', workflowId),
+  stepRemove: (workflowId, id) => ipcRenderer.send('step-remove', workflowId, id),
   argv: process.argv
 })

@@ -4,9 +4,20 @@ const TimeWindow = require('./TimeWindow.js')
 const DubbingWindow = require('./DubbingWindow.js')
 const store = require('../infrastructure/repository/store.js');
 const PlaylistWindow = require('./PlaylistWindow.js');
-const { listFolderUseCase, deleteFolderUseCase, listAudioByFolderUseCase, deleteAudioUseCase } = require('../infrastructure/useCase.js');
+const {
+  listFolderUseCase,
+  deleteFolderUseCase,
+  listAudioByFolderUseCase,
+  deleteAudioUseCase,
+  listWorkflowUseCase,
+  deleteWorkflowUseCase,
+  listStepByWorkflowUseCase,
+  deleteStepUseCase
+} = require('../infrastructure/useCase.js');
 const FolderWindow = require('./FolderWindow.js');
 const AudioWindow = require('./AudioWindow.js');
+const WorkflowWindow = require('./WorkflowWindow.js');
+const StepWindow = require('./StepWindow.js')
 
 class MainWindow {
   constructor() {
@@ -28,6 +39,13 @@ class MainWindow {
     this.audioFetch = this.audioFetch.bind(this)
     this.audioOpen = this.audioOpen.bind(this)
     this.audioRemove = this.audioRemove.bind(this)
+    this.workflowOpen = this.workflowOpen.bind(this)
+    this.workflowFetch = this.workflowFetch.bind(this)
+    this.workflowClose = this.workflowClose.bind(this)
+    this.workflowRemove = this.workflowRemove.bind(this)
+    this.stepFetch = this.stepFetch.bind(this)
+    this.stepOpen = this.stepOpen.bind(this)
+    this.stepRemove = this.stepRemove.bind(this)
   }
 
   open() {
@@ -66,6 +84,12 @@ class MainWindow {
       ipcMain.removeListener('audio-fetch', this.audioFetch)
       ipcMain.removeListener('audio-open', this.audioOpen)
       ipcMain.removeListener('audio-remove', this.audioRemove)
+      ipcMain.removeListener('workflow-open', this.workflowOpen)
+      ipcMain.removeListener('workflow-fetch', this.workflowFetch)
+      ipcMain.removeListener('workflow-remove', this.workflowRemove)
+      ipcMain.removeListener('step-fetch', this.stepFetch)
+      ipcMain.removeListener('step-open', this.stepOpen)
+      ipcMain.removeListener('step-remove', this.stepRemove)
     });
 
     this.initHandle()
@@ -84,6 +108,12 @@ class MainWindow {
     ipcMain.addListener('audio-fetch', this.audioFetch)
     ipcMain.addListener('audio-open', this.audioOpen)
     ipcMain.addListener('audio-remove', this.audioRemove)
+    ipcMain.addListener('workflow-open', this.workflowOpen)
+    ipcMain.addListener('workflow-fetch', this.workflowFetch)
+    ipcMain.addListener('workflow-remove', this.workflowRemove)
+    ipcMain.addListener('step-fetch', this.stepFetch)
+    ipcMain.addListener('step-open', this.stepOpen)
+    ipcMain.addListener('step-remove', this.stepRemove)
   }
 
   async timeOpen(event, argv) {
@@ -168,6 +198,29 @@ class MainWindow {
     this.playlistWindow = null;
   }
 
+  workflowOpen(event, value) {
+    this.workflowWindow = new WorkflowWindow({
+      mainWindow: this.window,
+      value,
+      onClose: this.workflowClose
+    })
+    this.workflowWindow.start()
+  }
+
+  async workflowFetch() {
+    const workflows = await listWorkflowUseCase.execute();
+    this.window.webContents.send('workflow-onchange', workflows);
+  }
+
+  workflowClose() {
+    this.workflowWindow = null;
+  }
+
+  async workflowRemove(event, id) {
+    await deleteWorkflowUseCase.execute(id);
+    this.window.webContents.send('workflow-onchange', await listWorkflowUseCase.execute());
+  }
+
   async folderFetch() {
     this.window.webContents.send('folder-onchange', await listFolderUseCase.execute());
   }
@@ -205,9 +258,29 @@ class MainWindow {
   }
 
   async audioRemove(event, folderId, id) {
-    console.log('MainWindow audioRemove', folderId, id);
     await deleteAudioUseCase.execute(folderId, id);
     this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
+  }
+
+  async stepFetch(event, workflowId) {
+    const steps = await listStepByWorkflowUseCase.execute(workflowId)
+    this.window.webContents.send('step-onchange', steps);
+  }
+
+  stepOpen(event, { workflowId, value, afterIndex }) {
+    this.stepWindow = new StepWindow({
+      mainWindow: this.window,
+      value,
+      onClose: this.stepClose,
+      afterIndex,
+      workflowId
+    })
+    this.stepWindow.start()
+  }
+
+  async stepRemove(event, workflowId, id) {
+    await deleteStepUseCase.execute(workflowId, id);
+    this.window.webContents.send('step-onchange', await listStepByWorkflowUseCase.execute(workflowId));
   }
 
   setRunning(value) {

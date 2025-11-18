@@ -18,14 +18,20 @@ class AudioRepository {
         throw new Error("Not implemented");
     }
 
+    /**
+     * @param {string} folderId 
+     * @param {string} id 
+     * @param {Audio} audio 
+     */
     async update(folderId, id, audio) {
         throw new Error("Not implemented");
     }
 
     /**
+     * @param {string} folderId 
      * @param {string} id 
      */
-    async delete(id) {
+    async delete(folderId, id) {
         throw new Error("Not implemented");
     }
 }

@@ -6,7 +6,9 @@ import Time from './component/Time/Time';
 import Dubbing from './component/Dubbing/Dubbing';
 import Playlist from './component/Playlist/Playlist';
 import Folder from './component/Folder/Folder';
+import Workflow from './component/Workflow/Workflow';
 import Audio from './component/Audio/Audio';
+import Step from './component/Step/Step';
 
 function App() {
 
@@ -23,6 +25,10 @@ function App() {
       return <Folder />;
     case 'audio':
       return <Audio />;
+    case 'workflow':
+      return <Workflow />;
+    case 'step':
+      return <Step />;
     default:
       return 'loading...';
   }

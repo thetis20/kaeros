@@ -19,7 +19,6 @@ class UpdateAudioUseCase {
      * @param {Audio} audio 
      */
     async execute(folderId, id, audio) {
-        console.log('UpdateAudioUseCase', folderId, id, audio);
         this.validAudioUseCase.execute(audio);
 
         audio.updatedAt = new Date();

@@ -5,6 +5,7 @@ import PlaylistDashboard from './PlaylistDashboard';
 import FolderDashboard from './FolderDashboard';
 import DubbingController from '../Controller/DubbingController';
 import TimeController from '../Controller/TimeController';
+import WorkflowDashboard from './WorkflowDashboard';
 
 function Dashboard() {
   const { t } = useTranslation();
@@ -46,6 +47,14 @@ function Dashboard() {
         >
           {t('nav.folders')}
         </button>
+        <button
+          style={{ borderRadius: 0 }}
+          type="button"
+          className={`btn btn-light ${status === 'workflows' ? 'active' : ''}`}
+          onClick={() => setStatus('workflows')}
+        >
+          {t('nav.workflows')}
+        </button>
         <hr style={{ marginBottom: '2em' }} />
         {running === 'dubbing' && <DubbingController />}
         {running === 'time' && <TimeController />}
@@ -53,6 +62,7 @@ function Dashboard() {
       <main style={{ maxHeight: '100%', overflowY: 'auto', flex: 1 }}>
         {status === 'playlists' && <PlaylistDashboard />}
         {status === 'folders' && <FolderDashboard />}
+        {status === 'workflows' && <WorkflowDashboard />}
       </main>
     </div>
   );

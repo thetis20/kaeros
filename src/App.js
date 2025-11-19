@@ -9,6 +9,7 @@ import Folder from './component/Folder/Folder';
 import Workflow from './component/Workflow/Workflow';
 import Audio from './component/Audio/Audio';
 import Step from './component/Step/Step';
+import Session from './component/Session/Session';
 
 function App() {
 
@@ -29,6 +30,8 @@ function App() {
       return <Workflow />;
     case 'step':
       return <Step />;
+    case 'session':
+      return <Session />;
     default:
       return 'loading...';
   }

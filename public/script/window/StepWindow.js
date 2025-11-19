@@ -1,12 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const Step = require('../application/entity/Step.js');
+const Step = require('../application/entity/step/Step.js');
 const {
   createStepUseCase,
   updateStepUseCase,
   listStepByWorkflowUseCase
 } = require('../infrastructure/useCase.js');
-const StepFactory = require('../application/entity/StepFactory.js');
+const StepFactory = require('../application/entity/step/StepFactory.js');
 
 class StepWindow {
   constructor({ mainWindow, onClose, value, workflowId, afterIndex }) {

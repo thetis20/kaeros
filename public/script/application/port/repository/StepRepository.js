@@ -1,4 +1,4 @@
-const Step = require("../../entity/Step");
+const Step = require("../../entity/step/Step");
 
 class StepRepository {
 

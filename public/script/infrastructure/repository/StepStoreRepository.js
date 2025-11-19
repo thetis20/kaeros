@@ -1,6 +1,6 @@
 const StepRepository = require('../../application/port/repository/StepRepository.js');
 const store = require('./store.js');
-const StepFactory = require('../../application/entity/StepFactory.js')
+const StepFactory = require('../../application/entity/step/StepFactory.js')
 
 class StepStoreRepository extends StepRepository {
 

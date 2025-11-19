@@ -1,5 +1,5 @@
 import { useState, Fragment } from 'react';
-import { Pen, Trash } from 'react-bootstrap-icons';
+import { Pen, Play, Trash } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import useWorkflows from '../Hook/useWorkflows.js';
 import WorkflowItem from '../Workflow/WorkflowItem.js';
@@ -23,6 +23,10 @@ function WorkflowDashboard() {
 
   function edit() {
     window.electronAPI.workflowOpen(selectedWorkflow)
+  }
+
+  function play() {
+    window.electronAPI.sessionPlay(selectedWorkflow)
   }
 
   return (
@@ -55,6 +59,10 @@ function WorkflowDashboard() {
             <button className="btn btn-primary" onClick={edit}>
               <Pen style={{ marginRight: '.5em' }} />
               {t('workflow.edit')}
+            </button>
+            <button className="btn btn-info" onClick={play}>
+              <Play style={{ marginRight: '.5em' }} />
+              {t('workflow.play')}
             </button>
           </div>
           <StepDashboard workflowId={selectedId} />

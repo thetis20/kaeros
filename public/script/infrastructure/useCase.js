@@ -18,6 +18,8 @@ const UpdateStepUseCase = require('../application/useCase/step/UpdateStepUseCase
 const DeleteStepUseCase = require('../application/useCase/step/DeleteStepUseCase.js');
 const ListStepByWorkflowUseCase = require('../application/useCase/step/ListStepByWorkflowUseCase.js');
 
+const CreateSessionUseCase = require('../application/useCase/session/CreateSessionUseCase.js');
+
 const FolderStoreRespository = require('./repository/FolderStoreRepository.js');
 const AudioStoreRespository = require('./repository/AudioStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
@@ -48,6 +50,8 @@ const updateStepUseCase = new UpdateStepUseCase(stepStoreRespository);
 const deleteStepUseCase = new DeleteStepUseCase(stepStoreRespository);
 const listStepByWorkflowUseCase = new ListStepByWorkflowUseCase(stepStoreRespository);
 
+const createSessionUseCase = new CreateSessionUseCase(stepStoreRespository);
+
 
 module.exports = {
     listFolderUseCase,
@@ -69,4 +73,6 @@ module.exports = {
     updateStepUseCase,
     deleteStepUseCase,
     listStepByWorkflowUseCase,
+
+    createSessionUseCase
 }

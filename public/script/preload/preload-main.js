@@ -8,6 +8,7 @@ const events = [
   'audio-onchange',
   'workflow-onchange',
   'step-onchange',
+  'session-onchange'
 ]
 
 
@@ -44,5 +45,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   stepOpen: ({ workflowId, value, afterIndex }) => ipcRenderer.send('step-open', { workflowId, value, afterIndex }),
   stepFetch: (workflowId) => ipcRenderer.send('step-fetch', workflowId),
   stepRemove: (workflowId, id) => ipcRenderer.send('step-remove', workflowId, id),
-  argv: process.argv
+  sessionFetch: () => ipcRenderer.send('session-fetch'),
+  sessionPlay: (workflow) => ipcRenderer.send('session-play', workflow),
+  sessionNext: () => ipcRenderer.send('session-next'),
+  sessionPrevious: () => ipcRenderer.send('session-previous'),
+  sessionToStep: (index) => ipcRenderer.send('session-toStep', index),
+  trackPlay: () => ipcRenderer.send('track-play'),
+  trackPause: () => ipcRenderer.send('track-pause'),
+  trackPlus: () => ipcRenderer.send('track-plus'),
+  trackMinus: () => ipcRenderer.send('track-minus'),
 })

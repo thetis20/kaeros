@@ -12,12 +12,14 @@ const {
   listWorkflowUseCase,
   deleteWorkflowUseCase,
   listStepByWorkflowUseCase,
-  deleteStepUseCase
+  deleteStepUseCase,
+  createSessionUseCase
 } = require('../infrastructure/useCase.js');
 const FolderWindow = require('./FolderWindow.js');
 const AudioWindow = require('./AudioWindow.js');
 const WorkflowWindow = require('./WorkflowWindow.js');
 const StepWindow = require('./StepWindow.js')
+const SessionWindow = require('./SessionWindow.js')
 
 class MainWindow {
   constructor() {
@@ -46,6 +48,9 @@ class MainWindow {
     this.stepFetch = this.stepFetch.bind(this)
     this.stepOpen = this.stepOpen.bind(this)
     this.stepRemove = this.stepRemove.bind(this)
+    this.sessionPlay = this.sessionPlay.bind(this)
+    this.sessionFetch = this.sessionFetch.bind(this)
+    this.sessionClose = this.sessionClose.bind(this)
   }
 
   open() {
@@ -90,6 +95,7 @@ class MainWindow {
       ipcMain.removeListener('step-fetch', this.stepFetch)
       ipcMain.removeListener('step-open', this.stepOpen)
       ipcMain.removeListener('step-remove', this.stepRemove)
+      ipcMain.removeListener('session-play', this.sessionPlay)
     });
 
     this.initHandle()
@@ -114,6 +120,7 @@ class MainWindow {
     ipcMain.addListener('step-fetch', this.stepFetch)
     ipcMain.addListener('step-open', this.stepOpen)
     ipcMain.addListener('step-remove', this.stepRemove)
+    ipcMain.addListener('session-play', this.sessionPlay)
   }
 
   async timeOpen(event, argv) {
@@ -283,6 +290,30 @@ class MainWindow {
     this.window.webContents.send('step-onchange', await listStepByWorkflowUseCase.execute(workflowId));
   }
 
+  sessionFetch() {
+    if (!this.sessionWindow) return;
+    this.sessionWindow.fetch();
+  }
+
+  async sessionPlay(event, workflow) {
+    await this.closeSecondaryWindows()
+    const session = await createSessionUseCase.execute(workflow)
+
+    this.sessionWindow = new SessionWindow({
+      mainWindow: this.window,
+      onClose: this.sessionClose,
+      session
+    })
+    await this.sessionWindow.start()
+    ipcMain.addListener('session-fetch', this.sessionFetch)
+  }
+
+  async sessionClose() {
+    this.sessionWindow = null;
+    ipcMain.removeListener('session-fetch', this.sessionFetch)
+    this.window.webContents.send('session-onchange', undefined);
+  }
+
   setRunning(value) {
     this.running = value
     this.window.webContents.send('running-onchange', this.running);
@@ -303,6 +334,11 @@ class MainWindow {
 
     if (this.dubbingWindow) {
       this.dubbingWindow.window.close()
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    if (this.sessionWindow) {
+      this.sessionWindow.window.close()
       await new Promise(r => setTimeout(r, 1000));
     }
 

@@ -6,6 +6,8 @@ import FolderDashboard from './FolderDashboard';
 import DubbingController from '../Controller/DubbingController';
 import TimeController from '../Controller/TimeController';
 import WorkflowDashboard from './WorkflowDashboard';
+import useSession from '../Hook/useSession';
+import Controller from '../Session/Controller';
 
 function Dashboard() {
   const { t } = useTranslation();
@@ -56,6 +58,7 @@ function Dashboard() {
           {t('nav.workflows')}
         </button>
         <hr style={{ marginBottom: '2em' }} />
+        <Controller />
         {running === 'dubbing' && <DubbingController />}
         {running === 'time' && <TimeController />}
       </div>

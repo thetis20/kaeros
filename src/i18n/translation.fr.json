@@ -4,7 +4,34 @@
     },
     "nav": {
         "playlists": "Sessions",
-        "folders": "Musique"
+        "folders": "Musique",
+        "workflows": "Sessions"
+    },
+    "workflow": {
+        "name": "Sessions",
+        "create": "Créer une session",
+        "back": "Retour",
+        "remove": "Supprimer",
+        "edit": "Modifier",
+        "play": "Démarrer"
+    },
+    "step": {
+        "form": {
+            "title": "Formulaire une étape",
+            "name": "Nom",
+            "type": {
+                "label": "Type",
+                "option": {
+                    "images": "Image",
+                    "dubbingVideo": "Vidéo de doublage"
+                }
+            },
+            "src": {
+                "label": "Image",
+                "placeholder": "Rechercher dans mes fichiers"
+            },
+            "submit": "Enregistrer"
+        }
     },
     "time": {
         "name": "Time",

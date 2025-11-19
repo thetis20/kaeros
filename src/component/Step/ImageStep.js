@@ -27,7 +27,7 @@ function ImageStep({ value, setValue }) {
 
     return <Fragment>
         <div className='form-group'>
-            <label htmlFor={`step-file-${value.id}`} className="form-label">{t('step.form.label')}</label>
+            <label htmlFor={`step-file-${value.id}`} className="form-label">{t('step.form.src.label')}</label>
             <div className="custom-file">
                 <input
                     type="file"

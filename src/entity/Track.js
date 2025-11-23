@@ -1,7 +1,8 @@
 export default class Track {
-    constructor(track) {
-        this.type = track.type;
-        this.startedAt = track.strartedAt;
+    constructor({type, name, stratedAt}) {
+        this.type = type;
+        this.name = name
+        this.stratedAt = stratedAt;
     }
 
     canPlay() {

@@ -4,7 +4,6 @@ import PresentationTime from "./PresentationTime";
 import RunningTime from "./RunningTime";
 
 function TimeTrack({track}) {
-    console.log('time', track);
 
     switch (track.status) {
         case STATUS_PRESENTATION:

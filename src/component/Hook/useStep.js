@@ -4,7 +4,11 @@ function useStep(initialValue) {
     const [value, setValue] = useState(initialValue)
 
     function handler(event) {
-        setValue(event.detail)
+        const value = event.detail
+        if(Array.isArray(value.players)){
+            value.players = value.players.join('; ')
+        }
+        setValue(value)
     }
 
     useEffect(() => {

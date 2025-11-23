@@ -1,6 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 
 class Track {
+    /**
+     * @param {Step} step
+     */
     constructor(step) {
         this.id = uuidv4();
         this.type = step.type;

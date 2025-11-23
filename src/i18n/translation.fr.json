@@ -30,7 +30,8 @@
         "option": {
           "images": "Image",
           "dubbing-video": "Vidéo de doublage",
-          "time": "Time"
+          "time": "Time",
+          "battle-royal": "Battle Royal"
         }
       },
       "src": {
@@ -39,6 +40,10 @@
       },
       "impro": "Nombre d'impros",
       "minutes": "Minutes",
+      "players": {
+        "label": "Joueurs",
+        "help": "Séparer les jouers par un ;"
+      },
       "submit": "Enregistrer"
     }
   },

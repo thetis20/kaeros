@@ -4,6 +4,7 @@ import {ChevronBarLeft, ChevronBarRight, Dash, Pause, Play, Plus} from 'react-bo
 import {useTranslation} from 'react-i18next';
 import {white} from '../../enum/COLOR'
 import useSession from '../Hook/useSession';
+import StepController from "./StepController";
 
 function Controller({display}) {
     display = display === undefined ? true : display
@@ -158,15 +159,12 @@ function Controller({display}) {
                 borderRadius: 0,
                 overflowY: 'auto'
             }}>
-                {session.steps.map((step, index) =>
-                    <li
-                        style={{cursor: 'pointer'}}
-                        onClick={() => session.toStep(index)}
-                        className={'list-group-item ' + ((session.index === index) ? 'list-group-item-primary' : (session.index <= index ? '' : 'list-group-item-secondary'))}
-                        key={index}
-                    >
-                        {step.name}
-                    </li>)}
+                {session.steps.map((step, index) =><StepController
+                    key={step.id}
+                    session={session}
+                    step={step}
+                    index={index}
+                />)}
             </ul>
         </Fragment>
     );

@@ -5,18 +5,18 @@ function useSession(initialValue) {
     const [value, setValue] = useState(initialValue)
 
     function handler(event) {
+        console.log('useSession', event.detail)
         setValue(event.detail)
     }
 
     useEffect(() => {
-        window.electronAPI.sessionFetch()
         document.addEventListener('session-onchange', handler);
         return () => {
             document.removeEventListener('session-onchange', handler);
         }
     }, []);
 
-    return value ? new Session(value, setValue) : null
+    return value ? new Session(value) : null
 }
 
 export default useSession;

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { EmojiSunglassesFill } from 'react-bootstrap-icons';
 import FolderDashboard from './FolderDashboard';
 import WorkflowDashboard from './WorkflowDashboard';
-import Controller from '../Session/Controller';
+import Controller from '../Controller/Controller';
 
 function Dashboard() {
   const { t } = useTranslation();

@@ -1,9 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const DUBBING_STATE = require('../enum/DUBBING_STATE.js')
-const store = require('../infrastructure/repository/store.js');
 const Folder = require('../application/entity/Folder.js');
-const { v4: uuidv4 } = require('uuid');
 const { createFolderUseCase, updateFolderUseCase, listFolderUseCase } = require('../infrastructure/useCase.js');
 
 class FolderWindow {

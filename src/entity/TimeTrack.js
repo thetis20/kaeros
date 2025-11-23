@@ -25,11 +25,11 @@ export default class TimeTrack extends Track {
     }
 
     canPlus() {
-        return this.count < this.impro
+        return this.status === STATUS_RUNNING && this.count < this.impro
     }
 
     canMinus() {
-        return this.count > 1
+        return this.status === STATUS_RUNNING && this.count > 1
     }
 
     play() {

@@ -1,6 +1,5 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
-const DUBBING_STATE = require('../enum/DUBBING_STATE');
 const TrackFactory = require('../application/entity/track/TrackFactory');
 
 class SessionWindow {

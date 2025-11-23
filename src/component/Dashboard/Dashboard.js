@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EmojiSunglassesFill, Film, Images } from 'react-bootstrap-icons';
-import PlaylistDashboard from './PlaylistDashboard';
+import { EmojiSunglassesFill } from 'react-bootstrap-icons';
 import FolderDashboard from './FolderDashboard';
-import DubbingController from '../Controller/DubbingController';
-import TimeController from '../Controller/TimeController';
 import WorkflowDashboard from './WorkflowDashboard';
-import useSession from '../Hook/useSession';
 import Controller from '../Session/Controller';
 
 function Dashboard() {
@@ -36,14 +32,6 @@ function Dashboard() {
         <button
           style={{ borderRadius: 0 }}
           type="button"
-          className={`btn btn-light ${status === 'playlists' ? 'active' : ''}`}
-          onClick={() => setStatus('playlists')}
-        >
-          {t('nav.playlists')}
-        </button>
-        <button
-          style={{ borderRadius: 0 }}
-          type="button"
           className={`btn btn-light ${status === 'folders' ? 'active' : ''}`}
           onClick={() => setStatus('folders')}
         >
@@ -59,11 +47,8 @@ function Dashboard() {
         </button>
         <hr style={{ marginBottom: '2em' }} />
         <Controller />
-        {running === 'dubbing' && <DubbingController />}
-        {running === 'time' && <TimeController />}
       </div>
       <main style={{ maxHeight: '100%', overflowY: 'auto', flex: 1 }}>
-        {status === 'playlists' && <PlaylistDashboard />}
         {status === 'folders' && <FolderDashboard />}
         {status === 'workflows' && <WorkflowDashboard />}
       </main>

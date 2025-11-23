@@ -30,7 +30,7 @@ class StepRepository {
 
     /**
      * @param {string} workflowId 
-     * @returns Step[]
+     * @returns Promise<Step[]>
      */
     async getByWorkflowId(workflowId) {
         throw new Error("Not implemented");

@@ -1,9 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { blue, white } from '../../enum/COLOR'
+import { blue, white } from '../../../enum/COLOR'
 
-function PresentationDubbing({ dubbing }) {
-
-    const video = dubbing.videos[dubbing.index]
+function DescriptionDubbingVideo({ track }) {
 
     return (
         <div
@@ -25,12 +23,12 @@ function PresentationDubbing({ dubbing }) {
                 minHeight: 300,
                 fontSize: '2.5em'
             }}>
-                <div style={{ textAlign: 'right' }}>{video?.time}</div>
-                <div>{video?.description}</div>
+                <div style={{ textAlign: 'right' }}>{track?.time}</div>
+                <div>{track?.description}</div>
             </div>
             <img src="image/presentation-dubbing.png" className='width-full' />
         </div>
     );
 }
 
-export default PresentationDubbing;
+export default DescriptionDubbingVideo;

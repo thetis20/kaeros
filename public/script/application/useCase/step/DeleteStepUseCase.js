@@ -17,8 +17,6 @@ class DeleteStepUseCase {
      */
     async execute(workflowId, id) {
         await this.stepRepository.delete(workflowId, id);
-
-        return;
     }
 }
 

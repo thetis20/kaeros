@@ -19,4 +19,36 @@ export default class Track {
     canMinus() {
         return false
     }
+
+    plus() {
+        if (this.canPlus()) {
+            window.electronAPI.trackChange({
+                count: this.count + 1
+            })
+        }
+    }
+
+    minus() {
+        if (this.canMinus()) {
+            window.electronAPI.trackChange({
+                count: this.count - 1
+            })
+        }
+    }
+
+    play() {
+        if (this.canPlay()) {
+            window.electronAPI.trackChange({
+                paused: false
+            })
+        }
+    }
+
+    pause() {
+        if (this.canPause()) {
+            window.electronAPI.trackChange({
+                paused: true
+            })
+        }
+    }
 }

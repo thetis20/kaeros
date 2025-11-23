@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import ImageTrack from '../../entity/ImageTrack'
+import Session from "../../entity/Session";
 
 function useSession(initialValue) {
     const [value, setValue] = useState(initialValue)
@@ -16,14 +16,7 @@ function useSession(initialValue) {
         }
     }, []);
 
-    if (value?.track) {
-        switch (value.track.type) {
-            case 'image':
-                value.track = new ImageTrack(value.track)
-        }
-    }
-
-    return value
+    return value ? new Session(value, setValue) : null
 }
 
 export default useSession;

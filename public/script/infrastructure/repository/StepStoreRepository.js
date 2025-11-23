@@ -35,8 +35,8 @@ class StepStoreRepository extends StepRepository {
     }
 
     /**
-     * @param {string} workflowId 
-     * @returns Step[]
+     * @param {string} workflowId
+     * @returns Promise<Step[]>
      */
     async getByWorkflowId(workflowId) {
         return (store.get('steps_' + workflowId) || []).map(StepFactory.fromData);

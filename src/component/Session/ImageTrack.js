@@ -1,6 +1,6 @@
 import 'react';
 
-function ImageTrack({ track }) {
+function ImageTrack({track}) {
 
     return (
         <div style={{
@@ -15,7 +15,7 @@ function ImageTrack({ track }) {
                     width: '100%',
                 }}
                 src={'file://' + track.src}
-            />
+                alt={track.name}/>
         </div>
     );
 }

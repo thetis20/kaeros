@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import DUBBING_STATE from '../../enum/DUBBING_STATE'
-import IntroductionDubbing from './IntroductionDubbing'
+import PresentationDubbingVideo from '../Session/DubbingVideo/PresentationDubbingVideo'
 import PendingDubbing from './PendingDubbing'
-import PresentationDubbing from './PresentationDubbing'
-import RunningDubbing from './RunningDubbing';
+import DescriptionDubbingVideo from '../Session/DubbingVideo/DescriptionDubbingVideo'
+import RunningDubbingVideo from '../Session/DubbingVideo/RunningDubbingVideo';
 import DubbingController from '../Controller/DubbingController';
 
 function Dubbing() {
@@ -52,9 +52,9 @@ function Dubbing() {
         <div className="with-full height-full bg-black">
             <DubbingController display={false} />
             {dubbing?.state === DUBBING_STATE.PENDING && <PendingDubbing />}
-            {dubbing?.state === DUBBING_STATE.PRESENTATION && <PresentationDubbing dubbing={dubbing} />}
-            {dubbing?.state === DUBBING_STATE.INTRODUCTION && <IntroductionDubbing dubbing={dubbing} onEnded={nextStep} />}
-            {dubbing?.state === DUBBING_STATE.RUNNING && <RunningDubbing dubbing={dubbing} />}
+            {dubbing?.state === DUBBING_STATE.PRESENTATION && <DescriptionDubbingVideo dubbing={dubbing} />}
+            {dubbing?.state === DUBBING_STATE.INTRODUCTION && <PresentationDubbingVideo dubbing={dubbing} onEnded={nextStep} />}
+            {dubbing?.state === DUBBING_STATE.RUNNING && <RunningDubbingVideo dubbing={dubbing} />}
         </div>
     );
 }

@@ -1,10 +1,10 @@
 const Step = require('./Step.js');
 
 class DubbingVideoStep extends Step {
-    constructor(id, name, description, duration, src) {
-        super(id, name, "dubbingVideo");
+    constructor(id, name, src, description, time, createdAt, updatedAt) {
+        super(id, name, "dubbing-video", createdAt, updatedAt);
         this.description = description;
-        this.duration = duration;
+        this.time = time;
         this.src = src;
     }
 }

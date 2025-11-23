@@ -24,13 +24,6 @@ class WorkflowRepository {
         throw new Error("Not implemented");
     }
 
-    /**
-     * @param {string} workflowId
-     * @returns {Promise<Workflow[]>}
-     */
-    async getByWorkflowId(workflowId) {
-        throw new Error("Not implemented");
-    }
 }
 
 module.exports = WorkflowRepository;

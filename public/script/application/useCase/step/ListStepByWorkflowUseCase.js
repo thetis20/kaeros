@@ -14,10 +14,11 @@ class ListStepByWorkflowUseCase {
 
     /**
      * @param {string} workflowId 
-     * @returns {Promise<Step[]>}
+     * @returns Promise<Step[]>
      */
     async execute(workflowId) {
-        return await this.stepRepository.getByWorkflowId(workflowId);
+        const steps = await this.stepRepository.getByWorkflowId(workflowId);
+        return steps.filter((step) => step)
     }
 }
 

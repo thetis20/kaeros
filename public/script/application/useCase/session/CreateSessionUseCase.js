@@ -13,7 +13,7 @@ class CreateSessionUseCase {
     }
 
     /**
-     * @param {string} folderId 
+     * @param {Workflow} workflow
      * @return {Session} 
      */
     async execute(workflow) {

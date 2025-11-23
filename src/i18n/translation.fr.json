@@ -29,13 +29,16 @@
         "label": "Type",
         "option": {
           "images": "Image",
-          "dubbing-video": "Vidéo de doublage"
+          "dubbing-video": "Vidéo de doublage",
+          "time": "Time"
         }
       },
       "src": {
         "label": "Image",
         "placeholder": "Rechercher dans mes fichiers"
       },
+      "impro": "Nombre d'impros",
+      "minutes": "Minutes",
       "submit": "Enregistrer"
     }
   },

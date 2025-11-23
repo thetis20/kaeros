@@ -2,7 +2,8 @@ import 'react';
 import useSession from '../Hook/useSession';
 import ImageTrack from './ImageTrack';
 import Controller from './Controller';
-import DubbingVideoTrack from "./DubbingVideoTrack";
+import DubbingVideoTrack from "./DubbingVideo/DubbingVideoTrack";
+import TimeTrack from "./Time/TimeTrack";
 
 function Session() {
     const session = useSession()
@@ -16,6 +17,7 @@ function Session() {
             <Controller display={false} />
             {session.track.type === 'image' && <ImageTrack track={session.track} />}
             {session.track.type === 'dubbing-video' && <DubbingVideoTrack track={session.track} />}
+            {session.track.type === 'time' && <TimeTrack track={session.track} />}
         </div>
     );
 }

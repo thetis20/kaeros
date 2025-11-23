@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import useStep from '../Hook/useStep';
 import ImageStep from './ImageStep';
 import DubbingVideoStep from "./DubbingVideoStep";
+import TimeStep from "./TimeStep";
 
 function Step() {
     const { t } = useTranslation();
@@ -41,10 +42,12 @@ function Step() {
                         <option value=""></option>
                         <option value="image">{t('step.form.type.option.images')}</option>
                         <option value="dubbing-video">{t('step.form.type.option.dubbing-video')}</option>
+                        <option value="time">{t('step.form.type.option.time')}</option>
                     </select>
                 </div>
                 {value.type === 'image' && <ImageStep value={value} setValue={setValue} />}
                 {value.type === 'dubbing-video' && <DubbingVideoStep value={value} setValue={setValue} />}
+                {value.type === 'time' && <TimeStep value={value} setValue={setValue} />}
                 <button style={{ margin: '2em 0' }} type="submit" className="btn btn-primary">{t('step.form.submit')}</button>
             </form>
         </section>

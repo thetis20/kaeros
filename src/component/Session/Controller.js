@@ -1,6 +1,6 @@
 import 'react';
 import {useEffect, Fragment} from 'react';
-import {ChevronBarLeft, ChevronBarRight, Pause, Play} from 'react-bootstrap-icons';
+import {ChevronBarLeft, ChevronBarRight, Dash, Pause, Play, Plus} from 'react-bootstrap-icons';
 import {useTranslation} from 'react-i18next';
 import {white} from '../../enum/COLOR'
 import useSession from '../Hook/useSession';
@@ -23,10 +23,10 @@ function Controller({display}) {
                 case 'ArrowLeft':
                     session.previous()
                     break;
-                case 'ArrowTop':
+                case 'ArrowUp':
                     session.plus()
                     break;
-                case 'ArrowBottom':
+                case 'ArrowDown':
                     session.minus()
                     break;
             }
@@ -51,19 +51,44 @@ function Controller({display}) {
                         flex: 1,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        flexDirection: 'column'
                     }}>
-                        {session.hasPrevious() && <button
-                            style={{
-                                fontSize: 25,
-                                border: 'none',
-                                color: white,
-                                background: 'none'
-                            }}
-                            onClick={session.previous}><ChevronBarLeft/></button>}
+                        <div style={{
+                            height: 40,
+                            width: 40,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            {session.canPlus() && <button
+                                style={{
+                                    fontSize: 25,
+                                    border: 'none',
+                                    color: white,
+                                    background: 'none'
+                                }}
+                                onClick={session.plus}><Plus/></button>}
+                        </div>
+                        <div style={{
+                            height: 40,
+                            width: 40,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            {session.hasPrevious() && <button
+                                style={{
+                                    fontSize: 25,
+                                    border: 'none',
+                                    color: white,
+                                    background: 'none'
+                                }}
+                                onClick={session.previous}><ChevronBarLeft/></button>}
+                        </div>
                     </div>
                     <div style={{
-                        flex: 1,
+                        flex: 2,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
@@ -89,16 +114,41 @@ function Controller({display}) {
                         flex: 1,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        flexDirection: 'column'
                     }}>
-                        {session.hasNext() && <button
-                            style={{
-                                fontSize: 25,
-                                border: 'none',
-                                color: white,
-                                background: 'none'
-                            }}
-                            onClick={session.next}><ChevronBarRight/></button>}
+                        <div style={{
+                            height: 40,
+                            width: 40,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            {session.canMinus() && <button
+                                style={{
+                                    fontSize: 25,
+                                    border: 'none',
+                                    color: white,
+                                    background: 'none'
+                                }}
+                                onClick={session.minus}><Dash/></button>}
+                        </div>
+                        <div style={{
+                            height: 40,
+                            width: 40,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            {session.hasNext() && <button
+                                style={{
+                                    fontSize: 25,
+                                    border: 'none',
+                                    color: white,
+                                    background: 'none'
+                                }}
+                                onClick={session.next}><ChevronBarRight/></button>}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,8 @@
 import 'react';
-import {STATUS_DESCRIPTION, STATUS_PRESENTATION, STATUS_RUNNING} from '../../entity/DubbingVideoTrack'
-import PresentationDubbingVideo from "./DubbingVideo/PresentationDubbingVideo";
-import DescriptionDubbingVideo from "./DubbingVideo/DescriptionDubbingVideo";
-import RunningDubbingVideo from "./DubbingVideo/RunningDubbingVideo";
+import {STATUS_DESCRIPTION, STATUS_PRESENTATION, STATUS_RUNNING} from '../../../entity/DubbingVideoTrack'
+import PresentationDubbingVideo from "./PresentationDubbingVideo";
+import DescriptionDubbingVideo from "./DescriptionDubbingVideo";
+import RunningDubbingVideo from "./RunningDubbingVideo";
 
 function DubbingVideoTrack({track}) {
 

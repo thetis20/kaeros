@@ -1,5 +1,6 @@
 import ImageTrack from "./ImageTrack";
 import DubbingVideoTrack from "./DubbingVideoTrack";
+import TimeTrack from "./TimeTrack";
 
 export default class Session {
     constructor(session) {
@@ -15,6 +16,9 @@ export default class Session {
                 case 'dubbing-video':
                     this.track = new DubbingVideoTrack(this.track)
                     break;
+                case 'time':
+                    this.track = new TimeTrack(this.track)
+                    break;
             }
         }
 
@@ -23,34 +27,44 @@ export default class Session {
         this.next = this.next.bind(this);
         this.previous = this.previous.bind(this);
         this.toStep = this.toStep.bind(this);
+        this.canPlus = this.canPlus.bind(this);
+        this.canMinus = this.canMinus.bind(this);
         this.plus = this.plus.bind(this);
         this.minus = this.minus.bind(this);
         this.play = this.play.bind(this);
         this.pause = this.pause.bind(this);
     }
 
-    hasNext(){
+    hasNext() {
         return this.steps.length - 1 > this.index
     }
 
-    hasPrevious(){
+    hasPrevious() {
         return this.index !== 0
     }
 
     next() {
-        if(this.hasNext()) {
+        if (this.hasNext()) {
             window.electronAPI.sessionNext()
         }
     }
 
     previous() {
-        if(this.hasPrevious()) {
+        if (this.hasPrevious()) {
             window.electronAPI.sessionPrevious()
         }
     }
 
     toStep(index) {
         window.electronAPI.sessionToStep(index)
+    }
+
+    canPlus() {
+        return this.track.canPlus()
+    }
+
+    canMinus() {
+        return this.track.canMinus()
     }
 
     plus() {

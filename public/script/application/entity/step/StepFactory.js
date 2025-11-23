@@ -1,5 +1,6 @@
 const ImageStep = require('./ImageStep')
 const DubbingVideoStep = require("./DubbingVideoStep");
+const TimeStep = require("./TimeStep");
 
 class StepFactory {
 
@@ -9,6 +10,8 @@ class StepFactory {
                 return new ImageStep(data.id, data.name, data.src, data.createdAt, data.updatedAt)
             case 'dubbing-video':
                 return new DubbingVideoStep(data.id, data.name, data.src, data.description, data.time, data.createdAt, data.updatedAt)
+            case 'time':
+                return new TimeStep(data.id, data.name, data.impro, data.minutes, data.createdAt, data.updatedAt)
         }
     }
 

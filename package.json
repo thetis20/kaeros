@@ -6,7 +6,7 @@
   "homepage": "./",
   "scripts": {
     "start": "concurrently \"npm run react-start\" \"npm run electron-start\"",
-    "build": "npm run react-build && npm run electron-build",
+    "build": "npm run react-build && npm run electron-build:mac",
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "electron-start": "wait-on http://localhost:3000 && electron .",
@@ -34,7 +34,7 @@
     "wait-on": "^9.0.1"
   },
   "build": {
-    "appId": "com.electron.${name}",
+    "appId": "com.electron.kaeros",
     "productName": "Kaeros",
     "files": [
       "build/**/*",

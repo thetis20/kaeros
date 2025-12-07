@@ -53,7 +53,6 @@ class Player {
                 }
             }
         }
-        console.log('set', players);
         window.electronAPI.trackChange({
             players
         })
@@ -87,7 +86,6 @@ class Player {
 export default class BattleRoyalTrack extends Track {
     constructor(track) {
         super(track)
-        console.log('BattleRoyalTrack', track.players)
         this.players = track.players.map(player => new Player(player, this))
     }
 }

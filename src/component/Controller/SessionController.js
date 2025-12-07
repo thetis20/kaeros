@@ -6,7 +6,7 @@ import {white} from '../../enum/COLOR'
 import useSession from '../Hook/useSession';
 import StepController from "./StepController";
 
-function Controller({display}) {
+function SessionController({display}) {
     display = display === undefined ? true : display
     const {t} = useTranslation();
     const session = useSession()
@@ -170,4 +170,4 @@ function Controller({display}) {
     );
 }
 
-export default Controller;
+export default SessionController;

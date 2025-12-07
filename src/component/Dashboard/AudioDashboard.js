@@ -45,12 +45,13 @@ function AudioDashboard({ folderId }) {
     }
 
     function switchAudio(audio) {
-        setAudios(audios => audios.map(a => {
+        document.dispatchEvent(new CustomEvent('audio-play', {detail: audio}))
+        /*setAudios(audios => audios.map(a => {
             if (a.id === audio.id) {
                 return { ...a, playing: !audio.playing }
             }
             return a
-        }))
+        }))*/
     }
 
     useEffect(() => {

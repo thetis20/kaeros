@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
+import InputColor from "../Common/InputColor";
 
 function Audio() {
     const { t } = useTranslation();
@@ -59,7 +60,11 @@ function Audio() {
                 </div>
                 <div className='form-group'>
                     <label htmlFor="color" className="form-label">{t('audio.form.color')}</label>
-                    <input type="color" className="form-control form-control-color" id="color" value={value.color} onChange={(e) => setValue({ ...value, color: e.target.value })} />
+                    <InputColor
+                        id="color"
+                        value={value.color}
+                        onChange={(color) => setValue({...value, color})}
+                    />
                 </div>
                 <div className='form-group'>
                     <label htmlFor={'src'} className="form-label">{t('audio.form.src')}</label>

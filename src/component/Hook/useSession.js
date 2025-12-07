@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import Session from "../../entity/Session";
 
-function useSession(initialValue) {
-    const [value, setValue] = useState(initialValue)
+function useSession() {
+    const [value, setValue] = useState(window.session)
 
     function handler(event) {
-        console.log('useSession', event.detail)
+        window.session = event.detail
         setValue(event.detail)
     }
 

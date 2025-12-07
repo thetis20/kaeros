@@ -22,9 +22,11 @@
     "moment": "^2.30.1",
     "react": "^19.2.0",
     "react-bootstrap-icons": "^1.11.6",
+    "react-color": "^2.19.3",
     "react-dom": "^19.2.0",
     "react-i18next": "^16.0.0",
     "react-scripts": "5.0.1",
+    "typescript": "^5.9.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
@@ -32,6 +34,9 @@
     "electron": "^38.2.1",
     "electron-builder": "^26.0.12",
     "wait-on": "^9.0.1"
+  },
+  "overrides": {
+    "typescript": "^5.9.3"
   },
   "build": {
     "appId": "com.electron.kaeros",

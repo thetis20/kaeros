@@ -3,7 +3,6 @@ import { ChevronLeft, Pause, Pen, Play, Square, SquareFill, Trash } from 'react-
 import { useTranslation } from 'react-i18next';
 
 function Item({ audio, onClick, onEnded }) {
-    const { t } = useTranslation();
 
     return <li style={{
         width: 150,
@@ -18,8 +17,6 @@ function Item({ audio, onClick, onEnded }) {
         position: 'relative',
     }} onClick={() => onClick(audio)}>
         <h6>{audio.name}</h6>
-        {audio.playing && <SquareFill style={{ position: 'absolute', right: '1em', top: '1em' }} />}
-        {audio.playing && <audio autoPlay src={'file://' + audio.src} onEnded={() => onEnded(audio)}></audio>}
     </li>
 }
 
@@ -46,12 +43,6 @@ function AudioDashboard({ folderId }) {
 
     function switchAudio(audio) {
         document.dispatchEvent(new CustomEvent('audio-play', {detail: audio}))
-        /*setAudios(audios => audios.map(a => {
-            if (a.id === audio.id) {
-                return { ...a, playing: !audio.playing }
-            }
-            return a
-        }))*/
     }
 
     useEffect(() => {

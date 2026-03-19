@@ -32,7 +32,7 @@ class AudioStoreRepository extends AudioRepository {
     }
 
     async getByFolderId(folderId) {
-        return (store.get('audios_' + folderId) || []).map(a => new Audio(a.id, a.name, a.src, a.color, a.createdAt, a.updatedAt));
+        return (store.get('audios_' + folderId) || []).map(a => new Audio(a.id, a.name, a.src, a.color, a.playing, a.createdAt, a.updatedAt));
     }
 }
 

@@ -33,15 +33,6 @@ function Dashboard() {
                 >
                     {t('nav.workflows')}
                 </button>
-                <hr style={{marginBottom: '2em'}}/>
-                <SessionController/>
-            </div>
-            <main style={{maxHeight: '100%', overflowY: 'auto', flex: 1}}>
-                {status === 'folders' && <FolderDashboard/>}
-                {status === 'workflows' && <WorkflowDashboard/>}
-            </main>
-
-            <div className="d-flex flex-column flex-shrink-0 p-3 text-bg-dark height-full" style={{width: '320px'}}>
                 <button
                     style={{borderRadius: 0}}
                     type="button"
@@ -52,7 +43,14 @@ function Dashboard() {
                 </button>
                 <hr style={{marginBottom: '2em'}}/>
                 <AudioController/>
+                <SessionController/>
+
             </div>
+            <main style={{maxHeight: '100%', overflowY: 'auto', flex: 1}}>
+                {status === 'folders' && <FolderDashboard/>}
+                {status === 'workflows' && <WorkflowDashboard/>}
+            </main>
+
         </div>
     );
 }

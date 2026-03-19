@@ -6,6 +6,7 @@ class DubbingVideoTrack extends Track {
         this.src = step.src
         this.description = step.description
         this.time = step.time
+        this.paused = true
     }
 }
 

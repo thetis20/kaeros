@@ -39,6 +39,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     audioFetch: (folderId) => ipcRenderer.send('audio-fetch', folderId),
     audioOpen: (folderId, audio) => ipcRenderer.send('audio-open', folderId, audio),
     audioRemove: (folderId, id) => ipcRenderer.send('audio-remove', folderId, id),
+    audioPlay: (folderId, id) => ipcRenderer.send('audio-play', folderId, id),
+    audioEnd: (folderId, id) => ipcRenderer.send('audio-end', folderId, id),
     workflowFetch: () => ipcRenderer.send('workflow-fetch'),
     workflowOpen: (value) => ipcRenderer.send('workflow-open', value),
     workflowRemove: (id) => ipcRenderer.send('workflow-remove', id),

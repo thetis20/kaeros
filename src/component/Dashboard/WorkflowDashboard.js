@@ -40,6 +40,7 @@ function WorkflowDashboard() {
             padding: 0,
             gap: 30,
             display: 'flex',
+            flexDirection: 'column',
             marginTop: 30
           }}>
             {workflows.map((workflow) => <WorkflowItem key={workflow.id} workflow={workflow} onSelect={select} />)}

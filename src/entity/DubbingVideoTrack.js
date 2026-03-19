@@ -1,7 +1,6 @@
 import Track from "./Track"
 
 export const STATUS_DESCRIPTION = "STATUS_DESCRIPTION"
-export const STATUS_PRESENTATION = "STATUS_PRESENTATION"
 export const STATUS_RUNNING = "STATUS_RUNNING"
 
 export default class DubbingVideoTrack extends Track {
@@ -25,7 +24,7 @@ export default class DubbingVideoTrack extends Track {
     play() {
         const changes = {paused: false}
         if (this.status === STATUS_DESCRIPTION) {
-            changes.status = STATUS_PRESENTATION
+            changes.status = STATUS_RUNNING
         }
         window.electronAPI.trackChange(changes)
     }

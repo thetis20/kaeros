@@ -42,25 +42,32 @@ function AudioControllerItem({audio, onStop}) {
 function AudioController() {
     const [audios, setAudios] = useState([]);
 
-    function handleAudio(event) {
+    function handleAudioPlay(event) {
+        const audio = event.detail
         setAudios(audios => {
-            return [...audios, {
-                playId: uuidv4(),
-                ...event.detail
-            }];
+            audios.filter(a => a.id !== audio.id)
+            return [...audios, audio];
         })
+        window.electronAPI.audioPlay(event.detail.folderId, event.detail.id)
+    }
+
+    function handleAudioEnd(event) {
+        onStop(event.detail)
     }
 
     function onStop(audio) {
         setAudios(audios => {
-            return audios.filter(a => a.playId !== audio.playId);
+            return audios.filter(a => a.id !== audio.id);
         })
+        window.electronAPI.audioEnd(audio.folderId, audio.id)
     }
 
     useEffect(() => {
-        document.addEventListener('audio-play', handleAudio);
+        document.addEventListener('audio-play', handleAudioPlay);
+        document.addEventListener('audio-end', handleAudioEnd);
         return () => {
-            document.removeEventListener('audio-play', handleAudio);
+            document.removeEventListener('audio-play', handleAudioPlay);
+            document.removeEventListener('audio-end', handleAudioEnd);
         }
     }, []);
 

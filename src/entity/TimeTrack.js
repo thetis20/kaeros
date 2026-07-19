@@ -51,12 +51,12 @@ export default class TimeTrack extends Track {
 
     decrement() {
         if (this.time - 1 <= 0) {
-            electronAPI.trackChange({
+            window.electronAPI.trackChange({
                 time: 0,
                 paused: true
             })
         } else {
-            electronAPI.trackChange({
+            window.electronAPI.trackChange({
                 time: this.time - 1
             })
         }

@@ -80,9 +80,6 @@ function AudioDashboard({folderId}) {
             case 'edit':
                 edit(audio)
                 break;
-            case 'move':
-                move(audio)
-                break;
             case 'remove':
                 remove(audio)
                 break;
@@ -100,9 +97,6 @@ function AudioDashboard({folderId}) {
                     </button>
                     <button type="button" className={`btn ${mode === 'edit' ? 'btn-warning' : 'btn-secondary'}`}
                             onClick={() => setMode('edit')}>Edit
-                    </button>
-                    <button type="button" className={`btn ${mode === 'move' ? 'btn-warning' : 'btn-secondary'}`}
-                            onClick={() => setMode('move')}>Move
                     </button>
                     <button type="button" className={`btn ${mode === 'remove' ? 'btn-danger' : 'btn-secondary'}`}
                             onClick={() => setMode('remove')}>Delete

@@ -20,8 +20,8 @@ function StepDashboard({ workflowId }) {
                 width: '100%'
             }}>
                 <AddStep workflowId={workflowId} />
-                {steps.map((step, index) => <Fragment>
-                    <StepItem key={step.id} step={step} workflowId={workflowId} />
+                {steps.map((step, index) => <Fragment key={step.id}>
+                    <StepItem step={step} workflowId={workflowId} />
                     <AddStep workflowId={workflowId} afterIndex={index} />
                 </Fragment>)}
             </div>

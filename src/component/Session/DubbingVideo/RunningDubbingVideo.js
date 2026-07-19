@@ -24,7 +24,7 @@ function ProgressBar({ currentTime, duration }) {
 }
 
 function RunningDubbingVideo({ track }) {
-    const [time, setTime] = useState(0)
+    const [time, setTime] = useState({currentTime: 0, duration: 0})
     const ref = useRef()
 
     function onTimeUpdate(e) {

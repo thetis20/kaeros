@@ -10,7 +10,8 @@ function DubbingVideoTrack({track}) {
             return <DescriptionDubbingVideo track={track}/>
         case STATUS_RUNNING:
             return <RunningDubbingVideo track={track}/>
-
+        default:
+            return null
     }
 }
 

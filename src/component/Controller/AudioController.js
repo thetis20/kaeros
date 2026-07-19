@@ -45,8 +45,7 @@ function AudioController() {
     function handleAudioPlay(event) {
         const audio = event.detail
         setAudios(audios => {
-            audios.filter(a => a.id !== audio.id)
-            return [...audios, audio];
+            return [...audios.filter(a => a.id !== audio.id), audio];
         })
         window.electronAPI.audioPlay(event.detail.folderId, event.detail.id)
     }
@@ -72,8 +71,8 @@ function AudioController() {
     }, []);
 
     return <>
-        {audios.map((audio, index) => <AudioControllerItem key={audio.playId} audio={audio} onStop={onStop}/>)}
-    < />;
+        {audios.map((audio) => <AudioControllerItem key={audio.id} audio={audio} onStop={onStop}/>)}
+    </>;
 }
 
 export default AudioController;

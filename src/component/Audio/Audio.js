@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import InputColor from "../Common/InputColor";
+import { getFilename } from '../../lib/filename';
 
 function Audio() {
     const { t } = useTranslation();
@@ -28,20 +29,6 @@ function Audio() {
             ...value,
             file
         })
-    }
-
-    function getFilename() {
-        if (value.file) {
-            return value.file?.name
-        }
-        if (value.src) {
-            const regex = /\/([^/]*\..*)/g;
-
-            const array = [...value.src.matchAll(regex)];
-
-            return array[0][1]
-        }
-        return t('audio.form.placeholder')
     }
 
     function onSubmit(e) {
@@ -75,7 +62,7 @@ function Audio() {
                             id={'src'}
                             onChange={handleFile}
                         />
-                        <label className="btn btn-light" htmlFor={'src'}>{getFilename(value)}</label>
+                        <label className="btn btn-light" htmlFor={'src'}>{getFilename(value, t('audio.form.placeholder'))}</label>
                     </div>
                 </div>
                 <button style={{ marginTop: 30 }} type="submit" className="btn btn-primary">{t('audio.form.submit')}</button>

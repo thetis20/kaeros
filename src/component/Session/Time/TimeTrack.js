@@ -10,7 +10,8 @@ function TimeTrack({track}) {
             return <PresentationTime track={track}/>
         case STATUS_RUNNING:
             return <RunningTime track={track}/>
-
+        default:
+            return null
     }
 }
 

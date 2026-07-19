@@ -19,7 +19,7 @@ class FolderStoreRepository extends FolderRepository {
     }
 
     async getAll() {
-        return store.get('folders')
+        return store.get('folders') || []
     }
 }
 

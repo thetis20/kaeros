@@ -19,7 +19,7 @@ class WorkflowStoreRepository extends WorkflowRepository {
     }
 
     async getAll() {
-        return store.get('workflows')
+        return store.get('workflows') || []
     }
 }
 

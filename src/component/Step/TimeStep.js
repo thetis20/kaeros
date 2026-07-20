@@ -32,7 +32,7 @@ function TimeStep({ value, setValue, errors = {}, setErrors = () => {} }) {
                 min="1"
                 id={`step-impro-${value.id}`}
                 className={`form-control ${errors.impro ? 'is-invalid' : ''}`}
-                value={value.impro}
+                value={value.impro ?? ''}
                 name='impro'
                 onChange={handleChange}
             />
@@ -46,7 +46,7 @@ function TimeStep({ value, setValue, errors = {}, setErrors = () => {} }) {
                 min="1"
                 id={`step-minutes-${value.id}`}
                 className={`form-control ${errors.minutes ? 'is-invalid' : ''}`}
-                value={value.minutes}
+                value={value.minutes ?? ''}
                 name='minutes'
                 onChange={handleChange}
             />

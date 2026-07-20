@@ -27,7 +27,7 @@ function BattleRoyalStep({ value, setValue, errors = {}, setErrors = () => {} })
                 type="text"
                 id={`step-players-${value.id}`}
                 className={`form-control ${errors.players ? 'is-invalid' : ''}`}
-                value={value.players}
+                value={value.players ?? ''}
                 name='players'
                 onChange={handleChange}
             />

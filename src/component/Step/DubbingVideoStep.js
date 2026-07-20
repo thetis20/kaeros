@@ -50,7 +50,7 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
                 type="text"
                 id={`step-time-${value.id}`}
                 className={`form-control ${errors.time ? 'is-invalid' : ''}`}
-                value={value.time}
+                value={value.time ?? ''}
                 name='time'
                 onChange={handleChange}
             />
@@ -62,7 +62,7 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
             <textarea
                 id={`step-description-${value.id}`}
                 className="form-control"
-                value={value.description}
+                value={value.description ?? ''}
                 name='description'
                 onChange={handleChange}
             />

@@ -9,3 +9,7 @@ export function getFilename(value, placeholder) {
     }
     return placeholder
 }
+
+export function hasSource(value) {
+    return !!(value.file || value.src);
+}

@@ -1,7 +1,7 @@
 import {TwitterPicker} from "react-color";
 import {useState, useEffect, useRef} from "react";
 
-function InputColor({id, value, onChange}) {
+function InputColor({id, value, onChange, isInvalid}) {
     const ref = useRef();
     const [open, setOpen] = useState(false);
 
@@ -27,7 +27,7 @@ function InputColor({id, value, onChange}) {
 
     return <>
         <button
-            className="form-control form-control-color"
+            className={`form-control form-control-color${isInvalid ? ' is-invalid' : ''}`}
             id={id}
             style={{
                 backgroundColor: '#e9ebee',

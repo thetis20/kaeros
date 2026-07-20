@@ -18,7 +18,11 @@
       "title": "Formulaire de session",
       "name": "Nom",
       "color": "Couleur",
-      "submit": "Enregistrer"
+      "submit": "Enregistrer",
+      "error": {
+        "name": "Le nom est obligatoire.",
+        "color": "Merci de choisir une couleur (le blanc n'est pas autorisé)."
+      }
     }
   },
   "step": {
@@ -44,7 +48,16 @@
         "label": "Joueurs",
         "help": "Séparer les jouers par un ;"
       },
-      "submit": "Enregistrer"
+      "submit": "Enregistrer",
+      "error": {
+        "name": "Le nom est obligatoire.",
+        "type": "Veuillez sélectionner un type.",
+        "file": "Un fichier est obligatoire.",
+        "time": "La durée est obligatoire.",
+        "impro": "Doit être un nombre entier positif (1 ou plus).",
+        "minutes": "Doit être un nombre entier positif (1 ou plus).",
+        "players": "Merci d'indiquer au moins un nom de joueur (séparés par ;)."
+      }
     }
   },
   "time": {
@@ -137,7 +150,11 @@
       "title": "Ajouter un dossier de musique",
       "name": "Nom du dossier",
       "color": "Couleur du dossier",
-      "submit": "Enregistrer"
+      "submit": "Enregistrer",
+      "error": {
+        "name": "Le nom est obligatoire.",
+        "color": "Merci de choisir une couleur (le blanc n'est pas autorisé)."
+      }
     },
     "back": "Retour aux dossiers",
     "remove": "Supprimer le dossier",
@@ -151,7 +168,12 @@
       "color": "Couleur du fichier audio",
       "src": "Fichier audio",
       "placeholder": "Rechercher dans mes fichiers",
-      "submit": "Enregistrer"
+      "submit": "Enregistrer",
+      "error": {
+        "name": "Le nom est obligatoire.",
+        "color": "Merci de choisir une couleur (le blanc n'est pas autorisé).",
+        "src": "Un fichier audio est obligatoire."
+      }
     }
   },
   "session": {

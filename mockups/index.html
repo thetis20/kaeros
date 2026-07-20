@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kaeros — Maquettes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+
+  <nav class="sidebar">
+    <div class="brand">Kaeros</div>
+    <button class="nav-item active" data-target="regie">
+      <i class="ti ti-broadcast"></i>
+      <span style="flex:1; text-align:left;">Régie</span>
+      <span id="nav-tag-session" class="nav-tag" style="display:none;" title="Session en cours"><i class="ti ti-device-tv"></i></span>
+      <span id="nav-tag-music" class="nav-tag" style="display:none;" title="Musique en cours"><i class="ti ti-music"></i></span>
+    </button>
+    <div class="nav-category">Bibliothèque</div>
+    <button class="nav-item nav-subitem" data-target="musique"><i class="ti ti-music"></i>Musique</button>
+    <button class="nav-item nav-subitem" data-target="scenarios"><i class="ti ti-list"></i>Sessions</button>
+  </nav>
+
+  <main class="content">
+
+    <section id="scenarios" class="screen">
+      <div class="top-bar">
+        <p class="screen-title">Sessions</p>
+        <button class="btn btn-accent" data-goto="creation"><i class="ti ti-plus"></i>Nouvelle session</button>
+      </div>
+      <div class="grid grid-cards" id="full-workflows"></div>
+    </section>
+
+    <section id="creation" class="screen">
+      <p class="screen-title">Créer une session</p>
+      <p class="screen-sub">Liste ordonnée d'étapes, insertion possible entre chaque étape.</p>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <input type="text" value="Remise des diplômes" style="flex:1; font-weight:500;" />
+        <button class="btn btn-accent"><i class="ti ti-device-floppy"></i>Enregistrer</button>
+      </div>
+      <div id="creation-steps" class="step-list" style="margin-bottom:16px;"></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <span style="font-size:13px; color:var(--text-secondary); margin-right:4px;">Ajouter :</span>
+        <div id="creation-add-buttons" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+      </div>
+    </section>
+
+    <section id="regie" class="screen active">
+      <p class="screen-title">Régie</p>
+      <p class="screen-sub">Pilote la session en cours et les musiques.</p>
+
+      <div class="card" id="regie-session-card" style="margin-bottom:16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <p style="font-size:12px; color:var(--text-secondary); margin:0;">Session</p>
+          <button class="btn btn-icon" id="regie-session-toggle" aria-label="Réduire la session"><i class="ti ti-chevron-up"></i></button>
+        </div>
+
+        <div id="regie-session-content" style="margin-top:12px;">
+          <div id="regie-empty">
+            <p class="screen-sub" style="margin:0 0 12px;">Aucune session en cours. Choisis une session à démarrer.</p>
+            <div class="grid grid-cards" id="regie-session-list"></div>
+          </div>
+
+          <div id="regie-live" style="display:none;">
+            <div class="top-bar">
+              <div style="flex:1;">
+                <p style="font-weight:500; font-size:15px; margin:0;" id="regie-live-name">Remise des diplômes</p>
+                <p style="font-size:13px; color:var(--text-secondary); margin:0;">Étape 3 / 4</p>
+              </div>
+              <button class="btn btn-icon"><i class="ti ti-player-track-prev"></i></button>
+              <button class="btn btn-icon btn-accent"><i class="ti ti-player-play"></i></button>
+              <button class="btn btn-icon"><i class="ti ti-player-track-next"></i></button>
+              <button class="btn btn-sm" id="regie-end-btn"><i class="ti ti-square"></i>Terminer la session</button>
+            </div>
+
+            <div class="two-col">
+              <div id="regie-steplist" class="step-list"></div>
+              <div class="card">
+                <div class="tabs" id="regie-tabs"></div>
+                <div id="regie-controller"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <p style="font-size:12px; color:var(--text-secondary); margin:0 0 8px;">Audio en cours</p>
+        <div id="regie-audios"></div>
+      </div>
+
+      <div class="card">
+        <p style="font-size:12px; color:var(--text-secondary); margin:0 0 8px;">Démarrer une musique</p>
+        <div class="tabs" id="regie-music-tags"></div>
+        <div class="step-list" id="regie-music-list"></div>
+      </div>
+    </section>
+
+    <section id="musique" class="screen">
+      <div class="top-bar">
+        <p class="screen-title" style="flex:1;">Bibliothèque de musique</p>
+        <button class="btn btn-accent" id="add-track-btn"><i class="ti ti-plus"></i>Ajouter une musique</button>
+      </div>
+      <p class="screen-sub">Configure les musiques disponibles et leur tag (bruitage, musique, disco...).</p>
+
+      <div class="card" id="add-track-form" style="display:none; margin-bottom:16px;">
+        <label class="field-label">Fichier audio</label>
+        <div class="file-row">
+          <div class="file-thumb"><i class="ti ti-file-music"></i></div>
+          <button class="btn btn-sm"><i class="ti ti-upload"></i>Choisir un fichier</button>
+        </div>
+        <label class="field-label">Nom</label>
+        <input type="text" id="new-track-name" style="width:100%; margin-bottom:10px;" placeholder="Nom de la musique" />
+        <label class="field-label">Tag</label>
+        <select id="new-track-tag" style="width:200px; margin-bottom:12px;">
+          <option>Musique</option>
+          <option>Bruitage</option>
+          <option>Disco</option>
+        </select>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-accent-solid" id="save-track-btn">Ajouter</button>
+          <button class="btn" id="cancel-track-btn">Annuler</button>
+        </div>
+      </div>
+
+      <div class="tabs" id="musique-tags"></div>
+      <div class="step-list" id="musique-tracks"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

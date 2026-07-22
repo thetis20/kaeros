@@ -1,0 +1,28 @@
+const UpdateTrackUseCase = require('../UpdateTrackUseCase');
+
+describe('UpdateTrackUseCase', () => {
+    function fakeRepository() {
+        const updated = [];
+        return {updated, update: async (id, track) => { updated.push({id, track}); }};
+    }
+
+    it('sets updatedAt and persists a valid track update', async () => {
+        const repository = fakeRepository();
+        const updateTrackUseCase = new UpdateTrackUseCase(repository);
+        const track = {id: 't1', name: 'Track One', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Bruitage', createdAt: new Date('2024-01-01')};
+
+        await updateTrackUseCase.execute('t1', track);
+
+        expect(repository.updated).toHaveLength(1);
+        expect(repository.updated[0].id).toBe('t1');
+        expect(repository.updated[0].track.updatedAt).toBeInstanceOf(Date);
+    });
+
+    it('throws and does not persist when the tag is invalid', async () => {
+        const repository = fakeRepository();
+        const updateTrackUseCase = new UpdateTrackUseCase(repository);
+
+        await expect(updateTrackUseCase.execute('t1', {id: 't1', name: 'Track One', tag: 'Jazz'})).rejects.toThrow('Invalid track tag');
+        expect(repository.updated).toEqual([]);
+    });
+});

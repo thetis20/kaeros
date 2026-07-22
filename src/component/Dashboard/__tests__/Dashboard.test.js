@@ -1,0 +1,43 @@
+import '../../../lib/i18n';
+import {render, screen, fireEvent} from '@testing-library/react';
+import Dashboard from '../Dashboard';
+
+jest.mock('../../Screen/RegieScreen', () => function FakeRegieScreen() { return <div>regie-stub</div>; });
+jest.mock('../../Screen/MusiqueScreen', () => function FakeMusiqueScreen() { return <div>musique-stub</div>; });
+jest.mock('../WorkflowDashboard', () => function FakeWorkflowDashboard() { return <div>sessions-stub</div>; });
+
+describe('Dashboard', () => {
+    beforeEach(() => {
+        window.electronAPI = {workflowFetch: jest.fn()};
+        delete window.session;
+    });
+
+    it('shows the Régie screen by default', () => {
+        render(<Dashboard/>);
+        expect(screen.getByText('regie-stub')).toBeTruthy();
+    });
+
+    it('switches to the Musique screen when its nav item is clicked', () => {
+        render(<Dashboard/>);
+        fireEvent.click(screen.getByRole('button', {name: /Musique/}));
+
+        expect(screen.getByText('musique-stub')).toBeTruthy();
+        expect(screen.queryByText('regie-stub')).toBeNull();
+    });
+
+    it('switches to the Sessions screen when its nav item is clicked', () => {
+        render(<Dashboard/>);
+        fireEvent.click(screen.getByRole('button', {name: /Sessions/}));
+
+        expect(screen.getByText('sessions-stub')).toBeTruthy();
+        expect(screen.queryByText('regie-stub')).toBeNull();
+    });
+
+    it('switches back to Régie from another screen', () => {
+        render(<Dashboard/>);
+        fireEvent.click(screen.getByRole('button', {name: /Musique/}));
+        fireEvent.click(screen.getByRole('button', {name: /Régie/}));
+
+        expect(screen.getByText('regie-stub')).toBeTruthy();
+    });
+});

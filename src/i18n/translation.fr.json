@@ -5,7 +5,15 @@
   "nav": {
     "playlists": "Sessions",
     "folders": "Musique",
-    "workflows": "Sessions"
+    "workflows": "Sessions",
+    "regie": "Régie",
+    "library": "Bibliothèque",
+    "musique": "Musique",
+    "sessions": "Sessions",
+    "tag": {
+      "session": "Session en cours",
+      "music": "Musique en cours"
+    }
   },
   "workflow": {
     "name": "Sessions",
@@ -178,5 +186,15 @@
   },
   "session": {
     "name": "Session"
+  },
+  "regie": {
+    "title": "Régie",
+    "empty": {
+      "title": "Aucune session en cours. Choisis une session à démarrer."
+    }
+  },
+  "musique": {
+    "title": "Musique",
+    "placeholder": "Bientôt disponible : gestion de la bibliothèque musicale."
   }
 }

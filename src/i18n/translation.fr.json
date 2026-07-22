@@ -5,7 +5,15 @@
   "nav": {
     "playlists": "Sessions",
     "folders": "Musique",
-    "workflows": "Sessions"
+    "workflows": "Sessions",
+    "regie": "Régie",
+    "library": "Bibliothèque",
+    "musique": "Musique",
+    "sessions": "Sessions",
+    "tag": {
+      "session": "Session en cours",
+      "music": "Musique en cours"
+    }
   },
   "workflow": {
     "name": "Sessions",

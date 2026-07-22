@@ -19,7 +19,7 @@
 - The backend `Workflow` entity/`ValidWorkflowUseCase` require a non-empty, non-white `color` string, but the mockup's creation screen has no color field. A new session gets a random color from the palette already used elsewhere in this codebase's demo/mockup data (`['#378ADD', '#D85A30', '#1D9E75', '#7F77DD', '#D4537E', '#BA7517']`); an edited session keeps its existing `color` untouched.
 - The existing `UpdateStepUseCase`/`StepStoreRepository.update` replaces a step in place by id — it cannot reposition an already-persisted step. Reordering persisted steps therefore cannot be expressed as a series of per-step updates. Save instead deletes every currently-persisted step for the workflow (existing `stepRemove` IPC, looped) then recreates the full local list in final order (new `stepSave` IPC, sequential `afterIndex`). Documented, accepted consequence: a step's `createdAt` resets on every save of its parent session — nothing in this screen displays a step's creation date (the old `StepItem`'s "updated x ago" display belongs to the untouched `StepDashboard` sub-flow, not this screen).
 - `BattleRoyalStep.js` (reused unmodified) stores `players` as a single semicolon-separated **string** while editing, not an array (the backend stores/returns an array — conversion happens the same way `Step.js`/`useStep.js` already do it: join with `'; '` when loading for editing, split on `';'` and trim when saving). The mockup's per-player add/remove input rows are decorative in the same sense as its drag-and-drop grip icon — not implemented, in favor of the real reused component's single text field.
-- Test command: `yarn test --watchAll=false <path>`.
+- Test command: `npm test -- --watchAll=false <path>`.
 - New translation keys go under one new top-level `sessionCreation` object in `src/i18n/translation.fr.json`; reuse `workflow.form.name`, `playlist.form.name`, `step.form.*` wherever they already fit instead of duplicating strings.
 - Every component test imports `'../../../lib/i18n'` first (existing convention, e.g. `Workflow.test.js`); hook-only tests skip it. Tests mock `window.electronAPI` methods with `jest.fn()` and drive real hooks via `document.dispatchEvent(new CustomEvent(...))` — `jest.mock()` is only used for child components, never for hooks (existing convention, verified in `Workflow.test.js`/`useWorkflows.test.js`).
 - All existing test files in this repo live in a sibling `__tests__/` folder (e.g. `src/component/Step/__tests__/BattleRoyalStep.test.js`) — new test files in this plan follow that convention, not a flat sibling-file convention.
@@ -220,7 +220,7 @@ Add the two new methods (next to `workflowRemove`/`stepRemove`):
 
 - [ ] **Step 3: Manually verify — no session/workflow exists yet (create path)**
 
-Run: `yarn start`
+Run: `npm start`
 
 In the Electron window's devtools console (Cmd+Option+I):
 
@@ -246,7 +246,7 @@ window.electronAPI.workflowSave({id: 'manual-wf-1', name: 'Test manuel modifié'
 
 Expected: `workflow-onchange` fires again, the entry's `name` is now `'Test manuel modifié'` (same `id`, not duplicated).
 
-Restart the app (`yarn start` again) and confirm `manual-wf-1`/`manual-step-1` are still present after restart (persisted to disk by `electron-store`). Then clean up: `window.electronAPI.workflowRemove('manual-wf-1')`.
+Restart the app (`npm start` again) and confirm `manual-wf-1`/`manual-step-1` are still present after restart (persisted to disk by `electron-store`). Then clean up: `window.electronAPI.workflowRemove('manual-wf-1')`.
 
 - [ ] **Step 5: Commit**
 
@@ -340,7 +340,7 @@ describe('WorkflowDashboard', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --watchAll=false src/component/Dashboard/__tests__/WorkflowDashboard.test.js`
+Run: `npm test -- --watchAll=false src/component/Dashboard/__tests__/WorkflowDashboard.test.js`
 Expected: FAIL — `onCreateNew`/`onEditWorkflow` are never called, `window.electronAPI.workflowOpen` is called instead (current `create()`/`edit()` bodies).
 
 - [ ] **Step 3: Write minimal implementation**
@@ -426,7 +426,7 @@ export default WorkflowDashboard;
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `yarn test --watchAll=false src/component/Dashboard/__tests__/WorkflowDashboard.test.js`
+Run: `npm test -- --watchAll=false src/component/Dashboard/__tests__/WorkflowDashboard.test.js`
 Expected: PASS (4 tests)
 
 - [ ] **Step 5: Commit**
@@ -507,7 +507,7 @@ describe('Sidebar', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
+Run: `npm test -- --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
 Expected: FAIL on the new `'creation'` test — Sessions button has no `active` class (the other 4 tests already pass, unaffected by this change).
 
 - [ ] **Step 3: Write minimal implementation**
@@ -536,7 +536,7 @@ Change exactly this one line in `src/component/Sidebar/Sidebar.js`:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `yarn test --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
+Run: `npm test -- --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
 Expected: PASS (5 tests)
 
 - [ ] **Step 5: Commit**
@@ -666,7 +666,7 @@ describe('SessionCreationScreen - new session, local step list', () => {
 
 - [ ] **Step 3: Run test to verify it fails**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: FAIL with "Cannot find module '../SessionCreationScreen'"
 
 - [ ] **Step 4: Write minimal implementation**
@@ -850,7 +850,7 @@ export default SessionCreationScreen;
 
 - [ ] **Step 5: Run test to verify it passes**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: PASS (6 tests)
 
 - [ ] **Step 6: Commit**
@@ -934,7 +934,7 @@ describe('SessionCreationScreen - editing an existing workflow', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: FAIL — `name` stays empty and no steps render (the component ignores `workflowId` so far).
 
 - [ ] **Step 3: Write minimal implementation**
@@ -1014,7 +1014,7 @@ function SessionCreationScreen({workflowId, onDone}) {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: PASS (8 tests)
 
 - [ ] **Step 5: Commit**
@@ -1131,7 +1131,7 @@ describe('SessionCreationScreen - saving', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: FAIL — clicking "Enregistrer" calls nothing (no `onClick` wired yet), so `workflowSave`/`stepSave`/`onDone` are never called.
 
 - [ ] **Step 3: Write minimal implementation**
@@ -1203,12 +1203,12 @@ Wire the button:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: PASS (11 tests)
 
 - [ ] **Step 5: Run the whole screen's test file once more to confirm no cross-task regressions**
 
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/SessionCreationScreen.test.js`
 Expected: PASS (11 tests total across all three describe blocks)
 
 - [ ] **Step 6: Commit**
@@ -1325,7 +1325,7 @@ describe('Dashboard', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
+Run: `npm test -- --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
 Expected: FAIL on the three new tests — `Dashboard.js` doesn't yet pass `onCreateNew`/`onEditWorkflow` to `WorkflowDashboard`, nor render `SessionCreationScreen`.
 
 - [ ] **Step 3: Write minimal implementation**
@@ -1386,12 +1386,12 @@ export default Dashboard;
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `yarn test --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
+Run: `npm test -- --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
 Expected: PASS (7 tests)
 
 - [ ] **Step 5: Run the full test suite to confirm nothing else regressed**
 
-Run: `yarn test --watchAll=false`
+Run: `npm test -- --watchAll=false`
 Expected: PASS (every existing suite plus every suite added/modified in Tasks 1-7)
 
 - [ ] **Step 6: Commit**
@@ -1413,7 +1413,7 @@ None of the RTL suites in Tasks 1-7 exercise the real `window.electronAPI` IPC b
 
 - [ ] **Step 1: Start the app**
 
-Run: `yarn start`. Navigate to **Sessions** in the sidebar (bottom nav item under "Bibliothèque").
+Run: `npm start`. Navigate to **Sessions** in the sidebar (bottom nav item under "Bibliothèque").
 
 - [ ] **Step 2: Create a brand-new session end-to-end**
 
@@ -1429,7 +1429,7 @@ From the Sessions list, select the session you just created, click "Modifier" (p
 
 - [ ] **Step 4: Confirm persistence across a restart**
 
-Quit and restart the app (`yarn start` again). Navigate to Sessions, select the same session, and confirm all three steps are present in the exact order left in Step 3 (Image, Time, Battle Royal), and each one's fields (file, impro/minutes, players) still show the values entered.
+Quit and restart the app (`npm start` again). Navigate to Sessions, select the same session, and confirm all three steps are present in the exact order left in Step 3 (Image, Time, Battle Royal), and each one's fields (file, impro/minutes, players) still show the values entered.
 
 - [ ] **Step 5: Confirm the old per-step edit/add sub-flow inside the Sessions list still works unchanged**
 

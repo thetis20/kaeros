@@ -20,7 +20,7 @@
 - Follow the existing flat-key JSON convention in `src/i18n/translation.fr.json` (nested objects, French strings) for any new translation key.
 - Every component test imports `'../../../lib/i18n'` first when it renders translated text, matching the existing convention in `Workflow.test.js`/`Folder.test.js`/`AudioController.test.js`. Hook tests (no rendered text) skip this import, matching `useWorkflows.test.js`/`useSteps.test.js`.
 - This codebase's actual test convention (verified in `AudioController.test.js`, `Workflow.test.js`, `useWorkflows.test.js`) is to drive real hooks via `document.dispatchEvent(new CustomEvent(...))` / `window.session` and to mock `window.electronAPI` methods with `jest.fn()` — `jest.mock()` is only ever used to stub **child components** (e.g. `InputColor`), never custom hooks. All test code in this plan follows that same convention.
-- Test command: `yarn test --watchAll=false <path-or-pattern>`.
+- Test command: `npm test -- --watchAll=false <path-or-pattern>`.
 - `FolderDashboard.js` and `StepDashboard.js` are left on disk untouched; `Dashboard.js` simply stops importing `FolderDashboard` (a later plan decides its fate).
 - Accepted, temporary consequence of the above: `FolderDashboard` > `AudioDashboard` was the only existing UI path that ever dispatched the `audio-play` DOM event (there is no separate playback window — `mode: 'audio'`/`Audio.js` is only the create/edit form). Removing the "folders" nav tab means there is no UI left to actually start audio playback until plan 2 rebuilds the music library screen; `AudioController`/`Sidebar` still correctly *display* a playing audio if one is started (verified manually via devtools in Task 6), but nothing in this plan can *start* one through the UI. This is intentional scope reduction, not a regression to fix here.
 
@@ -109,7 +109,7 @@ describe('useAudios', () => {
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Hook/__tests__/useAudios.test.js`
+Run: `npm test -- --watchAll=false src/component/Hook/__tests__/useAudios.test.js`
 Expected: FAIL with "Cannot find module '../useAudios'"
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -142,10 +142,10 @@ function useAudios() {
 export default useAudios;
 ```
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Hook/__tests__/useAudios.test.js`
+Run: `npm test -- --watchAll=false src/component/Hook/__tests__/useAudios.test.js`
 Expected: PASS (5 tests)
 - [ ] **Step 5: Refactor `AudioController` to use the hook (still TDD — existing test is the safety net)**
-Run first to confirm the pre-refactor baseline is green: `yarn test --watchAll=false src/component/Controller/__tests__/AudioController.test.js`
+Run first to confirm the pre-refactor baseline is green: `npm test -- --watchAll=false src/component/Controller/__tests__/AudioController.test.js`
 Expected: PASS (5 existing tests, before any change to `AudioController.js`)
 Then replace the body of `src/component/Controller/AudioController.js`:
 ```js
@@ -222,7 +222,7 @@ export default AudioController;
 ```
 Why `onStop` dispatches an `audio-end` `CustomEvent` instead of calling `window.electronAPI.audioEnd` directly: the original code did two separate things on stop — synchronously drop the item from local render state, and notify the main process. Now that `useAudios` owns the list and only updates it in reaction to real `audio-play`/`audio-end` DOM events, `onStop` must go through that same event (not mutate state itself, since it no longer holds any) — this is exactly the same event `AudioDashboard.js`'s `switchAudio` already dispatches when toggling an audio off from the folder-browsing screen (see `src/component/Dashboard/AudioDashboard.js:49-65`), so both stop paths now converge on one mechanism. The dedicated `useEffect` above is the single place that turns *any* `audio-play`/`audio-end` DOM event — regardless of whether it came from this component's own stop button, the `<AudioPlayer>`'s `onEnded` callback, or `AudioDashboard`'s toggle — into the matching IPC call, preserving the exact `window.electronAPI.audioPlay('f1', 'a1')` / `audioEnd('f1', 'a1')` assertions the existing test file already makes.
 - [ ] **Step 6: Run both test suites to verify the refactor is safe**
-Run: `yarn test --watchAll=false src/component/Controller/__tests__/AudioController.test.js src/component/Hook/__tests__/useAudios.test.js`
+Run: `npm test -- --watchAll=false src/component/Controller/__tests__/AudioController.test.js src/component/Hook/__tests__/useAudios.test.js`
 Expected: PASS (5 + 5 tests, all unmodified assertions from the original `AudioController.test.js` still hold)
 - [ ] **Step 7: Commit**
 ```bash
@@ -307,7 +307,7 @@ describe('Sidebar', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
+Run: `npm test -- --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
 Expected: FAIL with "Cannot find module '../Sidebar'"
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -360,7 +360,7 @@ function Sidebar({screen, onNavigate, sessionRunning, musicPlaying}) {
 export default Sidebar;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
+Run: `npm test -- --watchAll=false src/component/Sidebar/__tests__/Sidebar.test.js`
 Expected: PASS (4 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -456,7 +456,7 @@ describe('RegieScreen', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: FAIL with "Cannot find module '../RegieScreen'"
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -512,7 +512,7 @@ function RegieScreen() {
 export default RegieScreen;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: PASS (3 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -558,7 +558,7 @@ describe('MusiqueScreen', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
 Expected: FAIL with "Cannot find module '../MusiqueScreen'"
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -580,7 +580,7 @@ function MusiqueScreen() {
 export default MusiqueScreen;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
 Expected: PASS (1 test)
 - [ ] **Step 6: Commit**
 ```bash
@@ -648,7 +648,7 @@ describe('Dashboard', () => {
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
+Run: `npm test -- --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
 Expected: FAIL — `Dashboard.js` does not yet render `Sidebar`/`RegieScreen`/`MusiqueScreen`, so `regie-stub` is never found (`Unable to find an element with text: regie-stub`).
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -687,10 +687,10 @@ function Dashboard() {
 export default Dashboard;
 ```
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
+Run: `npm test -- --watchAll=false src/component/Dashboard/__tests__/Dashboard.test.js`
 Expected: PASS (4 tests)
 - [ ] **Step 5: Run the full test suite to confirm nothing else regressed**
-Run: `yarn test --watchAll=false`
+Run: `npm test -- --watchAll=false`
 Expected: PASS (every existing suite plus all suites added in Tasks 1-5)
 - [ ] **Step 6: Commit**
 ```bash
@@ -709,7 +709,7 @@ This task has no automated test — none of the RTL suites in Tasks 1-5 exercise
 **Interfaces:** none produced; exercises the full stack assembled by Tasks 1-5.
 
 - [ ] **Step 1: Start the app**
-Run: `yarn start`
+Run: `npm start`
 Wait for both the Vite/react-scripts dev server and the Electron window to open. The main window should load with the Régie screen active by default (highlighted in the sidebar).
 - [ ] **Step 2: Verify the empty-state Régie screen**
 If no session is running, confirm you see "Aucune session en cours. Choisis une session à démarrer." and one card per existing session (workflow), each with a "Démarrer" button. If you have no sessions yet, first click the **Sessions** nav item, use the existing "Créer une session" flow (unchanged Workflow window) to create one, then return to **Régie**.

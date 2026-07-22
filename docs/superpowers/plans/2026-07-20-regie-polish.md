@@ -21,7 +21,7 @@
 - Every component test that renders translated text imports `'../../../lib/i18n'` first, matching the existing convention (`AudioController.test.js`, `BattleRoyalStepController.test.js` does **not** because it renders no translated text — follow whichever applies).
 - This codebase's real test convention (verified in `SessionController.test.js`, `BattleRoyalStepController.test.js`, `useWorkflows.test.js`): drive real hooks via `document.dispatchEvent(new CustomEvent(...))` or by seeding `window.session` directly (for `useSession()`, which seeds from `window.session` on mount — see `useSession.js`), and mock `window.electronAPI` methods with `jest.fn()`. `jest.mock()` is only ever used to stub **child components**, never custom hooks. All test code in this plan follows the same convention.
 - Icon-only buttons in this plan's new code get an explicit `aria-label` (the collapse/expand toggle, the impro prev/next buttons) so tests can query them by accessible name — this mirrors the mockup's own use of `aria-label` on equivalent buttons (`mockups/index.html:57`, `:72-74`).
-- Test command: `yarn test --watchAll=false <path-or-pattern>`.
+- Test command: `npm test -- --watchAll=false <path-or-pattern>`.
 
 ---
 
@@ -145,7 +145,7 @@ describe('RegieScreen', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: FAIL on the new "collapses and expands" test with "Unable to find role='button' and name 'Réduire la session'" — the current `RegieScreen.js` has no collapse toggle yet.
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -225,7 +225,7 @@ function RegieScreen() {
 export default RegieScreen;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: PASS (4 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -309,7 +309,7 @@ describe('RegieLiveController', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
 Expected: FAIL with "Cannot find module '../RegieLiveController'"
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -372,7 +372,7 @@ function RegieLiveController() {
 export default RegieLiveController;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
 Expected: PASS (4 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -474,7 +474,7 @@ describe('RegieLiveController - time tab', () => {
 ```
 Add the matching import at the top of the test file (`fireEvent` is already imported; no new imports needed).
 - [ ] **Step 3: Run tests to verify they fail**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
 Expected: FAIL — clicking "Time" currently renders nothing (`renderPanel()` returns `null` for `activeType === 'time'`), so none of the new assertions find anything.
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -522,7 +522,7 @@ if (activeType === 'time') {
 }
 ```
 - [ ] **Step 5: Run tests to verify they pass**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
 Expected: PASS (8 tests: the 4 from Task 2 + 4 new)
 - [ ] **Step 6: Commit**
 ```bash
@@ -599,7 +599,7 @@ describe('RegieLiveController - battle-royal tab', () => {
 ```
 The `#regie-controller` scoped query (rather than a bare `.btn-primary` lookup) is deliberate: the active tab button itself also gets the `btn-primary` class (see Task 2), and it lives inside `#regie-tabs`, not `#regie-controller` — without scoping, `document.querySelector('.btn-primary')` could match the active tab button instead of the intended increment button.
 - [ ] **Step 2: Run tests to verify they fail**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
 Expected: FAIL — clicking "Battle Royal" currently renders nothing.
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -616,7 +616,7 @@ if (activeType === 'battle-royal') {
 }
 ```
 - [ ] **Step 4: Run tests to verify they pass**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieLiveController.test.js`
 Expected: PASS (10 tests: the 8 from Tasks 2-3 + 2 new)
 - [ ] **Step 5: Commit**
 ```bash
@@ -653,7 +653,7 @@ it('renders RegieLiveController alongside the step list once a session is runnin
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: FAIL with "Unable to find role='button' and name 'Battle Royal'" — `RegieLiveController` isn't rendered by `RegieScreen` yet.
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -675,7 +675,7 @@ import RegieLiveController from './RegieLiveController';
 ```
 The `<AudioController/>` line that previously sat right after `<SessionController/>` is removed here — Task 6 gives it its own dedicated card outside the collapsible "Session" content entirely (matching the mockup, where "Audio en cours" is a sibling card, not nested inside "Session").
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: PASS (5 tests)
 - [ ] **Step 5: Commit**
 ```bash
@@ -723,7 +723,7 @@ it('shows the "Audio en cours" card wrapping the audio controller', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: FAIL with "Unable to find element with text: Audio en cours" — `AudioController` still renders directly under the session content with no titled card.
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -734,7 +734,7 @@ Expected: FAIL with "Unable to find element with text: Audio en cours" — `Audi
 </div>
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: PASS (6 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -812,7 +812,7 @@ it('starts a track from the "Démarrer une musique" card and shows it as playing
 });
 ```
 - [ ] **Step 3: Run tests to verify they fail**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: FAIL with "Unable to find element with text: Démarrer une musique" — the card doesn't exist yet, and (separately) `useTracks()` isn't called by `RegieScreen` yet so `track-onchange` events have nothing to update.
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -838,10 +838,10 @@ function startTrack(track) {
 </div>
 ```
 - [ ] **Step 5: Run tests to verify they pass**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/RegieScreen.test.js`
 Expected: PASS (8 tests)
 - [ ] **Step 6: Run the full test suite to confirm nothing else regressed**
-Run: `yarn test --watchAll=false`
+Run: `npm test -- --watchAll=false`
 Expected: PASS (every existing suite plus every suite touched/added by this plan)
 - [ ] **Step 7: Commit**
 ```bash
@@ -860,7 +860,7 @@ This task has no automated test — none of the RTL suites in Tasks 1-7 exercise
 **Interfaces:** none produced; exercises the full stack assembled by Tasks 1-7.
 
 - [ ] **Step 1: Start the app**
-Run: `yarn start`. Wait for the Electron window to open on the Régie screen.
+Run: `npm start`. Wait for the Electron window to open on the Régie screen.
 - [ ] **Step 2: Verify the collapsible Session card**
 With no session running, click the chevron next to "Session" — the empty-state picker should hide while the "Session" label stays visible; click again to re-expand.
 - [ ] **Step 3: Verify the live two-column layout**

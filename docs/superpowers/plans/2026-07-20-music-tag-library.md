@@ -13,7 +13,7 @@
 - **Re-read fresh before starting:** `src/component/Dashboard/Dashboard.js`, `src/component/Screen/MusiqueScreen.js`, `src/component/Controller/AudioController.js`, `src/component/Hook/useAudios.js`, `src/component/Sidebar/Sidebar.js`, `src/i18n/translation.fr.json` — these are produced by the sibling `2026-07-20-nav-shell-regie-v1.md` plan, which had **not** been executed at the time this plan was written. That plan may have been implemented with small deviations from its own written form. Treat the actual code on disk as ground truth over any excerpt quoted in this document; if a quoted excerpt doesn't match, adapt the diff to the real file and note the deviation in the task's commit message.
 - **Never construct the real production `store.js` singleton in a test.** `public/script/infrastructure/repository/store.js` is instantiated with no explicit `cwd`, so on a machine without a real Electron `app` instance (i.e. under Jest) it falls back to `electron-store`'s own OS-default config path for this project — the exact same family of path the packaged app could use. Task 5 therefore extracts the `migrations` object into its own side-effect-free module (`public/script/infrastructure/repository/migrations.js`, a plain object, no `Store` construction) so tests can build throwaway `Store` instances with an explicit `cwd: os.tmpdir()` without ever requiring `store.js` itself. This is a deliberate structural deviation from a naive "just add a migration key to store.js and test it directly" approach — it exists specifically to protect the real user's production data, which the user has confirmed is real and must not be lost.
 - **Migrated tracks default to tag `'Musique'`.** There is no reliable automatic mapping from an arbitrary user-chosen folder name/color to one of the three fixed tags (`Musique`/`Bruitage`/`Disco`); `'Musique'` is the most generic bucket, and users can bulk-retag afterward from `MusiqueScreen`. The migration is purely additive: `store.set('tracks', (store.get('tracks') || []).concat(tracks))` appends, and the old `'folders'`/`'audios_'+id` keys are never deleted by it — they remain on disk, untouched, as a recoverable backup, until Task 11 explicitly deletes the *code* that reads them (never the data itself; the migration is the only thing allowed to touch the `'tracks'` key from old data).
-- **Backend test runner does not exist yet and `yarn test` cannot reach `public/script/`.** Verified empirically: `react-scripts`' Jest config hardcodes `roots: ['<rootDir>/src']`, and `roots` is not among the Jest options `react-scripts` allows a project's `package.json` to override (confirmed: adding `roots` to `package.json`'s `jest` field makes `react-scripts test` hard-error and refuse to run). Task 1 therefore adds a dedicated `"test:main"` npm script that invokes the plain `jest` binary directly, bypassing `react-scripts` entirely: `jest --rootDir public/script --testEnvironment node --testMatch "**/__tests__/**/*.test.js"` — verified working end-to-end (including `electron-store` against a temp `cwd`) before this plan was written. Every backend (main-process) task in this plan runs tests via `yarn test:main <path>`; every frontend (`src/`) task runs tests via `yarn test --watchAll=false <path>`, per the existing convention.
+- **Backend test runner does not exist yet and `npm test` cannot reach `public/script/`.** Verified empirically: `react-scripts`' Jest config hardcodes `roots: ['<rootDir>/src']`, and `roots` is not among the Jest options `react-scripts` allows a project's `package.json` to override (confirmed: adding `roots` to `package.json`'s `jest` field makes `react-scripts test` hard-error and refuse to run). Task 1 therefore adds a dedicated `"test:main"` npm script that invokes the plain `jest` binary directly, bypassing `react-scripts` entirely: `jest --rootDir public/script --testEnvironment node --testMatch "**/__tests__/**/*.test.js"` — verified working end-to-end (including `electron-store` against a temp `cwd`) before this plan was written. Every backend (main-process) task in this plan runs tests via `npm run test:main -- <path>`; every frontend (`src/`) task runs tests via `npm test -- --watchAll=false <path>`, per the existing convention.
 - **`CreateTrackUseCase` mints the track's id itself** (via `uuid`'s `v4()`), unlike the old `Audio.js` form which pre-generated an id client-side (`useState({id: uuidv4(), ...})`). `MusiqueScreen`'s "add" form never sets an `id` on a brand-new track, so `MainWindow.trackSave` can use `value.id` presence as the sole create-vs-update signal (create when absent, update when present) — this is this plan's design, not a pre-existing convention, and is required to make the `if (value.id)` branch in `trackSave` meaningful.
 - **`color` is not a field on the add-track form.** The form only collects name, tag and file (per this plan's design); `ValidTrackUseCase` does not validate `color` at all. `MusiqueScreen.js` derives `color` automatically from a fixed `tag → hex` palette (`Musique` → `#4C6EFF`, `Bruitage` → `#F76707`, `Disco` → `#AE3EC9`) at creation time only, so `RegieTrackPicker`'s colored dot always has something to render without needing a color picker. Editing an existing track preserves its already-stored `color` unchanged — the edit path never re-derives it.
 - Follow the existing flat-key JSON convention in `src/i18n/translation.fr.json` (nested objects, French strings) for every new translation key, same as the sibling `nav-shell-regie-v1` plan.
@@ -21,7 +21,7 @@
 - This codebase's real test convention (verified in `AudioController.test.js`, `Workflow.test.js`, `useWorkflows.test.js`): drive real hooks via `document.dispatchEvent(new CustomEvent(...))`, mock `window.electronAPI` methods with `jest.fn()`. `jest.mock()` is only ever used to stub **child components** (e.g. `InputColor`), never custom hooks. Follow this for every new frontend test in this plan.
 - Backend use-case tests use plain hand-written fake repository objects (no mocking library) — there are no pre-existing use-case tests under `public/script/application/useCase/**` to contradict this; it matches this codebase's minimal-dependency style everywhere else.
 - Do not touch anything workflow/step/session-related in `MainWindow.js`, `preload-main.js`, or `useCase.js` beyond exactly what is specified in Tasks 4 and 9.
-- Task 11 (retirement) runs only after Tasks 1-10 are green. It `grep -rn`s for every symbol/path about to be deleted **before** deleting (output pasted into the step), then deletes, then re-runs both full suites (`yarn test --watchAll=false` and `yarn test:main`).
+- Task 11 (retirement) runs only after Tasks 1-10 are green. It `grep -rn`s for every symbol/path about to be deleted **before** deleting (output pasted into the step), then deletes, then re-runs both full suites (`npm test -- --watchAll=false` and `npm run test:main`).
 
 ---
 
@@ -76,7 +76,7 @@
 
 **Interfaces:**
 - Consumes: nothing from earlier tasks (first task).
-- Produces: `new Audio(id, name, src, color, tag, createdAt, updatedAt)` → `{id, name, src, color, tag, createdAt, updatedAt}` (no `playing`), relied on by every later backend task in this plan. `yarn test:main <path>` as the standing backend test command, relied on by Tasks 2, 3, 5.
+- Produces: `new Audio(id, name, src, color, tag, createdAt, updatedAt)` → `{id, name, src, color, tag, createdAt, updatedAt}` (no `playing`), relied on by every later backend task in this plan. `npm run test:main -- <path>` as the standing backend test command, relied on by Tasks 2, 3, 5.
 
 - [ ] **Step 1: Add the backend test script and write the failing test**
 ```json
@@ -114,7 +114,7 @@ describe('Audio entity', () => {
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test:main public/script/application/entity/__tests__/Audio.test.js`
+Run: `npm run test:main -- public/script/application/entity/__tests__/Audio.test.js`
 Expected: FAIL — `expect(audio.tag).toBe('Musique')` fails because the current constructor's 5th parameter is `playing`, not `tag` (so `audio.tag` is `undefined` and `audio.playing` is `'Musique'`, not `undefined`).
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -134,7 +134,7 @@ class Audio {
 module.exports = Audio
 ```
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test:main public/script/application/entity/__tests__/Audio.test.js`
+Run: `npm run test:main -- public/script/application/entity/__tests__/Audio.test.js`
 Expected: PASS (2 tests)
 - [ ] **Step 5: Commit**
 ```bash
@@ -215,7 +215,7 @@ describe('TrackStoreRepository', () => {
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test:main public/script/infrastructure/repository/__tests__/TrackStoreRepository.test.js`
+Run: `npm run test:main -- public/script/infrastructure/repository/__tests__/TrackStoreRepository.test.js`
 Expected: FAIL with "Cannot find module '../TrackStoreRepository'"
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -276,7 +276,7 @@ class TrackStoreRepository extends TrackRepository {
 module.exports = TrackStoreRepository;
 ```
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test:main public/script/infrastructure/repository/__tests__/TrackStoreRepository.test.js`
+Run: `npm run test:main -- public/script/infrastructure/repository/__tests__/TrackStoreRepository.test.js`
 Expected: PASS (4 tests)
 - [ ] **Step 5: Commit**
 ```bash
@@ -441,7 +441,7 @@ describe('DeleteTrackUseCase', () => {
 });
 ```
 - [ ] **Step 2: Run tests to verify they fail**
-Run: `yarn test:main public/script/application/useCase/track`
+Run: `npm run test:main -- public/script/application/useCase/track`
 Expected: FAIL with "Cannot find module '../ValidTrackUseCase'" (and similarly for the other 4 modules)
 - [ ] **Step 3: Write minimal implementations**
 ```js
@@ -577,7 +577,7 @@ class DeleteTrackUseCase {
 module.exports = DeleteTrackUseCase;
 ```
 - [ ] **Step 4: Run tests to verify they pass**
-Run: `yarn test:main public/script/application/useCase/track`
+Run: `npm run test:main -- public/script/application/useCase/track`
 Expected: PASS (11 tests: 4 + 2 + 2 + 2 + 1)
 - [ ] **Step 5: Commit**
 ```bash
@@ -649,7 +649,7 @@ module.exports = {
 }
 ```
 - [ ] **Step 2: Verify by re-running every backend suite written so far**
-Run: `yarn test:main`
+Run: `npm run test:main`
 Expected: PASS (all suites from Tasks 1-3 still pass; `useCase.js` itself has no dedicated test since it's pure wiring — a `require('./useCase.js')` syntax/runtime error would surface as every other suite failing to load, so a full green run is the verification here)
 - [ ] **Step 3: (no separate implementation step — Step 1 is the full change)**
 - [ ] **Step 4: (covered by Step 2)**
@@ -741,7 +741,7 @@ describe('migrations 0.1.0 (folders/audios_* -> flat tracks)', () => {
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test:main public/script/infrastructure/repository/__tests__/migrations.test.js`
+Run: `npm run test:main -- public/script/infrastructure/repository/__tests__/migrations.test.js`
 Expected: FAIL with "Cannot find module '../migrations.js'"
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -783,7 +783,7 @@ const store = new Store({migrations});
 module.exports = store
 ```
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test:main public/script/infrastructure/repository/__tests__/migrations.test.js`
+Run: `npm run test:main -- public/script/infrastructure/repository/__tests__/migrations.test.js`
 Expected: PASS (3 tests)
 - [ ] **Step 5: Commit**
 ```bash
@@ -841,7 +841,7 @@ describe('useTracks', () => {
 });
 ```
 - [ ] **Step 2: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Hook/__tests__/useTracks.test.js`
+Run: `npm test -- --watchAll=false src/component/Hook/__tests__/useTracks.test.js`
 Expected: FAIL with "Cannot find module '../useTracks'"
 - [ ] **Step 3: Write minimal implementation**
 ```js
@@ -869,7 +869,7 @@ function useTracks() {
 export default useTracks;
 ```
 - [ ] **Step 4: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Hook/__tests__/useTracks.test.js`
+Run: `npm test -- --watchAll=false src/component/Hook/__tests__/useTracks.test.js`
 Expected: PASS (3 tests)
 - [ ] **Step 5: Commit**
 ```bash
@@ -952,7 +952,7 @@ describe('RegieTrackPicker', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Track/__tests__/RegieTrackPicker.test.js`
+Run: `npm test -- --watchAll=false src/component/Track/__tests__/RegieTrackPicker.test.js`
 Expected: FAIL with "Cannot find module '../RegieTrackPicker'"
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -1010,7 +1010,7 @@ function RegieTrackPicker({ tracks, playingIds, onStart }) {
 export default RegieTrackPicker;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Track/__tests__/RegieTrackPicker.test.js`
+Run: `npm test -- --watchAll=false src/component/Track/__tests__/RegieTrackPicker.test.js`
 Expected: PASS (4 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -1151,7 +1151,7 @@ describe('MusiqueScreen', () => {
 });
 ```
 - [ ] **Step 3: Run test to verify it fails**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
 Expected: FAIL — the plan-1 placeholder renders only a title and a "Bientôt disponible..." sentence, so none of the form/list assertions above find anything (e.g. `Unable to find a label with the text of: Nom`).
 - [ ] **Step 4: Write minimal implementation**
 ```js
@@ -1294,7 +1294,7 @@ function MusiqueScreen() {
 export default MusiqueScreen;
 ```
 - [ ] **Step 5: Run test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
+Run: `npm test -- --watchAll=false src/component/Screen/__tests__/MusiqueScreen.test.js`
 Expected: PASS (5 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -1591,7 +1591,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 ```
 Note: `trackChange` (the pre-existing `'track-change'` IPC channel used by the session/step controllers for a completely different concept — playback progress inside a session) is unrelated to this plan's new `'track-*'` (music library) channels and must be left exactly as-is; the naming collision is coincidental and pre-existing in this codebase.
 - [ ] **Step 3: Manual verification (no automated test possible)**
-Run: `yarn start`
+Run: `npm start`
 Wait for the Electron window to load, navigate to **Musique**, add a track (name + tag + a real local audio file), confirm it appears in the list, confirm editing and deleting it round-trip through the main process without console errors (Cmd+Option+I to open devtools). Confirm `electron-store`'s config file (find its path by running `require('electron-store').default` isn't accessible from devtools directly — instead check the app's `userData` folder, printed via `require('electron').app.getPath('userData')` if needed, or simply trust the in-app list persisting across an app restart) now has a `'tracks'` array after adding a track, and that restarting the app still shows it (persistence check).
 - [ ] **Step 4: Commit**
 ```bash
@@ -1677,7 +1677,7 @@ describe('AudioController', () => {
 });
 ```
 - [ ] **Step 3: Run the test to verify it fails against the current (folderId-based) implementation**
-Run: `yarn test --watchAll=false src/component/Controller/__tests__/AudioController.test.js`
+Run: `npm test -- --watchAll=false src/component/Controller/__tests__/AudioController.test.js`
 Expected: FAIL — `window.electronAPI.trackPlay` is `undefined` in the real component (it still calls `window.electronAPI.audioPlay(folderId, id)`), so the assertions on `trackPlay`/`trackEnd` never match and the component throws when it tries to call the now-missing `audioPlay`/`audioEnd`.
 - [ ] **Step 4: Apply the two-line change**
 ```js
@@ -1699,7 +1699,7 @@ useEffect(() => {
 ```
 Everything else in the file (the `AudioControllerItem` sub-component, `useAudios()` call, `onStop`'s `audio-end` dispatch, the JSX) stays exactly as-is.
 - [ ] **Step 5: Run the test to verify it passes**
-Run: `yarn test --watchAll=false src/component/Controller/__tests__/AudioController.test.js`
+Run: `npm test -- --watchAll=false src/component/Controller/__tests__/AudioController.test.js`
 Expected: PASS (5 tests)
 - [ ] **Step 6: Commit**
 ```bash
@@ -1855,9 +1855,9 @@ module.exports = {
 }
 ```
 - [ ] **Step 5: Run both full test suites to confirm nothing regressed**
-Run: `yarn test --watchAll=false`
+Run: `npm test -- --watchAll=false`
 Expected: PASS (every remaining `src/` suite — `Folder.test.js`/`Audio.test.js` no longer exist to run)
-Run: `yarn test:main`
+Run: `npm run test:main`
 Expected: PASS (every `public/script/` suite from Tasks 1, 2, 3, 5 — the deleted folder/audio use cases never had tests under this runner to begin with)
 - [ ] **Step 6: Commit**
 ```bash

@@ -76,7 +76,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "/node_modules/(?!(uuid|@iconify)/)"
+      "/node_modules/(?!(uuid|@iconify|electron-store)/)"
     ],
     "moduleNameMapper": {
       "\\.(css|less|scss|sass)$": "<rootDir>/src/__mocks__/styleMock.js"

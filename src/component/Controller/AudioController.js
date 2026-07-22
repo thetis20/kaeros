@@ -1,9 +1,9 @@
 import 'react';
-import {useEffect, Fragment, useState} from 'react';
-import {v4 as uuidv4} from 'uuid';
+import {useEffect} from 'react';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import {SquareFill} from "react-bootstrap-icons";
+import useAudios from '../Hook/useAudios';
 
 function AudioControllerItem({audio, onStop}) {
     return <div style={{
@@ -40,34 +40,25 @@ function AudioControllerItem({audio, onStop}) {
 }
 
 function AudioController() {
-    const [audios, setAudios] = useState([]);
-
-    function handleAudioPlay(event) {
-        const audio = event.detail
-        setAudios(audios => {
-            return [...audios.filter(a => a.id !== audio.id), audio];
-        })
-        window.electronAPI.audioPlay(event.detail.folderId, event.detail.id)
-    }
-
-    function handleAudioEnd(event) {
-        onStop(event.detail)
-    }
+    const audios = useAudios();
 
     function onStop(audio) {
-        setAudios(audios => {
-            return audios.filter(a => a.id !== audio.id);
-        })
-        window.electronAPI.audioEnd(audio.folderId, audio.id)
+        document.dispatchEvent(new CustomEvent('audio-end', {detail: audio}));
     }
 
     useEffect(() => {
-        document.addEventListener('audio-play', handleAudioPlay);
-        document.addEventListener('audio-end', handleAudioEnd);
-        return () => {
-            document.removeEventListener('audio-play', handleAudioPlay);
-            document.removeEventListener('audio-end', handleAudioEnd);
+        function notifyPlay(event) {
+            window.electronAPI.audioPlay(event.detail.folderId, event.detail.id);
         }
+        function notifyEnd(event) {
+            window.electronAPI.audioEnd(event.detail.folderId, event.detail.id);
+        }
+        document.addEventListener('audio-play', notifyPlay);
+        document.addEventListener('audio-end', notifyEnd);
+        return () => {
+            document.removeEventListener('audio-play', notifyPlay);
+            document.removeEventListener('audio-end', notifyEnd);
+        };
     }, []);
 
     return <>

@@ -8,6 +8,11 @@ const CreateAudioUseCase = require('../application/useCase/audio/CreateAudioUseC
 const UpdateAudioUseCase = require('../application/useCase/audio/UpdateAudioUseCase.js');
 const DeleteAudioUseCase = require('../application/useCase/audio/DeleteAudioUseCase.js');
 
+const ListTrackUseCase = require('../application/useCase/track/ListTrackUseCase.js');
+const CreateTrackUseCase = require('../application/useCase/track/CreateTrackUseCase.js');
+const UpdateTrackUseCase = require('../application/useCase/track/UpdateTrackUseCase.js');
+const DeleteTrackUseCase = require('../application/useCase/track/DeleteTrackUseCase.js');
+
 const CreateWorkflowUseCase = require('../application/useCase/workflow/CreateWorkflowUseCase.js');
 const UpdateWorkflowUseCase = require('../application/useCase/workflow/UpdateWorkflowUseCase.js');
 const DeleteWorkflowUseCase = require('../application/useCase/workflow/DeleteWorkflowUseCase.js');
@@ -22,11 +27,13 @@ const CreateSessionUseCase = require('../application/useCase/session/CreateSessi
 
 const FolderStoreRespository = require('./repository/FolderStoreRepository.js');
 const AudioStoreRespository = require('./repository/AudioStoreRepository.js');
+const TrackStoreRespository = require('./repository/TrackStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
 const StepStoreRespository = require('./repository/StepStoreRepository.js');
 
 const folderStoreRespository = new FolderStoreRespository();
 const audioStoreRespository = new AudioStoreRespository();
+const trackStoreRespository = new TrackStoreRespository();
 const workflowStoreRespository = new WorkflowStoreRespository();
 const stepStoreRespository = new StepStoreRespository();
 
@@ -39,6 +46,11 @@ const createAudioUseCase = new CreateAudioUseCase(audioStoreRespository);
 const updateAudioUseCase = new UpdateAudioUseCase(audioStoreRespository);
 const deleteAudioUseCase = new DeleteAudioUseCase(audioStoreRespository);
 const listAudioByFolderUseCase = new ListAudioByFolderUseCase(audioStoreRespository);
+
+const listTrackUseCase = new ListTrackUseCase(trackStoreRespository);
+const createTrackUseCase = new CreateTrackUseCase(trackStoreRespository);
+const updateTrackUseCase = new UpdateTrackUseCase(trackStoreRespository);
+const deleteTrackUseCase = new DeleteTrackUseCase(trackStoreRespository);
 
 const createWorkflowUseCase = new CreateWorkflowUseCase(workflowStoreRespository);
 const updateWorkflowUseCase = new UpdateWorkflowUseCase(workflowStoreRespository);
@@ -63,6 +75,11 @@ module.exports = {
     createAudioUseCase,
     updateAudioUseCase,
     deleteAudioUseCase,
+
+    listTrackUseCase,
+    createTrackUseCase,
+    updateTrackUseCase,
+    deleteTrackUseCase,
 
     createWorkflowUseCase,
     updateWorkflowUseCase,

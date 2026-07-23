@@ -196,5 +196,15 @@
   "musique": {
     "title": "Musique",
     "placeholder": "Bientôt disponible : gestion de la bibliothèque musicale."
+  },
+  "track": {
+    "tag": {
+      "all": "Tous",
+      "Musique": "Musique",
+      "Bruitage": "Bruitage",
+      "Disco": "Disco"
+    },
+    "start": "Démarrer",
+    "playing": "En cours"
   }
 }

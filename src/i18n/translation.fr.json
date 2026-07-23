@@ -195,7 +195,22 @@
   },
   "musique": {
     "title": "Musique",
-    "placeholder": "Bientôt disponible : gestion de la bibliothèque musicale."
+    "form": {
+      "title": "Ajouter un morceau",
+      "name": "Nom",
+      "tag": "Tag",
+      "src": "Fichier audio",
+      "placeholder": "Rechercher dans mes fichiers",
+      "submit": "Enregistrer",
+      "error": {
+        "name": "Le nom est obligatoire.",
+        "tag": "Veuillez sélectionner un tag.",
+        "src": "Un fichier audio est obligatoire."
+      }
+    },
+    "edit": "Modifier",
+    "remove": "Supprimer",
+    "empty": "Aucun morceau dans cette catégorie."
   },
   "track": {
     "tag": {

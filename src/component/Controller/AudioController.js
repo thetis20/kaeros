@@ -48,10 +48,10 @@ function AudioController() {
 
     useEffect(() => {
         function notifyPlay(event) {
-            window.electronAPI.audioPlay(event.detail.folderId, event.detail.id);
+            window.electronAPI.trackPlay(event.detail.id);
         }
         function notifyEnd(event) {
-            window.electronAPI.audioEnd(event.detail.folderId, event.detail.id);
+            window.electronAPI.trackEnd(event.detail.id);
         }
         document.addEventListener('audio-play', notifyPlay);
         document.addEventListener('audio-end', notifyEnd);

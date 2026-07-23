@@ -1,11 +1,6 @@
 const Store = require('electron-store').default;
+const migrations = require('./migrations.js');
 
-const store = new Store({
-    migrations: {
-        '0.0.1': store => {
-            store.set('playlists', []);
-        }
-    }
-});
+const store = new Store({migrations});
 
 module.exports = store

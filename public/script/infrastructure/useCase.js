@@ -1,13 +1,3 @@
-const ListFolderUseCase = require('../application/useCase/folder/ListFolderUseCase.js');
-const CreateFolderUseCase = require('../application/useCase/folder/CreateFolderUseCase.js');
-const UpdateFolderUseCase = require('../application/useCase/folder/UpdateFolderUseCase.js');
-const DeleteFolderUseCase = require('../application/useCase/folder/DeleteFolderUseCase.js');
-
-const ListAudioByFolderUseCase = require('../application/useCase/audio/ListAudioByFolderUseCase.js');
-const CreateAudioUseCase = require('../application/useCase/audio/CreateAudioUseCase.js');
-const UpdateAudioUseCase = require('../application/useCase/audio/UpdateAudioUseCase.js');
-const DeleteAudioUseCase = require('../application/useCase/audio/DeleteAudioUseCase.js');
-
 const ListTrackUseCase = require('../application/useCase/track/ListTrackUseCase.js');
 const CreateTrackUseCase = require('../application/useCase/track/CreateTrackUseCase.js');
 const UpdateTrackUseCase = require('../application/useCase/track/UpdateTrackUseCase.js');
@@ -25,27 +15,13 @@ const ListStepByWorkflowUseCase = require('../application/useCase/step/ListStepB
 
 const CreateSessionUseCase = require('../application/useCase/session/CreateSessionUseCase.js');
 
-const FolderStoreRespository = require('./repository/FolderStoreRepository.js');
-const AudioStoreRespository = require('./repository/AudioStoreRepository.js');
 const TrackStoreRespository = require('./repository/TrackStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
 const StepStoreRespository = require('./repository/StepStoreRepository.js');
 
-const folderStoreRespository = new FolderStoreRespository();
-const audioStoreRespository = new AudioStoreRespository();
 const trackStoreRespository = new TrackStoreRespository();
 const workflowStoreRespository = new WorkflowStoreRespository();
 const stepStoreRespository = new StepStoreRespository();
-
-const listFolderUseCase = new ListFolderUseCase(folderStoreRespository);
-const createFolderUseCase = new CreateFolderUseCase(folderStoreRespository);
-const updateFolderUseCase = new UpdateFolderUseCase(folderStoreRespository);
-const deleteFolderUseCase = new DeleteFolderUseCase(folderStoreRespository);
-
-const createAudioUseCase = new CreateAudioUseCase(audioStoreRespository);
-const updateAudioUseCase = new UpdateAudioUseCase(audioStoreRespository);
-const deleteAudioUseCase = new DeleteAudioUseCase(audioStoreRespository);
-const listAudioByFolderUseCase = new ListAudioByFolderUseCase(audioStoreRespository);
 
 const listTrackUseCase = new ListTrackUseCase(trackStoreRespository);
 const createTrackUseCase = new CreateTrackUseCase(trackStoreRespository);
@@ -66,16 +42,6 @@ const createSessionUseCase = new CreateSessionUseCase(stepStoreRespository);
 
 
 module.exports = {
-    listFolderUseCase,
-    createFolderUseCase,
-    updateFolderUseCase,
-    deleteFolderUseCase,
-
-    listAudioByFolderUseCase,
-    createAudioUseCase,
-    updateAudioUseCase,
-    deleteAudioUseCase,
-
     listTrackUseCase,
     createTrackUseCase,
     updateTrackUseCase,

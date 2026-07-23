@@ -1,34 +1,27 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
 const {
-    listFolderUseCase,
-    deleteFolderUseCase,
-    listAudioByFolderUseCase,
-    updateAudioUseCase,
-    deleteAudioUseCase,
+    listTrackUseCase,
+    createTrackUseCase,
+    updateTrackUseCase,
+    deleteTrackUseCase,
     listWorkflowUseCase,
     deleteWorkflowUseCase,
     listStepByWorkflowUseCase,
     deleteStepUseCase,
     createSessionUseCase
 } = require('../infrastructure/useCase.js');
-const FolderWindow = require('./FolderWindow.js');
-const AudioWindow = require('./AudioWindow.js');
 const WorkflowWindow = require('./WorkflowWindow.js');
 const StepWindow = require('./StepWindow.js')
 const SessionWindow = require('./SessionWindow.js')
 
 class MainWindow {
     constructor() {
-        this.folderFetch = this.folderFetch.bind(this)
-        this.folderOpen = this.folderOpen.bind(this)
-        this.folderClose = this.folderClose.bind(this)
-        this.folderRemove = this.folderRemove.bind(this)
-        this.audioFetch = this.audioFetch.bind(this)
-        this.audioOpen = this.audioOpen.bind(this)
-        this.audioRemove = this.audioRemove.bind(this)
-        this.audioPlay = this.audioPlay.bind(this)
-        this.audioEnd = this.audioEnd.bind(this)
+        this.trackFetch = this.trackFetch.bind(this)
+        this.trackSave = this.trackSave.bind(this)
+        this.trackRemove = this.trackRemove.bind(this)
+        this.trackPlay = this.trackPlay.bind(this)
+        this.trackEnd = this.trackEnd.bind(this)
         this.workflowOpen = this.workflowOpen.bind(this)
         this.workflowFetch = this.workflowFetch.bind(this)
         this.workflowClose = this.workflowClose.bind(this)
@@ -63,14 +56,11 @@ class MainWindow {
         // Emitted when the window is closed.
         this.window.on('closed', () => {
             this.window = null;
-            ipcMain.removeListener('folder-fetch', this.folderFetch)
-            ipcMain.removeListener('folder-open', this.folderOpen)
-            ipcMain.removeListener('folder-remove', this.folderRemove)
-            ipcMain.removeListener('audio-fetch', this.audioFetch)
-            ipcMain.removeListener('audio-open', this.audioOpen)
-            ipcMain.removeListener('audio-remove', this.audioRemove)
-            ipcMain.removeListener('audio-play', this.audioPlay)
-            ipcMain.removeListener('audio-end', this.audioEnd)
+            ipcMain.removeListener('track-fetch', this.trackFetch)
+            ipcMain.removeListener('track-save', this.trackSave)
+            ipcMain.removeListener('track-remove', this.trackRemove)
+            ipcMain.removeListener('track-play', this.trackPlay)
+            ipcMain.removeListener('track-end', this.trackEnd)
             ipcMain.removeListener('workflow-open', this.workflowOpen)
             ipcMain.removeListener('workflow-fetch', this.workflowFetch)
             ipcMain.removeListener('workflow-remove', this.workflowRemove)
@@ -84,14 +74,11 @@ class MainWindow {
     }
 
     initHandle() {
-        ipcMain.addListener('folder-fetch', this.folderFetch)
-        ipcMain.addListener('folder-open', this.folderOpen)
-        ipcMain.addListener('folder-remove', this.folderRemove)
-        ipcMain.addListener('audio-fetch', this.audioFetch)
-        ipcMain.addListener('audio-open', this.audioOpen)
-        ipcMain.addListener('audio-remove', this.audioRemove)
-        ipcMain.addListener('audio-play', this.audioPlay)
-        ipcMain.addListener('audio-end', this.audioEnd)
+        ipcMain.addListener('track-fetch', this.trackFetch)
+        ipcMain.addListener('track-save', this.trackSave)
+        ipcMain.addListener('track-remove', this.trackRemove)
+        ipcMain.addListener('track-play', this.trackPlay)
+        ipcMain.addListener('track-end', this.trackEnd)
         ipcMain.addListener('workflow-open', this.workflowOpen)
         ipcMain.addListener('workflow-fetch', this.workflowFetch)
         ipcMain.addListener('workflow-remove', this.workflowRemove)
@@ -124,61 +111,30 @@ class MainWindow {
         this.window.webContents.send('workflow-onchange', await listWorkflowUseCase.execute());
     }
 
-    async folderFetch() {
-        this.window.webContents.send('folder-onchange', await listFolderUseCase.execute());
+    async trackFetch() {
+        this.window.webContents.send('track-onchange', await listTrackUseCase.execute());
     }
 
-    folderOpen(event, value) {
-        this.folderWindow = new FolderWindow({
-            mainWindow: this.window,
-            value,
-            onClose: this.folderClose
-        })
-        this.folderWindow.start()
+    async trackSave(event, value) {
+        if (value.id) {
+            await updateTrackUseCase.execute(value.id, value);
+        } else {
+            await createTrackUseCase.execute(value);
+        }
+        this.window.webContents.send('track-onchange', await listTrackUseCase.execute());
     }
 
-    folderClose() {
-        this.folderWindow = null;
+    async trackRemove(event, id) {
+        await deleteTrackUseCase.execute(id);
+        this.window.webContents.send('track-onchange', await listTrackUseCase.execute());
     }
 
-    async folderRemove(event, id) {
-        await deleteFolderUseCase.execute(id);
-        this.window.webContents.send('folder-onchange', await listFolderUseCase.execute());
+    async trackPlay(event, id) {
+        this.window.webContents.send('track-onchange', await listTrackUseCase.execute());
     }
 
-    async audioFetch(event, folderId) {
-        this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
-    }
-
-    audioOpen(event, folderId, value) {
-        this.audioWindow = new AudioWindow({
-            mainWindow: this.window,
-            value,
-            onClose: this.audioClose,
-            folderId
-        })
-        this.audioWindow.start()
-    }
-
-    async audioRemove(event, folderId, id) {
-        await deleteAudioUseCase.execute(folderId, id);
-        this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
-    }
-
-    async audioPlay(event, folderId, id) {
-        const audios = await listAudioByFolderUseCase.execute(folderId);
-        const audio = audios.find(audio => audio.id === id);
-        audio.playing = true;
-        updateAudioUseCase.execute(folderId, audio.id, audio)
-        this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
-    }
-
-    async audioEnd(event, folderId, id) {
-        const audios = await listAudioByFolderUseCase.execute(folderId);
-        const audio = audios.find(audio => audio.id === id);
-        delete audio.playing;
-        updateAudioUseCase.execute(folderId, audio.id, audio)
-        this.window.webContents.send('audio-onchange', await listAudioByFolderUseCase.execute(folderId));
+    async trackEnd(event, id) {
+        this.window.webContents.send('track-onchange', await listTrackUseCase.execute());
     }
 
     async stepFetch(event, workflowId) {

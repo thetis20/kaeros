@@ -1,11 +1,10 @@
-const {contextBridge, ipcRenderer} = require('electron')
+const {contextBridge, ipcRenderer, webUtils} = require('electron')
 const events = [
     'time-onchange',
     'dubbing-onchange',
     'playlist-onchange',
     'running-onchange',
-    'folder-onchange',
-    'audio-onchange',
+    'track-onchange',
     'workflow-onchange',
     'step-onchange',
     'session-onchange'
@@ -33,14 +32,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
     playlistFetch: () => ipcRenderer.send('playlist-fetch'),
     playlistPlay: (playlist) => ipcRenderer.send('playlist-play', playlist),
     playlistRemove: (id) => ipcRenderer.send('playlist-remove', id),
-    folderFetch: () => ipcRenderer.send('folder-fetch'),
-    folderOpen: (value) => ipcRenderer.send('folder-open', value),
-    folderRemove: (id) => ipcRenderer.send('folder-remove', id),
-    audioFetch: (folderId) => ipcRenderer.send('audio-fetch', folderId),
-    audioOpen: (folderId, audio) => ipcRenderer.send('audio-open', folderId, audio),
-    audioRemove: (folderId, id) => ipcRenderer.send('audio-remove', folderId, id),
-    audioPlay: (folderId, id) => ipcRenderer.send('audio-play', folderId, id),
-    audioEnd: (folderId, id) => ipcRenderer.send('audio-end', folderId, id),
+    trackFetch: () => ipcRenderer.send('track-fetch'),
+    trackSave: (value) => {
+        if (value.file !== undefined) {
+            value.src = webUtils.getPathForFile(value.file)
+            delete value.file
+        }
+        ipcRenderer.send('track-save', value)
+    },
+    trackRemove: (id) => ipcRenderer.send('track-remove', id),
+    trackPlay: (id) => ipcRenderer.send('track-play', id),
+    trackEnd: (id) => ipcRenderer.send('track-end', id),
     workflowFetch: () => ipcRenderer.send('workflow-fetch'),
     workflowOpen: (value) => ipcRenderer.send('workflow-open', value),
     workflowRemove: (id) => ipcRenderer.send('workflow-remove', id),

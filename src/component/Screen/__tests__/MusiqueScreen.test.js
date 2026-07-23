@@ -40,6 +40,7 @@ describe('MusiqueScreen', () => {
             file,
             color: '#AE3EC9',
         }));
+        expect(window.electronAPI.trackSave.mock.calls[0][0]).not.toHaveProperty('id');
     });
 
     it('filters the track list by tag when a tab is clicked', () => {

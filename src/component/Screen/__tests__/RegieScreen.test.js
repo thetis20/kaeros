@@ -74,4 +74,17 @@ describe('RegieScreen', () => {
 
         expect(screen.getByText('Remise des diplômes')).toBeTruthy();
     });
+
+    it('renders RegieLiveController alongside the step list once a session is running', () => {
+        window.session = {
+            track: {type: 'time', paused: true, status: 'STATUS_RUNNING', count: 1, impro: 5},
+            steps: [{id: 's1', name: 'Step 1', type: 'time'}],
+            index: 0,
+        };
+        render(<RegieScreen/>);
+
+        expect(screen.getByText('Step 1')).toBeTruthy();
+        expect(screen.getByRole('button', {name: 'Battle Royal'})).toBeTruthy();
+        expect(screen.getByText('Impro 1 / 5')).toBeTruthy();
+    });
 });

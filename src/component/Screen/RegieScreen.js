@@ -5,7 +5,7 @@ import {ChevronDown, ChevronUp} from 'react-bootstrap-icons';
 import useWorkflows from '../Hook/useWorkflows';
 import useSession from '../Hook/useSession';
 import SessionController from '../Controller/SessionController';
-import AudioController from '../Controller/AudioController';
+import RegieLiveController from './RegieLiveController';
 
 function RegieSessionCard({workflow}) {
     const {t} = useTranslation();
@@ -51,10 +51,14 @@ function RegieScreen() {
                 {!collapsed && (
                     <div style={{marginTop: '1em'}}>
                         {session ? (
-                            <>
-                                <SessionController/>
-                                <AudioController/>
-                            </>
+                            <div style={{display: 'flex', gap: '1em'}}>
+                                <div style={{flex: 1}}>
+                                    <SessionController/>
+                                </div>
+                                <div className="card" style={{flex: 1, padding: '1em'}}>
+                                    <RegieLiveController/>
+                                </div>
+                            </div>
                         ) : (
                             <>
                                 <p>{t('regie.empty.title')}</p>

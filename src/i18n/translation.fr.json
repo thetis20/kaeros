@@ -196,6 +196,16 @@
       "label": "Session",
       "collapse": "Réduire la session",
       "expand": "Afficher la session"
+    },
+    "tabs": {
+      "image": "Image",
+      "dubbing-video": "Vidéo de doublage",
+      "time": "Time",
+      "battle-royal": "Battle Royal"
+    },
+    "controller": {
+      "imagePreview": "Aperçu image plein écran",
+      "dubbingPreview": "Lecture vidéo (muet)"
     }
   },
   "musique": {

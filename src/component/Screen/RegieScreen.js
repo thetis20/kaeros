@@ -1,5 +1,7 @@
 import 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {ChevronDown, ChevronUp} from 'react-bootstrap-icons';
 import useWorkflows from '../Hook/useWorkflows';
 import useSession from '../Hook/useSession';
 import SessionController from '../Controller/SessionController';
@@ -24,23 +26,45 @@ function RegieScreen() {
     const {t} = useTranslation();
     const workflows = useWorkflows();
     const session = useSession();
+    const [collapsed, setCollapsed] = useState(false);
 
-    if (session) {
-        return (
-            <div style={{padding: '1em'}}>
-                <h1>{t('regie.title')}</h1>
-                <SessionController/>
-                <AudioController/>
-            </div>
-        );
+    function toggleCollapsed() {
+        setCollapsed((current) => !current);
     }
 
     return (
         <div style={{padding: '1em'}}>
             <h1>{t('regie.title')}</h1>
-            <p>{t('regie.empty.title')}</p>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1em'}}>
-                {workflows.map((workflow) => <RegieSessionCard key={workflow.id} workflow={workflow}/>)}
+
+            <div className="card" style={{padding: '1em', marginBottom: '1em'}}>
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <p style={{fontWeight: 500, margin: 0}}>{t('regie.session.label')}</p>
+                    <button
+                        type="button"
+                        className="btn btn-light"
+                        aria-label={collapsed ? t('regie.session.expand') : t('regie.session.collapse')}
+                        onClick={toggleCollapsed}
+                    >
+                        {collapsed ? <ChevronDown/> : <ChevronUp/>}
+                    </button>
+                </div>
+                {!collapsed && (
+                    <div style={{marginTop: '1em'}}>
+                        {session ? (
+                            <>
+                                <SessionController/>
+                                <AudioController/>
+                            </>
+                        ) : (
+                            <>
+                                <p>{t('regie.empty.title')}</p>
+                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1em'}}>
+                                    {workflows.map((workflow) => <RegieSessionCard key={workflow.id} workflow={workflow}/>)}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

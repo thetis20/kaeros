@@ -7,8 +7,8 @@ describe('RegieScreen', () => {
         window.electronAPI = {
             workflowFetch: jest.fn(),
             sessionPlay: jest.fn(),
-            audioPlay: jest.fn(),
-            audioEnd: jest.fn(),
+            trackPlay: jest.fn(),
+            trackEnd: jest.fn(),
             trackChange: jest.fn(),
             sessionNext: jest.fn(),
             sessionPrevious: jest.fn(),
@@ -56,5 +56,22 @@ describe('RegieScreen', () => {
 
         expect(screen.queryByText('Aucune session en cours. Choisis une session à démarrer.')).toBeNull();
         expect(screen.getByText('Step 1')).toBeTruthy();
+    });
+
+    it('collapses and expands the session card content while keeping the header visible', () => {
+        render(<RegieScreen/>);
+        seedWorkflows([{id: 'wf-1', name: 'Remise des diplômes'}]);
+
+        expect(screen.getByText('Session')).toBeTruthy();
+        expect(screen.getByText('Remise des diplômes')).toBeTruthy();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Réduire la session'}));
+
+        expect(screen.getByText('Session')).toBeTruthy();
+        expect(screen.queryByText('Remise des diplômes')).toBeNull();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Afficher la session'}));
+
+        expect(screen.getByText('Remise des diplômes')).toBeTruthy();
     });
 });

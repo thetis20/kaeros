@@ -191,6 +191,11 @@
     "title": "Régie",
     "empty": {
       "title": "Aucune session en cours. Choisis une session à démarrer."
+    },
+    "session": {
+      "label": "Session",
+      "collapse": "Réduire la session",
+      "expand": "Afficher la session"
     }
   },
   "musique": {

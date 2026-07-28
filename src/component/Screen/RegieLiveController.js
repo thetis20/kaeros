@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Dash, Plus} from 'react-bootstrap-icons';
 import useSession from '../Hook/useSession';
+import BattleRoyalStepController from '../Controller/BattleRoyalStepController';
 
 const TYPES = ['image', 'dubbing-video', 'time', 'battle-royal'];
 const PREVIEW_BOX_STYLE = {border: '1px dashed #ccc', padding: '2em', textAlign: 'center', marginBottom: '1em'};
@@ -66,6 +67,12 @@ function RegieLiveController() {
                     </div>
                 </div>
             );
+        }
+        if (activeType === 'battle-royal') {
+            if (session.track.type !== 'battle-royal') {
+                return <p>{t('regie.tabs.inactive')}</p>;
+            }
+            return <BattleRoyalStepController session={session} step={session.steps[session.index]} index={session.index}/>;
         }
         return null;
     }

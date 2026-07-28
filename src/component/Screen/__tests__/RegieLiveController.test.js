@@ -101,3 +101,53 @@ describe('RegieLiveController - time tab', () => {
         expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
     });
 });
+
+describe('RegieLiveController - battle-royal tab', () => {
+    beforeEach(() => {
+        window.electronAPI = {trackChange: jest.fn()};
+    });
+    afterEach(() => {
+        delete window.session;
+    });
+
+    it('reuses BattleRoyalStepController for the live scoreboard when the current step is battle-royal', () => {
+        window.session = {
+            track: {
+                type: 'battle-royal',
+                players: [
+                    {id: 'p1', name: 'Alice', score: 2, enabled: true},
+                    {id: 'p2', name: 'Bob', score: 0, enabled: true},
+                ],
+            },
+            steps: [{id: 's1', name: 'Quiz final', type: 'battle-royal'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        expect(screen.getByText(/Alice/)).toBeTruthy();
+        expect(screen.getByText(/Bob/)).toBeTruthy();
+
+        const incrementAlice = document.querySelector('#regie-controller .btn-primary');
+        fireEvent.click(incrementAlice);
+
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({
+            players: [
+                {id: 'p1', name: 'Alice', score: 3, enabled: true},
+                {id: 'p2', name: 'Bob', score: 0, enabled: true},
+            ],
+        });
+    });
+
+    it('shows the inactive fallback on the battle-royal tab when the current step is not battle-royal', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Quiz final', type: 'battle-royal'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Battle Royal'}));
+
+        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
+    });
+});

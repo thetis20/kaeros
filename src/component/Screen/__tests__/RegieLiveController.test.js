@@ -40,3 +40,64 @@ describe('RegieLiveController', () => {
         expect(screen.getByRole('slider')).toBeDisabled();
     });
 });
+
+describe('RegieLiveController - time tab', () => {
+    beforeEach(() => {
+        window.electronAPI = {trackChange: jest.fn()};
+    });
+    afterEach(() => {
+        delete window.session;
+    });
+
+    it('shows the current impro count and a MM:SS countdown derived from the real TimeTrack', () => {
+        window.session = {
+            track: {type: 'time', impro: 3, minutes: 2, count: 2, time: 95, paused: false, status: 'STATUS_RUNNING'},
+            steps: [{id: 's1', name: 'Impros', type: 'time'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        expect(screen.getByText('Impro 2 / 3')).toBeTruthy();
+        expect(screen.getByText('01:35')).toBeTruthy();
+    });
+
+    it('calls session.plus()/session.minus() (real trackChange IPC) from the impro navigation buttons', () => {
+        window.session = {
+            track: {type: 'time', impro: 3, minutes: 2, count: 2, time: 95, paused: false, status: 'STATUS_RUNNING'},
+            steps: [{id: 's1', name: 'Impros', type: 'time'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Impro suivante'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({count: 3});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Impro précédente'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({count: 1});
+    });
+
+    it('disables navigation at the impro boundaries', () => {
+        window.session = {
+            track: {type: 'time', impro: 3, minutes: 2, count: 3, time: 10, paused: false, status: 'STATUS_RUNNING'},
+            steps: [{id: 's1', name: 'Impros', type: 'time'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        expect(screen.getByRole('button', {name: 'Impro suivante'})).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Impro précédente'})).not.toBeDisabled();
+    });
+
+    it('shows the inactive fallback on the time tab when the current step is not a time step', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Time'}));
+
+        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
+    });
+});

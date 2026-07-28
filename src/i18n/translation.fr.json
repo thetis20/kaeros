@@ -201,11 +201,15 @@
       "image": "Image",
       "dubbing-video": "Vidéo de doublage",
       "time": "Time",
-      "battle-royal": "Battle Royal"
+      "battle-royal": "Battle Royal",
+      "inactive": "Cette étape n'est pas l'étape en cours."
     },
     "controller": {
       "imagePreview": "Aperçu image plein écran",
-      "dubbingPreview": "Lecture vidéo (muet)"
+      "dubbingPreview": "Lecture vidéo (muet)",
+      "impro": "Impro {{current}} / {{total}}",
+      "improPrevious": "Impro précédente",
+      "improNext": "Impro suivante"
     }
   },
   "musique": {

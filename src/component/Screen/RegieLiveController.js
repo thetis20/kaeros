@@ -1,10 +1,18 @@
 import 'react';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {Dash, Plus} from 'react-bootstrap-icons';
 import useSession from '../Hook/useSession';
 
 const TYPES = ['image', 'dubbing-video', 'time', 'battle-royal'];
 const PREVIEW_BOX_STYLE = {border: '1px dashed #ccc', padding: '2em', textAlign: 'center', marginBottom: '1em'};
+
+function formatCountdown(seconds) {
+    const total = Math.max(0, seconds || 0);
+    const minutes = Math.floor(total / 60);
+    const remaining = total % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
+}
 
 function RegieLiveController() {
     const {t} = useTranslation();
@@ -29,6 +37,34 @@ function RegieLiveController() {
                         <span>00:00</span>
                     </div>
                 </>
+            );
+        }
+        if (activeType === 'time') {
+            if (session.track.type !== 'time') {
+                return <p>{t('regie.tabs.inactive')}</p>;
+            }
+            const track = session.track;
+            return (
+                <div style={{textAlign: 'center'}}>
+                    <p>{t('regie.controller.impro', {current: track.count, total: track.impro})}</p>
+                    <p style={{fontSize: '2em', fontWeight: 600}}>{formatCountdown(track.time)}</p>
+                    <div style={{display: 'flex', justifyContent: 'center', gap: '1em'}}>
+                        <button
+                            type="button"
+                            className="btn btn-light"
+                            aria-label={t('regie.controller.improPrevious')}
+                            onClick={session.minus}
+                            disabled={!session.canMinus()}
+                        ><Dash/></button>
+                        <button
+                            type="button"
+                            className="btn btn-light"
+                            aria-label={t('regie.controller.improNext')}
+                            onClick={session.plus}
+                            disabled={!session.canPlus()}
+                        ><Plus/></button>
+                    </div>
+                </div>
             );
         }
         return null;

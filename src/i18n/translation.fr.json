@@ -210,6 +210,9 @@
       "impro": "Impro {{current}} / {{total}}",
       "improPrevious": "Impro précédente",
       "improNext": "Impro suivante"
+    },
+    "audios": {
+      "title": "Audio en cours"
     }
   },
   "musique": {

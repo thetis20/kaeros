@@ -1,5 +1,5 @@
 import '../../../lib/i18n';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, act} from '@testing-library/react';
 import Dashboard from '../Dashboard';
 
 jest.mock('../../Screen/RegieScreen', () => function FakeRegieScreen() { return <div>regie-stub</div>; });
@@ -8,7 +8,7 @@ jest.mock('../WorkflowDashboard', () => function FakeWorkflowDashboard() { retur
 
 describe('Dashboard', () => {
     beforeEach(() => {
-        window.electronAPI = {workflowFetch: jest.fn()};
+        window.electronAPI = {workflowFetch: jest.fn(), trackPlay: jest.fn(), trackEnd: jest.fn()};
         delete window.session;
     });
 
@@ -39,5 +39,29 @@ describe('Dashboard', () => {
         fireEvent.click(screen.getByRole('button', {name: /Régie/}));
 
         expect(screen.getByText('regie-stub')).toBeTruthy();
+    });
+
+    it('shows the "Audio en cours" card and reacts to audio-play regardless of active screen', () => {
+        render(<Dashboard/>);
+        expect(screen.getByText('Audio en cours')).toBeTruthy();
+
+        act(() => {
+            document.dispatchEvent(new CustomEvent('audio-play', {detail: {id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'}}));
+        });
+
+        expect(screen.getByText('Track One')).toBeTruthy();
+        expect(window.electronAPI.trackPlay).toHaveBeenCalledWith('a1');
+    });
+
+    it('keeps the playing audio mounted after navigating away from Régie', () => {
+        render(<Dashboard/>);
+        act(() => {
+            document.dispatchEvent(new CustomEvent('audio-play', {detail: {id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'}}));
+        });
+
+        fireEvent.click(screen.getByRole('button', {name: /Musique/}));
+
+        expect(screen.getByText('musique-stub')).toBeTruthy();
+        expect(screen.getByText('Track One')).toBeTruthy();
     });
 });

@@ -213,6 +213,9 @@
     },
     "audios": {
       "title": "Audio en cours"
+    },
+    "music": {
+      "title": "Démarrer une musique"
     }
   },
   "musique": {

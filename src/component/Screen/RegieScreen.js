@@ -4,8 +4,11 @@ import {useTranslation} from 'react-i18next';
 import {ChevronDown, ChevronUp} from 'react-bootstrap-icons';
 import useWorkflows from '../Hook/useWorkflows';
 import useSession from '../Hook/useSession';
+import useAudios from '../Hook/useAudios';
+import useTracks from '../Hook/useTracks';
 import SessionController from '../Controller/SessionController';
 import RegieLiveController from './RegieLiveController';
+import RegieTrackPicker from '../Track/RegieTrackPicker';
 
 function RegieSessionCard({workflow}) {
     const {t} = useTranslation();
@@ -26,10 +29,16 @@ function RegieScreen() {
     const {t} = useTranslation();
     const workflows = useWorkflows();
     const session = useSession();
+    const audios = useAudios();
+    const tracks = useTracks();
     const [collapsed, setCollapsed] = useState(false);
 
     function toggleCollapsed() {
         setCollapsed((current) => !current);
+    }
+
+    function startTrack(track) {
+        document.dispatchEvent(new CustomEvent('audio-play', {detail: track}));
     }
 
     return (
@@ -69,6 +78,11 @@ function RegieScreen() {
                         )}
                     </div>
                 )}
+            </div>
+
+            <div className="card" style={{padding: '1em'}}>
+                <p style={{fontWeight: 500, margin: '0 0 .75em'}}>{t('regie.music.title')}</p>
+                <RegieTrackPicker tracks={tracks} playingIds={audios.map((audio) => audio.id)} onStart={startTrack}/>
             </div>
         </div>
     );

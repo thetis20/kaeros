@@ -7,8 +7,7 @@ describe('RegieScreen', () => {
         window.electronAPI = {
             workflowFetch: jest.fn(),
             sessionPlay: jest.fn(),
-            trackPlay: jest.fn(),
-            trackEnd: jest.fn(),
+            trackFetch: jest.fn(),
             trackChange: jest.fn(),
             sessionNext: jest.fn(),
             sessionPrevious: jest.fn(),
@@ -20,6 +19,12 @@ describe('RegieScreen', () => {
     function seedWorkflows(workflows) {
         act(() => {
             document.dispatchEvent(new CustomEvent('workflow-onchange', {detail: workflows}));
+        });
+    }
+
+    function seedTracks(tracks) {
+        act(() => {
+            document.dispatchEvent(new CustomEvent('track-onchange', {detail: tracks}));
         });
     }
 
@@ -86,5 +91,24 @@ describe('RegieScreen', () => {
         expect(screen.getByText('Step 1')).toBeTruthy();
         expect(screen.getByRole('button', {name: 'Battle Royal'})).toBeTruthy();
         expect(screen.getByText('Impro 1 / 5')).toBeTruthy();
+    });
+
+    it('shows the "Démarrer une musique" card with tracks from useTracks', () => {
+        render(<RegieScreen/>);
+        seedWorkflows([]);
+        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'}]);
+
+        expect(screen.getByText('Démarrer une musique')).toBeTruthy();
+        expect(screen.getByText('Générique')).toBeTruthy();
+    });
+
+    it('dispatches audio-play and shows the track as playing when "Démarrer" is clicked', () => {
+        render(<RegieScreen/>);
+        seedWorkflows([]);
+        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'}]);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Démarrer'}));
+
+        expect(screen.getByRole('button', {name: 'En cours'})).toBeDisabled();
     });
 });

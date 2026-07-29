@@ -64,4 +64,16 @@ describe('Dashboard', () => {
         expect(screen.getByText('musique-stub')).toBeTruthy();
         expect(screen.getByText('Track One')).toBeTruthy();
     });
+
+    it('hides the "Audio en cours" card chrome when nothing is playing, without unmounting AudioController', () => {
+        render(<Dashboard/>);
+
+        expect(screen.getByText('Audio en cours').closest('.card')).toHaveStyle({display: 'none'});
+
+        act(() => {
+            document.dispatchEvent(new CustomEvent('audio-play', {detail: {id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'}}));
+        });
+
+        expect(screen.getByText('Audio en cours').closest('.card')).not.toHaveStyle({display: 'none'});
+    });
 });

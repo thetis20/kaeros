@@ -1,5 +1,5 @@
 import 'react';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Dash, Plus} from 'react-bootstrap-icons';
 import useSession from '../Hook/useSession';
@@ -19,6 +19,12 @@ function RegieLiveController() {
     const {t} = useTranslation();
     const session = useSession();
     const [activeType, setActiveType] = useState(session ? session.track.type : null);
+
+    useEffect(() => {
+        if (session) {
+            setActiveType(session.track.type);
+        }
+    }, [session && session.track.type]);
 
     if (!session) {
         return null;

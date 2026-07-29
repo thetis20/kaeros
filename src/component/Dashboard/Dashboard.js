@@ -24,7 +24,7 @@ function Dashboard() {
                 musicPlaying={audios.length > 0}
             />
             <main style={{maxHeight: '100%', overflowY: 'auto', flex: 1}}>
-                <div className="card" style={{padding: '1em', margin: '1em'}}>
+                <div className="card" style={{padding: '1em', margin: '1em', display: audios.length ? undefined : 'none'}}>
                     <p style={{fontWeight: 500, margin: '0 0 .75em'}}>{t('regie.audios.title')}</p>
                     <AudioController/>
                 </div>

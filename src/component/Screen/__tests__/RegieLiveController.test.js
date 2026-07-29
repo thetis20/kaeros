@@ -1,5 +1,5 @@
 import '../../../lib/i18n';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, act} from '@testing-library/react';
 import RegieLiveController from '../RegieLiveController';
 
 describe('RegieLiveController', () => {
@@ -149,5 +149,27 @@ describe('RegieLiveController - battle-royal tab', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Battle Royal'}));
 
         expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
+    });
+});
+
+describe('RegieLiveController - active tab sync', () => {
+    afterEach(() => {
+        delete window.session;
+    });
+
+    it('automatically switches the active tab when the live step changes', () => {
+        window.session = {track: {type: 'image', src: '/tmp/logo.png'}, steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}], index: 0};
+        render(<RegieLiveController/>);
+
+        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('btn-primary');
+
+        act(() => {
+            document.dispatchEvent(new CustomEvent('session-onchange', {
+                detail: {track: {type: 'time', impro: 3, minutes: 2, count: 1, time: 60, paused: false, status: 'STATUS_RUNNING'}, steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}], index: 1},
+            }));
+        });
+
+        expect(screen.getByRole('button', {name: 'Time'})).toHaveClass('btn-primary');
+        expect(screen.getByText('Impro 1 / 3')).toBeTruthy();
     });
 });

@@ -27,6 +27,7 @@ describe('Dashboard audio integration (unmocked)', () => {
 
         fireEvent.click(screen.getByRole('button', {name: 'Démarrer'}));
 
+        expect(window.electronAPI.trackPlay).toHaveBeenCalledTimes(1);
         expect(window.electronAPI.trackPlay).toHaveBeenCalledWith('t1');
         expect(screen.getByRole('button', {name: 'En cours'})).toBeDisabled();
         expect(screen.getByRole('button', {name: /stop/i})).toBeTruthy();

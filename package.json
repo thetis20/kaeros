@@ -17,6 +17,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.46.0",
     "bootstrap": "^5.3.8",
     "electron-store": "^11.0.2",
     "i18next": "^25.5.3",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.css';
+import './theme.css';
 import Dashboard from './component/Dashboard/Dashboard';
 import Workflow from './component/Workflow/Workflow';
 import Step from './component/Step/Step';

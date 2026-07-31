@@ -1,7 +1,9 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {v4 as uuidv4} from 'uuid';
 import {ChevronUp, ChevronDown, Pen, Trash, Image, CameraReelsFill, ClockFill, ShieldFill} from 'react-bootstrap-icons';
+import useWorkflows from '../Hook/useWorkflows';
+import useSteps from '../Hook/useSteps';
 import ImageStep, {validate as validateImage} from '../Step/ImageStep';
 import DubbingVideoStep, {validate as validateDubbingVideo} from '../Step/DubbingVideoStep';
 import TimeStep, {validate as validateTime} from '../Step/TimeStep';
@@ -41,6 +43,20 @@ const stepTypeLabelKeys = {
     'battle-royal': 'step.form.type.option.battle-royal',
 };
 
+const colorPalette = ['#378ADD', '#D85A30', '#1D9E75', '#7F77DD', '#D4537E', '#BA7517'];
+
+function randomColor() {
+    return colorPalette[Math.floor(Math.random() * colorPalette.length)];
+}
+
+function hydrateStepForEditing(step) {
+    const hydrated = {...step, open: false};
+    if (Array.isArray(hydrated.players)) {
+        hydrated.players = hydrated.players.join('; ');
+    }
+    return hydrated;
+}
+
 function newStep(type, t) {
     const base = {id: uuidv4(), type, name: t(`sessionCreation.newStepName.${type}`), open: false};
     if (type === 'dubbing-video') return {...base, time: '', description: ''};
@@ -51,9 +67,34 @@ function newStep(type, t) {
 
 function SessionCreationScreen({workflowId, onDone}) {
     const {t} = useTranslation();
+    const workflows = useWorkflows();
+    const fetchedSteps = useSteps(workflowId);
     const [name, setName] = useState('');
+    const [color, setColor] = useState(() => workflowId === null ? randomColor() : null);
     const [steps, setSteps] = useState([]);
     const [errorsByStepId, setErrorsByStepId] = useState({});
+    const nameLoadedRef = useRef(false);
+    const stepsLoadedRef = useRef(false);
+    const existingWorkflowRef = useRef(null);
+
+    useEffect(() => {
+        if (workflowId === null) return;
+        const workflow = workflows.find(w => w.id === workflowId);
+        if (workflow && !nameLoadedRef.current) {
+            existingWorkflowRef.current = workflow;
+            setName(workflow.name);
+            setColor(workflow.color);
+            nameLoadedRef.current = true;
+        }
+    }, [workflowId, workflows]);
+
+    useEffect(() => {
+        if (workflowId === null) return;
+        if (fetchedSteps.length > 0 && !stepsLoadedRef.current) {
+            setSteps(fetchedSteps.map(hydrateStepForEditing));
+            stepsLoadedRef.current = true;
+        }
+    }, [workflowId, fetchedSteps]);
 
     function updateStep(index, nextValue) {
         setSteps(current => current.map((step, i) => i === index ? nextValue : step));

@@ -1,5 +1,5 @@
 import '../../../lib/i18n';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {act, render, screen, fireEvent} from '@testing-library/react';
 import SessionCreationScreen from '../SessionCreationScreen';
 
 describe('SessionCreationScreen - new session, local step list', () => {
@@ -72,5 +72,51 @@ describe('SessionCreationScreen - new session, local step list', () => {
 
         fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Logo établissement'}});
         expect(screen.getByText('Logo établissement')).toBeTruthy();
+    });
+});
+
+describe('SessionCreationScreen - editing an existing workflow', () => {
+    beforeEach(() => {
+        window.electronAPI = {
+            workflowFetch: jest.fn(),
+            stepFetch: jest.fn(),
+            workflowSave: jest.fn(),
+            stepSave: jest.fn(),
+            stepRemove: jest.fn(),
+        };
+    });
+
+    function seedWorkflows(workflows) {
+        act(() => {
+            document.dispatchEvent(new CustomEvent('workflow-onchange', {detail: workflows}));
+        });
+    }
+
+    function seedSteps(steps) {
+        act(() => {
+            document.dispatchEvent(new CustomEvent('step-onchange', {detail: steps}));
+        });
+    }
+
+    it('loads the workflow name and its steps for editing', () => {
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}}/>);
+        seedWorkflows([{id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', createdAt: '2026-01-01'}]);
+        seedSteps([
+            {id: 'step-1', type: 'image', name: 'Logo établissement', src: '/tmp/logo.png', createdAt: '2026-01-01'},
+            {id: 'step-2', type: 'battle-royal', name: 'Quiz final', players: ['Alex', 'Sam'], createdAt: '2026-01-01'},
+        ]);
+
+        expect(screen.getByLabelText('Nom de la session').value).toBe('Remise des diplômes');
+        expect(screen.getByText('Logo établissement')).toBeTruthy();
+        expect(screen.getByText('Quiz final')).toBeTruthy();
+    });
+
+    it('joins a persisted array of players into a semicolon-separated string for editing', () => {
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}}/>);
+        seedWorkflows([{id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', createdAt: '2026-01-01'}]);
+        seedSteps([{id: 'step-2', type: 'battle-royal', name: 'Quiz final', players: ['Alex', 'Sam'], createdAt: '2026-01-01'}]);
+
+        fireEvent.click(screen.getByRole('button', {name: "Modifier l'étape"}));
+        expect(screen.getByLabelText('Joueurs').value).toBe('Alex; Sam');
     });
 });

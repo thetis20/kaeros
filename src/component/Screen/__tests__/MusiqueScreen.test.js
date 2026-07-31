@@ -31,7 +31,7 @@ describe('MusiqueScreen', () => {
         fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
         fireEvent.change(screen.getByLabelText('Tag'), {target: {value: 'Disco'}});
         const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
-        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+        fireEvent.change(document.getElementById('track-src'), {target: {files: [file]}});
         fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
 
         expect(window.electronAPI.trackSave).toHaveBeenCalledWith(expect.objectContaining({

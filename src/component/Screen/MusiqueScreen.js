@@ -94,7 +94,6 @@ function MusiqueScreen() {
                 </select>
                 {errors.tag && <div className="invalid-feedback">{errors.tag}</div>}
 
-                <label htmlFor="track-src" className="field-label">{t('musique.form.src')}</label>
                 <div className="file-row">
                     <div className="file-thumb"><IconUpload size={18}/></div>
                     <input

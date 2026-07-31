@@ -136,6 +136,55 @@ function SessionCreationScreen({workflowId, onDone}) {
         updateStep(index, {...steps[index], open: !steps[index].open});
     }
 
+    function validateStep(step) {
+        const errors = {};
+        if (!step.name || !step.name.trim()) errors.name = t('step.form.error.name');
+        const variantValidate = variantValidators[step.type];
+        if (variantValidate) Object.assign(errors, variantValidate(step, t));
+        return errors;
+    }
+
+    function handleSave() {
+        const nextErrorsByStepId = {};
+        let hasErrors = false;
+        steps.forEach(step => {
+            const errors = validateStep(step);
+            if (Object.keys(errors).length) {
+                nextErrorsByStepId[step.id] = errors;
+                hasErrors = true;
+            }
+        });
+        setErrorsByStepId(nextErrorsByStepId);
+        if (hasErrors) return;
+
+        const workflowIdToSave = workflowId === null ? uuidv4() : workflowId;
+        const workflowPayload = workflowId === null
+            ? {id: workflowIdToSave, name, color: color || randomColor()}
+            : {...(existingWorkflowRef.current || {id: workflowId}), name, color};
+        window.electronAPI.workflowSave(workflowPayload);
+
+        fetchedSteps.forEach(existing => {
+            window.electronAPI.stepRemove(workflowIdToSave, existing.id);
+        });
+
+        steps.forEach((step, index) => {
+            const payload = {...step};
+            delete payload.open;
+            delete payload.createdAt;
+            delete payload.updatedAt;
+            if (payload.players !== undefined) {
+                payload.players = payload.players.split(';').map(x => x.trim());
+            }
+            window.electronAPI.stepSave({
+                workflowId: workflowIdToSave,
+                value: payload,
+                afterIndex: index === 0 ? undefined : index - 1,
+            });
+        });
+
+        onDone();
+    }
+
     return (
         <div style={{padding: '1em'}}>
             <h1>{t(workflowId === null ? 'sessionCreation.title' : 'sessionCreation.titleEdit')}</h1>
@@ -149,7 +198,7 @@ function SessionCreationScreen({workflowId, onDone}) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={handleSave}>
                     {t('sessionCreation.save')}
                 </button>
             </div>

@@ -120,3 +120,90 @@ describe('SessionCreationScreen - editing an existing workflow', () => {
         expect(screen.getByLabelText('Joueurs').value).toBe('Alex; Sam');
     });
 });
+
+describe('SessionCreationScreen - saving', () => {
+    beforeEach(() => {
+        window.electronAPI = {
+            workflowFetch: jest.fn(),
+            stepFetch: jest.fn(),
+            workflowSave: jest.fn(),
+            stepSave: jest.fn(),
+            stepRemove: jest.fn(),
+        };
+    });
+
+    it('blocks save and shows a validation error when a step is invalid', () => {
+        render(<SessionCreationScreen workflowId={null} onDone={jest.fn()}/>);
+        fireEvent.change(screen.getByLabelText('Nom de la session'), {target: {value: 'Remise des diplômes'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Image'}));
+
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+        expect(window.electronAPI.workflowSave).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByRole('button', {name: "Modifier l'étape"}));
+        expect(screen.getByText('Un fichier est obligatoire.')).toBeTruthy();
+    });
+
+    it('saves a brand-new session: creates the workflow (no createdAt) then each step in order, and calls onDone', () => {
+        const onDone = jest.fn();
+        render(<SessionCreationScreen workflowId={null} onDone={onDone}/>);
+        fireEvent.change(screen.getByLabelText('Nom de la session'), {target: {value: 'Remise des diplômes'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Time'}));
+
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(window.electronAPI.workflowSave).toHaveBeenCalledWith(expect.objectContaining({name: 'Remise des diplômes'}));
+        expect(window.electronAPI.workflowSave.mock.calls[0][0].createdAt).toBeUndefined();
+        expect(window.electronAPI.stepRemove).not.toHaveBeenCalled();
+
+        const savedWorkflowId = window.electronAPI.workflowSave.mock.calls[0][0].id;
+        expect(window.electronAPI.stepSave).toHaveBeenCalledWith(expect.objectContaining({
+            workflowId: savedWorkflowId,
+            value: expect.objectContaining({type: 'time', name: 'Nouveau time', impro: '1', minutes: '2'}),
+            afterIndex: undefined,
+        }));
+        expect(window.electronAPI.stepSave.mock.calls[0][0].value.createdAt).toBeUndefined();
+        expect(onDone).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-saving an edited session deletes all previously-persisted steps then recreates the final list in order', () => {
+        const onDone = jest.fn();
+        render(<SessionCreationScreen workflowId="wf-1" onDone={onDone}/>);
+        act(() => {
+            document.dispatchEvent(new CustomEvent('workflow-onchange', {detail: [{id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', createdAt: '2026-01-01'}]}));
+        });
+        act(() => {
+            document.dispatchEvent(new CustomEvent('step-onchange', {detail: [
+                {id: 'step-1', type: 'time', name: 'Impros', impro: '3', minutes: '2', createdAt: '2026-01-01'},
+            ]}));
+        });
+
+        fireEvent.click(screen.getByRole('button', {name: 'Image'}));
+        fireEvent.click(screen.getAllByRole('button', {name: 'Monter'})[1]);
+
+        // two steps now exist (Image reordered to the front, then the persisted Time step) —
+        // open the first row's editor (Image) by index, since both rows share the same aria-label
+        fireEvent.click(screen.getAllByRole('button', {name: "Modifier l'étape"})[0]);
+        const file = new File(['img'], 'logo.png', {type: 'image/png'});
+        fireEvent.change(screen.getByLabelText('Image'), {target: {files: [file]}});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(window.electronAPI.workflowSave).toHaveBeenCalledWith(expect.objectContaining({
+            id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', createdAt: '2026-01-01',
+        }));
+        expect(window.electronAPI.stepRemove).toHaveBeenCalledWith('wf-1', 'step-1');
+        expect(window.electronAPI.stepSave).toHaveBeenNthCalledWith(1, expect.objectContaining({
+            workflowId: 'wf-1',
+            value: expect.objectContaining({type: 'image', file}),
+            afterIndex: undefined,
+        }));
+        expect(window.electronAPI.stepSave).toHaveBeenNthCalledWith(2, expect.objectContaining({
+            workflowId: 'wf-1',
+            value: expect.objectContaining({type: 'time', name: 'Impros'}),
+            afterIndex: 0,
+        }));
+        expect(window.electronAPI.stepSave.mock.calls[1][0].value.createdAt).toBeUndefined();
+        expect(onDone).toHaveBeenCalledTimes(1);
+    });
+});

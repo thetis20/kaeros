@@ -7,14 +7,14 @@ import { ChevronLeft } from 'react-bootstrap-icons';
 import AddStep from '../Step/AddStep.js';
 import StepDashboard from './StepDashboard.js'
 
-function WorkflowDashboard() {
+function WorkflowDashboard({ onCreateNew, onEditWorkflow }) {
   const { t } = useTranslation();
   const workflows = useWorkflows()
   const [selectedId, select] = useState(null)
   const selectedWorkflow = workflows.find(workflow => workflow.id === selectedId) || null
 
   function create() {
-    window.electronAPI.workflowOpen()
+    onCreateNew()
   }
 
   function remove() {
@@ -22,7 +22,7 @@ function WorkflowDashboard() {
   }
 
   function edit() {
-    window.electronAPI.workflowOpen(selectedWorkflow)
+    onEditWorkflow(selectedWorkflow)
   }
 
   function play() {

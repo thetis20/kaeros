@@ -33,10 +33,17 @@ describe('Sidebar', () => {
         expect(screen.getByTitle('Musique en cours')).toBeTruthy();
     });
 
-    it('renders without throwing and highlights nothing for an unrecognized screen value', () => {
-        render(<Sidebar screen="creation" onNavigate={() => {}} sessionRunning={false} musicPlaying={false}/>);
+    it('renders without throwing and highlights nothing for a genuinely unrecognized screen value', () => {
+        render(<Sidebar screen="unknown" onNavigate={() => {}} sessionRunning={false} musicPlaying={false}/>);
         expect(screen.getByRole('button', {name: /Régie/})).not.toHaveClass('active');
         expect(screen.getByRole('button', {name: /Musique/})).not.toHaveClass('active');
         expect(screen.getByRole('button', {name: /Sessions/})).not.toHaveClass('active');
+    });
+
+    it('treats "creation" as a Sessions sub-view for active-state highlighting', () => {
+        render(<Sidebar screen="creation" onNavigate={() => {}} sessionRunning={false} musicPlaying={false}/>);
+        expect(screen.getByRole('button', {name: /Sessions/})).toHaveClass('active');
+        expect(screen.getByRole('button', {name: /Régie/})).not.toHaveClass('active');
+        expect(screen.getByRole('button', {name: /Musique/})).not.toHaveClass('active');
     });
 });

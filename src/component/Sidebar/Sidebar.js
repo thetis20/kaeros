@@ -33,7 +33,7 @@ function Sidebar({screen, onNavigate, sessionRunning, musicPlaying}) {
             <button
                 type="button"
                 style={{borderRadius: 0, display: 'flex', alignItems: 'center', gap: '.5em'}}
-                className={`btn btn-light ${screen === 'sessions' ? 'active' : ''}`}
+                className={`btn btn-light ${(screen === 'sessions' || screen === 'creation') ? 'active' : ''}`}
                 onClick={() => onNavigate('sessions')}
             >
                 <List/>

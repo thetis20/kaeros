@@ -5,6 +5,7 @@ import Sidebar from '../Sidebar/Sidebar';
 import RegieScreen from '../Screen/RegieScreen';
 import MusiqueScreen from '../Screen/MusiqueScreen';
 import WorkflowDashboard from './WorkflowDashboard';
+import SessionCreationScreen from '../Screen/SessionCreationScreen';
 import useSession from '../Hook/useSession';
 import useAudios from '../Hook/useAudios';
 import AudioController from '../Controller/AudioController';
@@ -12,8 +13,24 @@ import AudioController from '../Controller/AudioController';
 function Dashboard() {
     const {t} = useTranslation();
     const [screen, setScreen] = useState('regie');
+    const [editingWorkflowId, setEditingWorkflowId] = useState(null);
     const session = useSession();
     const audios = useAudios();
+
+    function createNew() {
+        setEditingWorkflowId(null);
+        setScreen('creation');
+    }
+
+    function editWorkflow(workflow) {
+        setEditingWorkflowId(workflow.id);
+        setScreen('creation');
+    }
+
+    function doneCreating() {
+        setEditingWorkflowId(null);
+        setScreen('sessions');
+    }
 
     return (
         <div className="d-flex height-full" style={{height: '100vh'}}>
@@ -30,7 +47,8 @@ function Dashboard() {
                 </div>
                 {screen === 'regie' && <RegieScreen/>}
                 {screen === 'musique' && <MusiqueScreen/>}
-                {screen === 'sessions' && <WorkflowDashboard/>}
+                {screen === 'sessions' && <WorkflowDashboard onCreateNew={createNew} onEditWorkflow={editWorkflow}/>}
+                {screen === 'creation' && <SessionCreationScreen workflowId={editingWorkflowId} onDone={doneCreating}/>}
             </main>
         </div>
     );

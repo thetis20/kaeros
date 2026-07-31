@@ -1,7 +1,7 @@
 import 'react';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ChevronDown, ChevronUp} from 'react-bootstrap-icons';
+import {IconChevronDown, IconChevronUp} from '@tabler/icons-react';
 import useWorkflows from '../Hook/useWorkflows';
 import useSession from '../Hook/useSession';
 import useAudios from '../Hook/useAudios';
@@ -18,9 +18,12 @@ function RegieSessionCard({workflow}) {
     }
 
     return (
-        <div className="card" style={{padding: '1em'}}>
-            <p style={{fontWeight: 500, margin: '0 0 .75em'}}>{workflow.name}</p>
-            <button className="btn btn-primary" style={{width: '100%'}} onClick={start}>{t('workflow.play')}</button>
+        <div className="workflow-card">
+            <div style={{display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10}}>
+                <div className="color-chip" style={{background: workflow.color}}/>
+                <p style={{fontSize: 13, fontWeight: 500, margin: 0, flex: 1}}>{workflow.name}</p>
+            </div>
+            <button className="btn btn-accent" style={{width: '100%'}} onClick={start}>{t('workflow.play')}</button>
         </div>
     );
 }
@@ -42,36 +45,36 @@ function RegieScreen() {
     }
 
     return (
-        <div style={{padding: '1em'}}>
-            <h1>{t('regie.title')}</h1>
+        <div className="content">
+            <p className="screen-title">{t('regie.title')}</p>
 
-            <div className="card" style={{padding: '1em', marginBottom: '1em'}}>
+            <div className="card" style={{marginBottom: 16}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <p style={{fontWeight: 500, margin: 0}}>{t('regie.session.label')}</p>
+                    <p style={{fontSize: 12, color: 'var(--text-secondary)', margin: 0}}>{t('regie.session.label')}</p>
                     <button
                         type="button"
-                        className="btn btn-light"
+                        className="btn btn-icon"
                         aria-label={collapsed ? t('regie.session.expand') : t('regie.session.collapse')}
                         onClick={toggleCollapsed}
                     >
-                        {collapsed ? <ChevronDown/> : <ChevronUp/>}
+                        {collapsed ? <IconChevronDown/> : <IconChevronUp/>}
                     </button>
                 </div>
                 {!collapsed && (
-                    <div style={{marginTop: '1em'}}>
+                    <div style={{marginTop: 12}}>
                         {session ? (
-                            <div style={{display: 'flex', gap: '1em'}}>
-                                <div style={{flex: 1}}>
+                            <div className="two-col">
+                                <div>
                                     <SessionController/>
                                 </div>
-                                <div className="card" style={{flex: 1, padding: '1em'}}>
+                                <div className="card">
                                     <RegieLiveController/>
                                 </div>
                             </div>
                         ) : (
                             <>
-                                <p>{t('regie.empty.title')}</p>
-                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1em'}}>
+                                <p className="screen-sub" style={{margin: '0 0 12px'}}>{t('regie.empty.title')}</p>
+                                <div className="grid grid-cards">
                                     {workflows.map((workflow) => <RegieSessionCard key={workflow.id} workflow={workflow}/>)}
                                 </div>
                             </>
@@ -80,8 +83,8 @@ function RegieScreen() {
                 )}
             </div>
 
-            <div className="card" style={{padding: '1em'}}>
-                <p style={{fontWeight: 500, margin: '0 0 .75em'}}>{t('regie.music.title')}</p>
+            <div className="card">
+                <p style={{fontSize: 12, color: 'var(--text-secondary)', margin: '0 0 8px'}}>{t('regie.music.title')}</p>
                 <RegieTrackPicker tracks={tracks} playingIds={audios.map((audio) => audio.id)} onStart={startTrack}/>
             </div>
         </div>

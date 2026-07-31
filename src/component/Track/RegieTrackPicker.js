@@ -11,39 +11,39 @@ function RegieTrackPicker({ tracks, playingIds, onStart }) {
 
     return (
         <div>
-            <div className="btn-group" role="group" aria-label="tag-filter">
+            <div className="tabs" role="group" aria-label="tag-filter">
                 <button
                     type="button"
-                    className={`btn ${activeTag === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+                    className={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`}
                     onClick={() => setActiveTag('all')}
                 >{t('track.tag.all')}</button>
                 {TAGS.map((tag) => (
                     <button
                         key={tag}
                         type="button"
-                        className={`btn ${activeTag === tag ? 'btn-primary' : 'btn-secondary'}`}
+                        className={`btn btn-sm ${activeTag === tag ? 'is-active' : ''}`}
                         onClick={() => setActiveTag(tag)}
                     >{t(`track.tag.${tag}`)}</button>
                 ))}
             </div>
-            <ul style={{ listStyle: 'none', padding: 0, marginTop: '1em' }}>
+            <div className="step-list">
                 {filtered.map((track) => {
                     const playing = playingIds.includes(track.id);
                     return (
-                        <li key={track.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75em', padding: '0.5em 0' }}>
-                            <span style={{ width: '1em', height: '1em', borderRadius: '50%', background: track.color, display: 'inline-block' }}/>
-                            <span style={{ flex: 1 }}>{track.name}</span>
-                            <span className="badge text-bg-secondary">{t(`track.tag.${track.tag}`)}</span>
+                        <div key={track.id} className="step-row">
+                            <span className="dot" style={{background: track.color}}/>
+                            <span className="step-name">{track.name}</span>
+                            <span className="pill">{t(`track.tag.${track.tag}`)}</span>
                             <button
                                 type="button"
-                                className="btn btn-sm btn-primary"
+                                className="btn btn-sm"
                                 disabled={playing}
                                 onClick={() => onStart(track)}
                             >{playing ? t('track.playing') : t('track.start')}</button>
-                        </li>
+                        </div>
                     );
                 })}
-            </ul>
+            </div>
         </div>
     );
 }

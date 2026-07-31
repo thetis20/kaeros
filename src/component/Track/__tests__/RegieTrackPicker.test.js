@@ -29,7 +29,7 @@ describe('RegieTrackPicker', () => {
     it('calls onStart with the matching track when its start button is clicked', () => {
         const onStart = jest.fn();
         render(<RegieTrackPicker tracks={tracks} playingIds={[]} onStart={onStart}/>);
-        const row = screen.getByText('Générique').closest('li');
+        const row = screen.getByText('Générique').closest('.step-row');
         fireEvent.click(within(row).getByRole('button', {name: 'Démarrer'}));
 
         expect(onStart).toHaveBeenCalledWith(tracks[0]);
@@ -37,7 +37,7 @@ describe('RegieTrackPicker', () => {
 
     it('disables the button and shows "En cours" for a track whose id is in playingIds', () => {
         render(<RegieTrackPicker tracks={tracks} playingIds={['t1']} onStart={() => {}}/>);
-        const row = screen.getByText('Générique').closest('li');
+        const row = screen.getByText('Générique').closest('.step-row');
 
         expect(within(row).getByRole('button', {name: 'En cours'})).toBeDisabled();
     });

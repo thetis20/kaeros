@@ -46,9 +46,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
     workflowFetch: () => ipcRenderer.send('workflow-fetch'),
     workflowOpen: (value) => ipcRenderer.send('workflow-open', value),
     workflowRemove: (id) => ipcRenderer.send('workflow-remove', id),
+    workflowSave: (value) => ipcRenderer.send('workflow-save', value),
     stepOpen: ({workflowId, value, afterIndex}) => ipcRenderer.send('step-open', {workflowId, value, afterIndex}),
     stepFetch: (workflowId) => ipcRenderer.send('step-fetch', workflowId),
     stepRemove: (workflowId, id) => ipcRenderer.send('step-remove', workflowId, id),
+    stepSave: ({workflowId, value, afterIndex}) => {
+        if (value.file !== undefined) {
+            value.src = webUtils.getPathForFile(value.file)
+            delete value.file
+        }
+        ipcRenderer.send('step-save-main', {workflowId, value, afterIndex})
+    },
     sessionFetch: () => ipcRenderer.send('session-fetch'),
     sessionPlay: (workflow) => ipcRenderer.send('session-play', workflow),
     sessionNext: () => ipcRenderer.send('session-next'),

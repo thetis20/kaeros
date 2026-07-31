@@ -2,34 +2,17 @@ import 'react';
 import {useEffect} from 'react';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
-import {SquareFill} from "react-bootstrap-icons";
+import {IconPlayerStop} from '@tabler/icons-react';
 import useAudios from '../Hook/useAudios';
 
 function AudioControllerItem({audio, onStop}) {
-    return <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
-    }}>
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%'
-        }}>
-            {audio.name}
-            <button onClick={() => onStop(audio)} style={{
-                marginLeft: '1em',
-                background: 'none',
-                color: 'white',
-                border: '1px solid white',
-                borderRadius: '5px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '1em'
-            }}>stop <SquareFill/></button>
+    return <div className="audio-row" style={{flexDirection: 'column', alignItems: 'stretch'}}>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
+            <span className="dot" style={{background: audio.color || 'var(--accent)'}}/>
+            <span style={{flex: 1}}>{audio.name}</span>
+            <button className="btn btn-icon" aria-label="stop" onClick={() => onStop(audio)}>
+                <IconPlayerStop/>
+            </button>
         </div>
         <AudioPlayer
             autoPlay

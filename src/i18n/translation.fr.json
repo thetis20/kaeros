@@ -246,5 +246,22 @@
     },
     "start": "Démarrer",
     "playing": "En cours"
+  },
+  "sessionCreation": {
+    "title": "Créer une session",
+    "titleEdit": "Modifier une session",
+    "subtitle": "Liste ordonnée d'étapes, insertion possible entre chaque étape.",
+    "save": "Enregistrer",
+    "add": "Ajouter :",
+    "up": "Monter",
+    "down": "Descendre",
+    "editToggle": "Modifier l'étape",
+    "delete": "Supprimer l'étape",
+    "newStepName": {
+      "image": "Nouvelle image",
+      "dubbing-video": "Nouveau doublage",
+      "time": "Nouveau time",
+      "battle-royal": "Nouveau battle royal"
+    }
   }
 }

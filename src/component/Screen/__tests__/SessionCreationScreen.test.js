@@ -140,7 +140,32 @@ describe('SessionCreationScreen - saving', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
         expect(window.electronAPI.workflowSave).not.toHaveBeenCalled();
 
-        fireEvent.click(screen.getByRole('button', {name: "Modifier l'étape"}));
+        // the invalid step auto-opens on a blocked save, so its error is visible without an extra click
+        expect(screen.getByText('Un fichier est obligatoire.')).toBeTruthy();
+    });
+
+    it('blocks save and shows a validation error when the session name is empty', () => {
+        render(<SessionCreationScreen workflowId={null} onDone={jest.fn()}/>);
+        fireEvent.click(screen.getByRole('button', {name: 'Time'}));
+
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(window.electronAPI.workflowSave).not.toHaveBeenCalled();
+        expect(window.electronAPI.stepRemove).not.toHaveBeenCalled();
+        expect(window.electronAPI.stepSave).not.toHaveBeenCalled();
+        expect(screen.getByText('Le nom est obligatoire.')).toBeTruthy();
+    });
+
+    it('auto-opens a closed invalid step and shows its error when save is blocked', () => {
+        render(<SessionCreationScreen workflowId={null} onDone={jest.fn()}/>);
+        fireEvent.change(screen.getByLabelText('Nom de la session'), {target: {value: 'Remise des diplômes'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Image'}));
+
+        expect(screen.queryByText('Un fichier est obligatoire.')).toBeNull();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(window.electronAPI.workflowSave).not.toHaveBeenCalled();
         expect(screen.getByText('Un fichier est obligatoire.')).toBeTruthy();
     });
 

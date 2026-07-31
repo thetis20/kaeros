@@ -73,6 +73,7 @@ function SessionCreationScreen({workflowId, onDone}) {
     const [color, setColor] = useState(() => workflowId === null ? randomColor() : null);
     const [steps, setSteps] = useState([]);
     const [errorsByStepId, setErrorsByStepId] = useState({});
+    const [nameError, setNameError] = useState(null);
     const nameLoadedRef = useRef(false);
     const stepsLoadedRef = useRef(false);
     const existingWorkflowRef = useRef(null);
@@ -145,6 +146,9 @@ function SessionCreationScreen({workflowId, onDone}) {
     }
 
     function handleSave() {
+        const nameIsInvalid = !name || !name.trim();
+        setNameError(nameIsInvalid ? t('workflow.form.error.name') : null);
+
         const nextErrorsByStepId = {};
         let hasErrors = false;
         steps.forEach(step => {
@@ -155,7 +159,10 @@ function SessionCreationScreen({workflowId, onDone}) {
             }
         });
         setErrorsByStepId(nextErrorsByStepId);
-        if (hasErrors) return;
+        if (hasErrors) {
+            setSteps(current => current.map(step => nextErrorsByStepId[step.id] ? {...step, open: true} : step));
+        }
+        if (nameIsInvalid || hasErrors) return;
 
         const workflowIdToSave = workflowId === null ? uuidv4() : workflowId;
         const workflowPayload = workflowId === null
@@ -189,18 +196,21 @@ function SessionCreationScreen({workflowId, onDone}) {
         <div style={{padding: '1em'}}>
             <h1>{t(workflowId === null ? 'sessionCreation.title' : 'sessionCreation.titleEdit')}</h1>
             <p>{t('sessionCreation.subtitle')}</p>
-            <div style={{display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20}}>
-                <input
-                    type="text"
-                    aria-label={t('playlist.form.name')}
-                    style={{flex: 1, fontWeight: 500}}
-                    className="form-control"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-                <button className="btn btn-primary" onClick={handleSave}>
-                    {t('sessionCreation.save')}
-                </button>
+            <div style={{marginBottom: 20}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: 10}}>
+                    <input
+                        type="text"
+                        aria-label={t('playlist.form.name')}
+                        style={{flex: 1, fontWeight: 500}}
+                        className={`form-control ${nameError ? 'is-invalid' : ''}`}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                    <button className="btn btn-primary" onClick={handleSave}>
+                        {t('sessionCreation.save')}
+                    </button>
+                </div>
+                {nameError && <div className="invalid-feedback" style={{display: 'block'}}>{nameError}</div>}
             </div>
             <div style={{marginBottom: 16}}>
                 {steps.map((step, index) => {

@@ -127,7 +127,7 @@ describe('RegieLiveController - battle-royal tab', () => {
         expect(screen.getByText(/Alice/)).toBeTruthy();
         expect(screen.getByText(/Bob/)).toBeTruthy();
 
-        const incrementAlice = document.querySelector('#regie-controller .btn-primary');
+        const incrementAlice = document.querySelector('#regie-controller').querySelectorAll('[aria-label="increment"]')[0];
         fireEvent.click(incrementAlice);
 
         expect(window.electronAPI.trackChange).toHaveBeenCalledWith({

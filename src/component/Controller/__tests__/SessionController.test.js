@@ -28,7 +28,7 @@ describe('SessionController', () => {
         window.session = {track: {type: 'time', paused: true, status: 'STATUS_RUNNING', count: 1, impro: 5}, steps: [{id: 's1', name: 'Step 1'}], index: 0};
         render(<SessionController/>);
 
-        fireEvent.click(document.querySelector('svg.bi-play').closest('button'));
+        fireEvent.click(screen.getByRole('button', {name: 'play'}));
         expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: false});
     });
 

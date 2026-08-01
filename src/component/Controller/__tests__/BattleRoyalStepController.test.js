@@ -9,10 +9,10 @@ describe('BattleRoyalStepController', () => {
 
     it('renders a plain clickable row when it is not the current step', () => {
         const session = {index: 0, toStep: jest.fn()};
-        render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={2}/>);
+        const {container} = render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={2}/>);
 
-        const item = screen.getByText('BR Round');
-        expect(item.className).not.toContain('list-group-item-primary');
+        const item = container.querySelector('.step-row');
+        expect(item.className).not.toContain('current');
         fireEvent.click(item);
         expect(session.toStep).toHaveBeenCalledWith(2);
     });
@@ -25,9 +25,9 @@ describe('BattleRoyalStepController', () => {
             ],
         });
         const session = {index: 0, track, toStep: jest.fn()};
-        render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={0}/>);
+        const {container} = render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={0}/>);
 
-        expect(screen.getByText('BR Round').className).toContain('list-group-item-primary');
+        expect(container.querySelector('.step-row').className).toContain('current');
         expect(screen.getByText(/Alice/)).toBeTruthy();
         expect(screen.getByText(/Bob/)).toBeTruthy();
     });
@@ -39,8 +39,8 @@ describe('BattleRoyalStepController', () => {
         const session = {index: 0, track, toStep: jest.fn()};
         render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={0}/>);
 
-        const incrementButton = document.querySelector('.btn-primary');
-        const decrementButton = document.querySelector('.btn-light');
+        const incrementButton = screen.getByRole('button', {name: 'increment'});
+        const decrementButton = screen.getByRole('button', {name: 'decrement'});
         expect(incrementButton.disabled).toBe(true);
         expect(decrementButton.disabled).toBe(true);
     });
@@ -52,8 +52,8 @@ describe('BattleRoyalStepController', () => {
         const session = {index: 0, track, toStep: jest.fn()};
         render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={0}/>);
 
-        const incrementButton = document.querySelector('.btn-primary');
-        const decrementButton = document.querySelector('.btn-light');
+        const incrementButton = screen.getByRole('button', {name: 'increment'});
+        const decrementButton = screen.getByRole('button', {name: 'decrement'});
         expect(incrementButton.disabled).toBe(false);
         expect(decrementButton.disabled).toBe(true);
     });
@@ -68,7 +68,7 @@ describe('BattleRoyalStepController', () => {
         const session = {index: 0, track, toStep: jest.fn()};
         render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={0}/>);
 
-        const incrementAlice = document.querySelector('.btn-primary');
+        const incrementAlice = screen.getAllByRole('button', {name: 'increment'})[0];
         fireEvent.click(incrementAlice);
 
         expect(window.electronAPI.trackChange).toHaveBeenCalledWith({
@@ -89,8 +89,8 @@ describe('BattleRoyalStepController', () => {
         const session = {index: 0, track, toStep: jest.fn()};
         render(<BattleRoyalStepController session={session} step={{id: 's1', name: 'BR Round'}} index={0}/>);
 
-        const disableButtons = document.querySelectorAll('.btn-danger');
-        const enableButtons = document.querySelectorAll('.btn-success');
+        const disableButtons = screen.getAllByRole('button', {name: 'disable'});
+        const enableButtons = screen.getAllByRole('button', {name: 'enable'});
         expect(disableButtons).toHaveLength(1);
         expect(enableButtons).toHaveLength(1);
 

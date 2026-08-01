@@ -1,8 +1,7 @@
 import 'react';
 import {useEffect, Fragment} from 'react';
-import {ChevronBarLeft, ChevronBarRight, Dash, Pause, Play, Plus} from 'react-bootstrap-icons';
+import {IconPlayerTrackPrev, IconPlayerTrackNext, IconMinus, IconPlayerPause, IconPlayerPlay, IconPlus} from '@tabler/icons-react';
 import {useTranslation} from 'react-i18next';
-import {white} from '../../enum/COLOR'
 import useSession from '../Hook/useSession';
 import StepController from "./StepController";
 
@@ -45,127 +44,23 @@ function SessionController({display}) {
 
     return (
         <Fragment>
-            <h5>{t('session.name')}</h5>
-            <div style={{width: '100%', display: 'flex', height: 150}}>
-                <div style={{width: '100%', display: 'flex'}}>
-                    <div style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexDirection: 'column'
-                    }}>
-                        <div style={{
-                            height: 40,
-                            width: 40,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            {session.canPlus() && <button
-                                style={{
-                                    fontSize: 25,
-                                    border: 'none',
-                                    color: white,
-                                    background: 'none'
-                                }}
-                                onClick={session.plus}><Plus/></button>}
-                        </div>
-                        <div style={{
-                            height: 40,
-                            width: 40,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            {session.hasPrevious() && <button
-                                style={{
-                                    fontSize: 25,
-                                    border: 'none',
-                                    color: white,
-                                    background: 'none'
-                                }}
-                                onClick={session.previous}><ChevronBarLeft/></button>}
-                        </div>
-                    </div>
-                    <div style={{
-                        flex: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        {track.canPlay() && <button
-                            style={{
-                                fontSize: 50,
-                                border: 'none',
-                                color: white,
-                                background: 'none'
-                            }}
-                            onClick={session.play}><Play/></button>}
-                        {track.canPause() && <button
-                            style={{
-                                fontSize: 50,
-                                border: 'none',
-                                color: white,
-                                background: 'none'
-                            }}
-                            onClick={session.pause}><Pause/></button>}
-                    </div>
-                    <div style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexDirection: 'column'
-                    }}>
-                        <div style={{
-                            height: 40,
-                            width: 40,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            {session.canMinus() && <button
-                                style={{
-                                    fontSize: 25,
-                                    border: 'none',
-                                    color: white,
-                                    background: 'none'
-                                }}
-                                onClick={session.minus}><Dash/></button>}
-                        </div>
-                        <div style={{
-                            height: 40,
-                            width: 40,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            {session.hasNext() && <button
-                                style={{
-                                    fontSize: 25,
-                                    border: 'none',
-                                    color: white,
-                                    background: 'none'
-                                }}
-                                onClick={session.next}><ChevronBarRight/></button>}
-                        </div>
-                    </div>
-                </div>
+            <p style={{fontWeight: 500, fontSize: 15, margin: '0 0 12px'}}>{t('session.name')}</p>
+            <div className="top-bar">
+                {session.canMinus() && <button type="button" className="btn btn-icon" aria-label="minus" onClick={session.minus}><IconMinus/></button>}
+                {session.hasPrevious() && <button type="button" className="btn btn-icon" aria-label="previous" onClick={session.previous}><IconPlayerTrackPrev/></button>}
+                {track.canPlay() && <button type="button" className="btn btn-icon btn-accent" aria-label="play" onClick={session.play}><IconPlayerPlay/></button>}
+                {track.canPause() && <button type="button" className="btn btn-icon btn-accent" aria-label="pause" onClick={session.pause}><IconPlayerPause/></button>}
+                {session.hasNext() && <button type="button" className="btn btn-icon" aria-label="next" onClick={session.next}><IconPlayerTrackNext/></button>}
+                {session.canPlus() && <button type="button" className="btn btn-icon" aria-label="plus" onClick={session.plus}><IconPlus/></button>}
             </div>
-            <ul className="list-group" style={{
-                margin: '0 -1em',
-                width: 280,
-                borderRadius: 0,
-                overflowY: 'auto'
-            }}>
-                {session.steps.map((step, index) =><StepController
+            <div className="step-list">
+                {session.steps.map((step, index) => <StepController
                     key={step.id}
                     session={session}
                     step={step}
                     index={index}
                 />)}
-            </ul>
+            </div>
         </Fragment>
     );
 }

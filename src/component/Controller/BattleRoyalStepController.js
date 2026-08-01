@@ -1,70 +1,42 @@
 import 'react';
-import {useEffect, Fragment} from 'react';
-import {ChevronBarLeft, ChevronBarRight, Dash, Pause, Play, Plus, Recycle, Trash} from 'react-bootstrap-icons';
-import {useTranslation} from 'react-i18next';
-import {white} from '../../enum/COLOR'
+import {IconMinus, IconPlus, IconRecycle, IconTrash} from '@tabler/icons-react';
 import useSession from '../Hook/useSession';
 
 function BattleRoyalStepController({session, step, index}) {
-    const isCurrentStep = session.index === index
+    const isCurrentStep = session.index === index;
+    const isDone = session.index > index;
     if (!isCurrentStep) {
-        return <li
+        return <div
+            className={`step-row ${isDone ? 'done' : ''}`}
             style={{cursor: 'pointer'}}
             onClick={() => session.toStep(index)}
-            className={'list-group-item ' + ((session.index === index) ? 'list-group-item-primary' : (session.index <= index ? '' : 'list-group-item-secondary'))}
         >
-            {step.name}
-        </li>
+            <span className="step-name">{step.name}</span>
+        </div>
     }
     const track = session.track;
 
-    return <li
-        style={{cursor: 'pointer'}}
-        className={'list-group-item list-group-item-primary'}
-    >
-        {step.name}
-        <ul style={{paddingLeft: '.5em'}}>
-            {track.players.map(player => <li
-                key={player.id}
-                className={'list-group-item'}
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0 0 0 .5em'
-                }}
-            >
-                {player.name} : {player.score}
-
-                <div>
-                    <button
-                        style={{borderRadius: 0}}
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={player.increment}
-                        disabled={!player.canIncrement()}
-                    >
-                        <Plus/>
+    return <div className="step-row current" style={{flexDirection: 'column', alignItems: 'stretch'}}>
+        <span className="step-name">{step.name}</span>
+        <div className="step-list" style={{marginTop: 8}}>
+            {track.players.map(player => (
+                <div key={player.id} className={`player-row ${!player.enabled ? 'disabled' : ''}`}>
+                    <span style={{flex: 1, fontSize: 14}}>{player.name}</span>
+                    <span style={{fontSize: 14, fontWeight: 500, minWidth: 20, textAlign: 'center'}}>{player.score}</span>
+                    <button type="button" className="btn btn-icon" onClick={player.decrement} disabled={!player.canDecrement()} aria-label="decrement">
+                        <IconMinus/>
                     </button>
-                    <button
-                        style={{borderRadius: 0}}
-                        type="button"
-                        className="btn btn-light"
-                        onClick={player.decrement}
-                        disabled={!player.canDecrement()}
-                    >
-                        <Dash/>
+                    <button type="button" className="btn btn-icon" onClick={player.increment} disabled={!player.canIncrement()} aria-label="increment">
+                        <IconPlus/>
                     </button>
                     {player.canDisable() &&
-                        <button style={{borderRadius: 0}} type="button" className="btn btn-danger"
-                                onClick={player.disable}><Trash/></button>}
+                        <button type="button" className="btn btn-icon" onClick={player.disable} aria-label="disable"><IconTrash/></button>}
                     {player.canEnable() &&
-                        <button style={{borderRadius: 0}} type="button" className="btn btn-success"
-                                onClick={player.enable}><Recycle/></button>}
+                        <button type="button" className="btn btn-icon" onClick={player.enable} aria-label="enable"><IconRecycle/></button>}
                 </div>
-            </li>)}
-        </ul>
-    </li>
+            ))}
+        </div>
+    </div>
 }
 
 export default BattleRoyalStepController;

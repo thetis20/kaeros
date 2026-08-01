@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next';
+import { IconUpload } from '@tabler/icons-react';
 import { getFilename, hasSource } from '../../lib/filename';
 
 export function validate(value, t) {
@@ -30,43 +31,40 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
     }
 
     return <Fragment>
-        <div className='form-group'>
-            <label htmlFor={`step-file-${value.id}`} className="form-label">{t('step.form.src.label')}</label>
-            <div>
-                <input
-                    type="file"
-                    style={{display: 'none'}}
-                    className={errors.file ? 'is-invalid' : undefined}
-                    id={`step-file-${value.id}`}
-                    onChange={handleFile}
-                />
-                <label className="btn btn-light" htmlFor={`step-file-${value.id}`}>{getFilename(value, t('step.form.src.placeholder'))}</label>
-                {errors.file && <div className="invalid-feedback">{errors.file}</div>}
-            </div>
-        </div>
-        <div className='form-group'>
-            <label htmlFor={`step-time-${value.id}`} className="form-label">{t('step.form.time')}</label>
+        <label htmlFor={`step-file-${value.id}`} className="field-label">{t('step.form.src.label')}</label>
+        <div className="file-row">
+            <div className="file-thumb"><IconUpload size={18}/></div>
             <input
-                type="text"
-                id={`step-time-${value.id}`}
-                className={`form-control ${errors.time ? 'is-invalid' : ''}`}
-                value={value.time ?? ''}
-                name='time'
-                onChange={handleChange}
+                type="file"
+                style={{display: 'none'}}
+                className={errors.file ? 'is-invalid' : undefined}
+                id={`step-file-${value.id}`}
+                onChange={handleFile}
             />
-            {errors.time && <div className="invalid-feedback">{errors.time}</div>}
+            <label className="btn btn-sm" htmlFor={`step-file-${value.id}`}>{getFilename(value, t('step.form.src.placeholder'))}</label>
         </div>
-        <div className='form-group'>
-            <label htmlFor={`step-description-${value.id}`}
-                   className="form-label">{t('step.form.description')}</label>
-            <textarea
-                id={`step-description-${value.id}`}
-                className="form-control"
-                value={value.description ?? ''}
-                name='description'
-                onChange={handleChange}
-            />
-        </div>
+        {errors.file && <div className="invalid-feedback">{errors.file}</div>}
+
+        <label htmlFor={`step-time-${value.id}`} className="field-label">{t('step.form.time')}</label>
+        <input
+            type="text"
+            id={`step-time-${value.id}`}
+            style={{width: 120, marginBottom: 10}}
+            className={errors.time ? 'is-invalid' : ''}
+            value={value.time ?? ''}
+            name='time'
+            onChange={handleChange}
+        />
+        {errors.time && <div className="invalid-feedback">{errors.time}</div>}
+
+        <label htmlFor={`step-description-${value.id}`} className="field-label">{t('step.form.description')}</label>
+        <textarea
+            id={`step-description-${value.id}`}
+            style={{width: '100%'}}
+            value={value.description ?? ''}
+            name='description'
+            onChange={handleChange}
+        />
     </Fragment>
 }
 

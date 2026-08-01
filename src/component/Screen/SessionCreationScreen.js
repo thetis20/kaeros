@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {v4 as uuidv4} from 'uuid';
-import {ChevronUp, ChevronDown, Pen, Trash, Image, CameraReelsFill, ClockFill, ShieldFill} from 'react-bootstrap-icons';
+import {IconChevronUp, IconChevronDown, IconEdit, IconTrash, IconPhoto, IconMovie, IconClock, IconShield} from '@tabler/icons-react';
 import useWorkflows from '../Hook/useWorkflows';
 import useSteps from '../Hook/useSteps';
 import ImageStep, {validate as validateImage} from '../Step/ImageStep';
@@ -12,10 +12,10 @@ import BattleRoyalStep, {validate as validateBattleRoyal} from '../Step/BattleRo
 const STEP_TYPES = ['image', 'dubbing-video', 'time', 'battle-royal'];
 
 const stepIcons = {
-    image: Image,
-    'dubbing-video': CameraReelsFill,
-    time: ClockFill,
-    'battle-royal': ShieldFill,
+    image: IconPhoto,
+    'dubbing-video': IconMovie,
+    time: IconClock,
+    'battle-royal': IconShield,
 };
 
 const variantComponents = {
@@ -206,7 +206,7 @@ function SessionCreationScreen({workflowId, onDone}) {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
-                    <button className="btn btn-primary" onClick={handleSave}>
+                    <button className="btn btn-accent-solid" onClick={handleSave}>
                         {t('sessionCreation.save')}
                     </button>
                 </div>
@@ -219,15 +219,15 @@ function SessionCreationScreen({workflowId, onDone}) {
                     const errors = errorsByStepId[step.id] || {};
                     return (
                         <div key={step.id} className="accordion-item">
-                            <div style={{display: 'flex', alignItems: 'center', gap: 8, padding: '.5em 0'}}>
+                            <div className="accordion-header">
                                 <span>{index + 1}</span>
                                 <Icon/>
                                 <span style={{flex: 1}}>{step.name}</span>
                                 <span>{t(stepTypeLabelKeys[step.type])}</span>
-                                <button className="btn btn-link" aria-label={t('sessionCreation.up')} onClick={() => moveUp(index)} disabled={index === 0}><ChevronUp/></button>
-                                <button className="btn btn-link" aria-label={t('sessionCreation.down')} onClick={() => moveDown(index)} disabled={index === steps.length - 1}><ChevronDown/></button>
-                                <button className="btn btn-link" aria-label={t('sessionCreation.editToggle')} onClick={() => toggleOpen(index)}><Pen/></button>
-                                <button className="btn btn-link" aria-label={t('sessionCreation.delete')} onClick={() => removeStep(index)}><Trash/></button>
+                                <button className="btn btn-icon" aria-label={t('sessionCreation.up')} onClick={() => moveUp(index)} disabled={index === 0}><IconChevronUp/></button>
+                                <button className="btn btn-icon" aria-label={t('sessionCreation.down')} onClick={() => moveDown(index)} disabled={index === steps.length - 1}><IconChevronDown/></button>
+                                <button className="btn btn-icon" aria-label={t('sessionCreation.editToggle')} onClick={() => toggleOpen(index)}><IconEdit/></button>
+                                <button className="btn btn-icon" aria-label={t('sessionCreation.delete')} onClick={() => removeStep(index)}><IconTrash/></button>
                             </div>
                             {step.open && (
                                 <div style={{padding: '0 0 1em 2em'}}>
@@ -259,7 +259,7 @@ function SessionCreationScreen({workflowId, onDone}) {
                 {STEP_TYPES.map(type => {
                     const Icon = stepIcons[type];
                     return (
-                        <button key={type} className="btn btn-light" onClick={() => addStep(type)}>
+                        <button key={type} className="btn btn-sm" onClick={() => addStep(type)}>
                             <Icon style={{marginRight: '.5em'}}/>
                             {t(stepTypeLabelKeys[type])}
                         </button>

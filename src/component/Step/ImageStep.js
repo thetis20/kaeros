@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next';
+import { IconUpload } from '@tabler/icons-react';
 import { getFilename, hasSource } from '../../lib/filename';
 
 export function validate(value, t) {
@@ -20,20 +21,19 @@ function ImageStep({ value, setValue, errors = {}, setErrors = () => {} }) {
     }
 
     return <Fragment>
-        <div className='form-group'>
-            <label htmlFor={`step-file-${value.id}`} className="form-label">{t('step.form.src.label')}</label>
-            <div className="custom-file">
-                <input
-                    type="file"
-                    style={{ display: 'none' }}
-                    className={`custom-file-input${errors.file ? ' is-invalid' : ''}`}
-                    id={`step-file-${value.id}`}
-                    onChange={handleFile}
-                />
-                <label className="btn btn-light" htmlFor={`step-file-${value.id}`}>{getFilename(value, t('step.form.src.placeholder'))}</label>
-                {errors.file && <div className="invalid-feedback">{errors.file}</div>}
-            </div>
+        <label htmlFor={`step-file-${value.id}`} className="field-label">{t('step.form.src.label')}</label>
+        <div className="file-row">
+            <div className="file-thumb"><IconUpload size={18}/></div>
+            <input
+                type="file"
+                style={{ display: 'none' }}
+                className={errors.file ? 'is-invalid' : undefined}
+                id={`step-file-${value.id}`}
+                onChange={handleFile}
+            />
+            <label className="btn btn-sm" htmlFor={`step-file-${value.id}`}>{getFilename(value, t('step.form.src.placeholder'))}</label>
         </div>
+        {errors.file && <div className="invalid-feedback">{errors.file}</div>}
     </Fragment>
 }
 

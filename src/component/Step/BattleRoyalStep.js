@@ -21,21 +21,20 @@ function BattleRoyalStep({ value, setValue, errors = {}, setErrors = () => {} })
     }
 
     return <Fragment>
-        <div className='form-group'>
-            <label htmlFor={`step-players-${value.id}`} className="form-label">{t('step.form.players.label')}</label>
-            <input
-                type="text"
-                id={`step-players-${value.id}`}
-                className={`form-control ${errors.players ? 'is-invalid' : ''}`}
-                value={value.players ?? ''}
-                name='players'
-                onChange={handleChange}
-            />
-            {errors.players && <div className="invalid-feedback">{errors.players}</div>}
-            <small id={`step-players-${value.id}-help`} className="form-text text-muted">
-                {t('step.form.players.help')}
-            </small>
-        </div>
+        <label htmlFor={`step-players-${value.id}`} className="field-label">{t('step.form.players.label')}</label>
+        <input
+            type="text"
+            id={`step-players-${value.id}`}
+            style={{width: '100%'}}
+            className={errors.players ? 'is-invalid' : ''}
+            value={value.players ?? ''}
+            name='players'
+            onChange={handleChange}
+        />
+        {errors.players && <div className="invalid-feedback">{errors.players}</div>}
+        <small id={`step-players-${value.id}-help`} style={{fontSize: 12, color: 'var(--text-muted)'}}>
+            {t('step.form.players.help')}
+        </small>
     </Fragment>
 }
 

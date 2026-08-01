@@ -25,33 +25,31 @@ function TimeStep({ value, setValue, errors = {}, setErrors = () => {} }) {
     }
 
     return <Fragment>
-        <div className='form-group'>
-            <label htmlFor={`step-impro-${value.id}`} className="form-label">{t('step.form.impro')}</label>
-            <input
-                type="number"
-                min="1"
-                id={`step-impro-${value.id}`}
-                className={`form-control ${errors.impro ? 'is-invalid' : ''}`}
-                value={value.impro ?? ''}
-                name='impro'
-                onChange={handleChange}
-            />
-            {errors.impro && <div className="invalid-feedback">{errors.impro}</div>}
-        </div>
-        <div className='form-group'>
-            <label htmlFor={`step-minutes-${value.id}`}
-                   className="form-label">{t('step.form.minutes')}</label>
-            <input
-                type="number"
-                min="1"
-                id={`step-minutes-${value.id}`}
-                className={`form-control ${errors.minutes ? 'is-invalid' : ''}`}
-                value={value.minutes ?? ''}
-                name='minutes'
-                onChange={handleChange}
-            />
-            {errors.minutes && <div className="invalid-feedback">{errors.minutes}</div>}
-        </div>
+        <label htmlFor={`step-impro-${value.id}`} className="field-label">{t('step.form.impro')}</label>
+        <input
+            type="number"
+            min="1"
+            id={`step-impro-${value.id}`}
+            style={{width: 100, marginBottom: 10}}
+            className={errors.impro ? 'is-invalid' : ''}
+            value={value.impro ?? ''}
+            name='impro'
+            onChange={handleChange}
+        />
+        {errors.impro && <div className="invalid-feedback">{errors.impro}</div>}
+
+        <label htmlFor={`step-minutes-${value.id}`} className="field-label">{t('step.form.minutes')}</label>
+        <input
+            type="number"
+            min="1"
+            id={`step-minutes-${value.id}`}
+            style={{width: 100}}
+            className={errors.minutes ? 'is-invalid' : ''}
+            value={value.minutes ?? ''}
+            name='minutes'
+            onChange={handleChange}
+        />
+        {errors.minutes && <div className="invalid-feedback">{errors.minutes}</div>}
     </Fragment>
 }
 

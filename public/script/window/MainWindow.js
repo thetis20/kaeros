@@ -17,8 +17,6 @@ const {
 } = require('../infrastructure/useCase.js');
 const Workflow = require('../application/entity/Workflow.js');
 const StepFactory = require('../application/entity/step/StepFactory.js');
-const WorkflowWindow = require('./WorkflowWindow.js');
-const StepWindow = require('./StepWindow.js')
 const SessionWindow = require('./SessionWindow.js')
 
 class MainWindow {
@@ -28,13 +26,10 @@ class MainWindow {
         this.trackRemove = this.trackRemove.bind(this)
         this.trackPlay = this.trackPlay.bind(this)
         this.trackEnd = this.trackEnd.bind(this)
-        this.workflowOpen = this.workflowOpen.bind(this)
         this.workflowFetch = this.workflowFetch.bind(this)
-        this.workflowClose = this.workflowClose.bind(this)
         this.workflowRemove = this.workflowRemove.bind(this)
         this.workflowSave = this.workflowSave.bind(this)
         this.stepFetch = this.stepFetch.bind(this)
-        this.stepOpen = this.stepOpen.bind(this)
         this.stepRemove = this.stepRemove.bind(this)
         this.stepSave = this.stepSave.bind(this)
         this.sessionPlay = this.sessionPlay.bind(this)
@@ -69,12 +64,10 @@ class MainWindow {
             ipcMain.removeListener('track-remove', this.trackRemove)
             ipcMain.removeListener('track-play', this.trackPlay)
             ipcMain.removeListener('track-end', this.trackEnd)
-            ipcMain.removeListener('workflow-open', this.workflowOpen)
             ipcMain.removeListener('workflow-fetch', this.workflowFetch)
             ipcMain.removeListener('workflow-remove', this.workflowRemove)
             ipcMain.removeListener('workflow-save', this.workflowSave)
             ipcMain.removeListener('step-fetch', this.stepFetch)
-            ipcMain.removeListener('step-open', this.stepOpen)
             ipcMain.removeListener('step-remove', this.stepRemove)
             ipcMain.removeListener('step-save-main', this.stepSave)
             ipcMain.removeListener('session-play', this.sessionPlay)
@@ -89,33 +82,18 @@ class MainWindow {
         ipcMain.addListener('track-remove', this.trackRemove)
         ipcMain.addListener('track-play', this.trackPlay)
         ipcMain.addListener('track-end', this.trackEnd)
-        ipcMain.addListener('workflow-open', this.workflowOpen)
         ipcMain.addListener('workflow-fetch', this.workflowFetch)
         ipcMain.addListener('workflow-remove', this.workflowRemove)
         ipcMain.addListener('workflow-save', this.workflowSave)
         ipcMain.addListener('step-fetch', this.stepFetch)
-        ipcMain.addListener('step-open', this.stepOpen)
         ipcMain.addListener('step-remove', this.stepRemove)
         ipcMain.addListener('step-save-main', this.stepSave)
         ipcMain.addListener('session-play', this.sessionPlay)
     }
 
-    workflowOpen(event, value) {
-        this.workflowWindow = new WorkflowWindow({
-            mainWindow: this.window,
-            value,
-            onClose: this.workflowClose
-        })
-        this.workflowWindow.start()
-    }
-
     async workflowFetch() {
         const workflows = await listWorkflowUseCase.execute();
         this.window.webContents.send('workflow-onchange', workflows);
-    }
-
-    workflowClose() {
-        this.workflowWindow = null;
     }
 
     async workflowRemove(event, id) {
@@ -163,17 +141,6 @@ class MainWindow {
     async stepFetch(event, workflowId) {
         const steps = await listStepByWorkflowUseCase.execute(workflowId)
         this.window.webContents.send('step-onchange', steps);
-    }
-
-    stepOpen(event, {workflowId, value, afterIndex}) {
-        this.stepWindow = new StepWindow({
-            mainWindow: this.window,
-            value,
-            onClose: this.stepClose,
-            afterIndex,
-            workflowId
-        })
-        this.stepWindow.start()
     }
 
     async stepRemove(event, workflowId, id) {

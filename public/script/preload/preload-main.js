@@ -44,10 +44,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     trackPlay: (id) => ipcRenderer.send('track-play', id),
     trackEnd: (id) => ipcRenderer.send('track-end', id),
     workflowFetch: () => ipcRenderer.send('workflow-fetch'),
-    workflowOpen: (value) => ipcRenderer.send('workflow-open', value),
     workflowRemove: (id) => ipcRenderer.send('workflow-remove', id),
     workflowSave: (value) => ipcRenderer.send('workflow-save', value),
-    stepOpen: ({workflowId, value, afterIndex}) => ipcRenderer.send('step-open', {workflowId, value, afterIndex}),
     stepFetch: (workflowId) => ipcRenderer.send('step-fetch', workflowId),
     stepRemove: (workflowId, id) => ipcRenderer.send('step-remove', workflowId, id),
     stepSave: ({workflowId, value, afterIndex}) => {

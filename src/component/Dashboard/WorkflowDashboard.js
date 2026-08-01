@@ -1,74 +1,35 @@
-import { useState, Fragment } from 'react';
-import { Pen, Play, Trash } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import useWorkflows from '../Hook/useWorkflows.js';
 import WorkflowItem from '../Workflow/WorkflowItem.js';
-import { ChevronLeft } from 'react-bootstrap-icons';
-import AddStep from '../Step/AddStep.js';
-import StepDashboard from './StepDashboard.js'
 
 function WorkflowDashboard({ onCreateNew, onEditWorkflow }) {
   const { t } = useTranslation();
   const workflows = useWorkflows()
-  const [selectedId, select] = useState(null)
-  const selectedWorkflow = workflows.find(workflow => workflow.id === selectedId) || null
 
-  function create() {
-    onCreateNew()
+  function play(workflow) {
+    window.electronAPI.sessionPlay(workflow)
   }
 
-  function remove() {
-    window.electronAPI.workflowRemove(selectedId)
+  function edit(workflow) {
+    onEditWorkflow(workflow)
   }
 
-  function edit() {
-    onEditWorkflow(selectedWorkflow)
-  }
-
-  function play() {
-    window.electronAPI.sessionPlay(selectedWorkflow)
+  function remove(workflow) {
+    window.electronAPI.workflowRemove(workflow.id)
   }
 
   return (
-    <div style={{ padding: '1em' }}>
-      <h1>{t('workflow.name')}</h1>
-      {selectedWorkflow === null
-        ? <Fragment>
-          <button className="btn btn-primary" onClick={create}>{t('workflow.create')}</button>
-          <div style={{
-            listStyle: 'none',
-            padding: 0,
-            gap: 30,
-            display: 'flex',
-            flexDirection: 'column',
-            marginTop: 30
-          }}>
-            {workflows.map((workflow) => <WorkflowItem key={workflow.id} workflow={workflow} onSelect={select} />)}
-          </div>
-        </Fragment>
-        : <Fragment>
-          <WorkflowItem workflow={selectedWorkflow} />
-          <div style={{ display: 'flex', margin: '1em 0', gap: '1em', justifyContent: 'space-between' }}>
-            <button className="btn btn-secondary" onClick={() => select(null)}>
-              <ChevronLeft style={{ marginRight: '.5em' }} />
-              {t('workflow.back')}
-            </button>
-            <button className="btn btn-danger" onClick={remove}>
-              <Trash style={{ marginRight: '.5em' }} />
-              {t('workflow.remove')}
-            </button>
-            <button className="btn btn-primary" onClick={edit}>
-              <Pen style={{ marginRight: '.5em' }} />
-              {t('workflow.edit')}
-            </button>
-            <button className="btn btn-info" onClick={play}>
-              <Play style={{ marginRight: '.5em' }} />
-              {t('workflow.play')}
-            </button>
-          </div>
-          <StepDashboard workflowId={selectedId} />
-        </Fragment>}
-    </div >
+    <div className="content">
+      <div className="top-bar">
+        <p className="screen-title">{t('workflow.name')}</p>
+        <button type="button" className="btn btn-accent" onClick={onCreateNew}>{t('workflow.create')}</button>
+      </div>
+      <div className="grid grid-cards">
+        {workflows.map((workflow) => (
+          <WorkflowItem key={workflow.id} workflow={workflow} onPlay={play} onEdit={edit} onRemove={remove}/>
+        ))}
+      </div>
+    </div>
   );
 }
 

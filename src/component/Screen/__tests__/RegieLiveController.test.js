@@ -16,7 +16,7 @@ describe('RegieLiveController', () => {
         window.session = {track: {type: 'image', src: '/tmp/logo.png'}, steps: [{id: 's1', name: 'Logo', type: 'image'}], index: 0};
         render(<RegieLiveController/>);
 
-        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('btn-primary');
+        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('is-active');
         expect(screen.getByText('Aperçu image plein écran')).toBeTruthy();
     });
 
@@ -161,7 +161,7 @@ describe('RegieLiveController - active tab sync', () => {
         window.session = {track: {type: 'image', src: '/tmp/logo.png'}, steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}], index: 0};
         render(<RegieLiveController/>);
 
-        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('btn-primary');
+        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('is-active');
 
         act(() => {
             document.dispatchEvent(new CustomEvent('session-onchange', {
@@ -169,7 +169,7 @@ describe('RegieLiveController - active tab sync', () => {
             }));
         });
 
-        expect(screen.getByRole('button', {name: 'Time'})).toHaveClass('btn-primary');
+        expect(screen.getByRole('button', {name: 'Time'})).toHaveClass('is-active');
         expect(screen.getByText('Impro 1 / 3')).toBeTruthy();
     });
 });

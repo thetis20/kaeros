@@ -57,14 +57,14 @@ function RegieLiveController() {
                     <div style={{display: 'flex', justifyContent: 'center', gap: '1em'}}>
                         <button
                             type="button"
-                            className="btn btn-light"
+                            className="btn btn-icon"
                             aria-label={t('regie.controller.improPrevious')}
                             onClick={session.minus}
                             disabled={!session.canMinus()}
                         ><IconMinus/></button>
                         <button
                             type="button"
-                            className="btn btn-light"
+                            className="btn btn-icon"
                             aria-label={t('regie.controller.improNext')}
                             onClick={session.plus}
                             disabled={!session.canPlus()}

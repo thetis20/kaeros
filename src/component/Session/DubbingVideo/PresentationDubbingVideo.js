@@ -14,7 +14,7 @@ function PresentationDubbingVideo({track}) {
     }, [ref, track])
 
     return (
-        <div className="d-flex width-full height-full align-items-center">
+        <div className="width-full height-full" style={{display: 'flex', alignItems: 'center'}}>
             <video onEnded={track.run} autoPlay ref={ref} className='width-full'>
                 <source src="video/dubbing-intro.mp4" type="video/mp4" />
             </video>

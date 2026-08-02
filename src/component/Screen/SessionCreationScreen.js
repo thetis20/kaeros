@@ -202,7 +202,7 @@ function SessionCreationScreen({workflowId, onDone}) {
                         type="text"
                         aria-label={t('playlist.form.name')}
                         style={{flex: 1, fontWeight: 500}}
-                        className={`form-control ${nameError ? 'is-invalid' : ''}`}
+                        className={nameError ? 'is-invalid' : undefined}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
@@ -230,13 +230,13 @@ function SessionCreationScreen({workflowId, onDone}) {
                                 <button className="btn btn-icon" aria-label={t('sessionCreation.delete')} onClick={() => removeStep(index)}><IconTrash/></button>
                             </div>
                             {step.open && (
-                                <div style={{padding: '0 0 1em 2em'}}>
-                                    <div className="form-group" style={{marginBottom: 10}}>
-                                        <label htmlFor={`creation-step-name-${step.id}`} className="form-label">{t('step.form.name')}</label>
+                                <div className="accordion-body">
+                                    <div style={{marginBottom: 10}}>
+                                        <label htmlFor={`creation-step-name-${step.id}`} className="field-label">{t('step.form.name')}</label>
                                         <input
                                             id={`creation-step-name-${step.id}`}
                                             type="text"
-                                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                            className={errors.name ? 'is-invalid' : undefined}
                                             value={step.name}
                                             onChange={(e) => updateStep(index, {...step, name: e.target.value})}
                                         />

@@ -33,7 +33,7 @@ function Dashboard() {
     }
 
     return (
-        <div className="d-flex height-full" style={{height: '100vh'}}>
+        <div className="app height-full" style={{height: '100vh'}}>
             <Sidebar
                 screen={screen}
                 onNavigate={setScreen}

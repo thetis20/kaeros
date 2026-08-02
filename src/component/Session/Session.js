@@ -10,11 +10,11 @@ function Session() {
     const session = useSession()
 
     if (null === session) {
-        return <div className="with-full height-full bg-black" />
+        return <div className="with-full height-full" style={{backgroundColor: '#000'}} />
     }
 
     return (
-        <div className="with-full height-full bg-black">
+        <div className="with-full height-full" style={{backgroundColor: '#000'}}>
             <SessionController display={false} />
             {session.track.type === 'image' && <ImageTrack track={session.track} />}
             {session.track.type === 'dubbing-video' && <DubbingVideoTrack track={session.track} />}

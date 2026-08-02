@@ -5,21 +5,27 @@ function ProgressBar({ currentTime, duration }) {
     const percent = currentTime / duration * 100
     const restTime = duration - currentTime
 
-    return <div className="progress" style={{
+    return <div style={{
         position: 'absolute',
         width: '80%',
         bottom: 30,
         margin: 'auto',
-        height: 5
+        height: 5,
+        backgroundColor: '#e9ecef',
+        borderRadius: '.25rem',
+        overflow: 'hidden'
     }}
     >
         <div
-            className={'progress-bar ' + (restTime < 10 ? 'bg-danger' : 'bg-secondary')}
             role="progressbar"
             aria-valuenow={percent}
             aria-valuemin="0"
             aria-valuemax="100"
-            style={{ width: percent + '%' }}></div>
+            style={{
+                width: percent + '%',
+                height: '100%',
+                backgroundColor: restTime < 10 ? '#dc3545' : '#6c757d'
+            }}></div>
     </div>
 }
 

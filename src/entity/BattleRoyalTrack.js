@@ -1,5 +1,4 @@
 import Track from "./Track"
-import {Dash, Plus, Trash} from "react-bootstrap-icons";
 import {STATUS_RUNNING} from "./DubbingVideoTrack";
 
 class Player {

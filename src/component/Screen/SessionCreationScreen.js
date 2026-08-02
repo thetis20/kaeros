@@ -193,9 +193,9 @@ function SessionCreationScreen({workflowId, onDone}) {
     }
 
     return (
-        <div style={{padding: '1em'}}>
-            <h1>{t(workflowId === null ? 'sessionCreation.title' : 'sessionCreation.titleEdit')}</h1>
-            <p>{t('sessionCreation.subtitle')}</p>
+        <div className="content">
+            <p className="screen-title">{t(workflowId === null ? 'sessionCreation.title' : 'sessionCreation.titleEdit')}</p>
+            <p className="screen-sub">{t('sessionCreation.subtitle')}</p>
             <div style={{marginBottom: 20}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: 10}}>
                     <input

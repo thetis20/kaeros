@@ -4,7 +4,7 @@ import { IconUpload } from '@tabler/icons-react';
 import useTracks from '../Hook/useTracks';
 import useTags from '../Hook/useTags';
 import TagMultiSelect from '../Tag/TagMultiSelect';
-import { getFilename, hasSource, stripExtension } from '../../lib/filename';
+import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
 
 const EMPTY_FORM = { name: '', tags: [] };
 
@@ -25,7 +25,7 @@ function MusiqueScreen() {
     function handleFile(e) {
         const file = e.target.files[0];
         if (!file) return;
-        const name = (!value.name || !value.name.trim()) ? stripExtension(file.name) : value.name;
+        const name = resolveAutoFillName(value.name, undefined, file.name);
         setValue({ ...value, file, name });
         if (errors.src) setErrors({ ...errors, src: undefined });
     }

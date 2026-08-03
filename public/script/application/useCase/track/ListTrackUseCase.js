@@ -14,7 +14,7 @@ class ListTrackUseCase {
      */
     async execute() {
         const tracks = await this.trackRepository.getAll();
-        return tracks.map(t => new Audio(t.id, t.name, t.src, t.color, t.tag, t.createdAt, t.updatedAt));
+        return tracks.map(t => new Audio(t.id, t.name, t.src, t.tags, t.createdAt, t.updatedAt));
     }
 }
 

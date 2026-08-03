@@ -9,9 +9,8 @@ class ValidTrackUseCase {
             throw new Error('Invalid track name');
         }
 
-        const validTags = ['Musique', 'Bruitage', 'Disco'];
-        if (!track.tag || !validTags.includes(track.tag)) {
-            throw new Error('Invalid track tag');
+        if (!Array.isArray(track.tags) || track.tags.length === 0) {
+            throw new Error('Invalid track tags');
         }
 
         return track

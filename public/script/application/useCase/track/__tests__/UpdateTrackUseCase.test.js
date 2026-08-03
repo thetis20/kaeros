@@ -9,7 +9,7 @@ describe('UpdateTrackUseCase', () => {
     it('sets updatedAt and persists a valid track update', async () => {
         const repository = fakeRepository();
         const updateTrackUseCase = new UpdateTrackUseCase(repository);
-        const track = {id: 't1', name: 'Track One', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Bruitage', createdAt: new Date('2024-01-01')};
+        const track = {id: 't1', name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1'], createdAt: new Date('2024-01-01')};
 
         await updateTrackUseCase.execute('t1', track);
 
@@ -18,11 +18,11 @@ describe('UpdateTrackUseCase', () => {
         expect(repository.updated[0].track.updatedAt).toBeInstanceOf(Date);
     });
 
-    it('throws and does not persist when the tag is invalid', async () => {
+    it('throws and does not persist when the tags are invalid', async () => {
         const repository = fakeRepository();
         const updateTrackUseCase = new UpdateTrackUseCase(repository);
 
-        await expect(updateTrackUseCase.execute('t1', {id: 't1', name: 'Track One', tag: 'Jazz'})).rejects.toThrow('Invalid track tag');
+        await expect(updateTrackUseCase.execute('t1', {id: 't1', name: 'Track One', tags: []})).rejects.toThrow('Invalid track tags');
         expect(repository.updated).toEqual([]);
     });
 });

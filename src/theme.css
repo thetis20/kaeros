@@ -198,6 +198,76 @@ input[type="color"] {
   background: var(--surface-1);
 }
 
+.pill-removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pill-removable button {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+}
+
+.tag-multiselect {
+  position: relative;
+}
+
+.tag-multiselect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border-strong);
+  background: var(--surface-2);
+}
+
+.tag-multiselect-input {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 13px;
+}
+
+.tag-multiselect-dropdown {
+  position: absolute;
+  z-index: 10;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--surface-2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tag-multiselect-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tag-multiselect-option:hover {
+  background: var(--surface-1);
+}
+
 .badge-accent {
   font-size: 12px;
   font-weight: 500;

@@ -2,24 +2,25 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconUpload } from '@tabler/icons-react';
 import useTracks from '../Hook/useTracks';
+import useTags from '../Hook/useTags';
+import TagMultiSelect from '../Tag/TagMultiSelect';
 import { getFilename, hasSource, stripExtension } from '../../lib/filename';
 
-const TAGS = ['Musique', 'Bruitage', 'Disco'];
-const TAG_COLORS = {
-    Musique: '#4C6EFF',
-    Bruitage: '#F76707',
-    Disco: '#AE3EC9',
-};
-const EMPTY_FORM = { name: '', tag: 'Musique' };
+const EMPTY_FORM = { name: '', tags: [] };
 
 function MusiqueScreen() {
     const { t } = useTranslation();
     const tracks = useTracks();
+    const tags = useTags();
     const [activeTag, setActiveTag] = useState('all');
     const [value, setValue] = useState(EMPTY_FORM);
     const [errors, setErrors] = useState({});
 
-    const filtered = activeTag === 'all' ? tracks : tracks.filter((track) => track.tag === activeTag);
+    const filtered = activeTag === 'all' ? tracks : tracks.filter((track) => track.tags.includes(activeTag));
+
+    function resolveTag(id) {
+        return tags.find((tag) => tag.id === id);
+    }
 
     function handleFile(e) {
         const file = e.target.files[0];
@@ -32,7 +33,7 @@ function MusiqueScreen() {
     function validate(value) {
         const errors = {};
         if (!value.name || !value.name.trim()) errors.name = t('musique.form.error.name');
-        if (!value.tag || !TAGS.includes(value.tag)) errors.tag = t('musique.form.error.tag');
+        if (!Array.isArray(value.tags) || value.tags.length === 0) errors.tags = t('musique.form.error.tags');
         if (!hasSource(value)) errors.src = t('musique.form.error.src');
         return errors;
     }
@@ -45,10 +46,7 @@ function MusiqueScreen() {
             return;
         }
         setErrors({});
-        window.electronAPI.trackSave({
-            ...value,
-            color: value.color || TAG_COLORS[value.tag],
-        });
+        window.electronAPI.trackSave(value);
         setValue(EMPTY_FORM);
     }
 
@@ -81,22 +79,20 @@ function MusiqueScreen() {
                 />
                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
 
-                <label htmlFor="track-tag" className="field-label">{t('musique.form.tag')}</label>
-                <select
-                    id="track-tag"
-                    style={{ width: 200, marginBottom: 12 }}
-                    className={errors.tag ? 'is-invalid' : ''}
-                    value={value.tag}
-                    onChange={(e) => {
-                        setValue({ ...value, tag: e.target.value });
-                        if (errors.tag) setErrors({ ...errors, tag: undefined });
+                <label htmlFor="track-tags" className="field-label">{t('musique.form.tags')}</label>
+                <TagMultiSelect
+                    id="track-tags"
+                    className={errors.tags ? 'is-invalid' : ''}
+                    tags={tags}
+                    value={value.tags}
+                    onChange={(newTags) => {
+                        setValue({ ...value, tags: newTags });
+                        if (errors.tags) setErrors({ ...errors, tags: undefined });
                     }}
-                >
-                    {TAGS.map((tag) => <option key={tag} value={tag}>{t(`track.tag.${tag}`)}</option>)}
-                </select>
-                {errors.tag && <div className="invalid-feedback">{errors.tag}</div>}
+                />
+                {errors.tags && <div className="invalid-feedback">{errors.tags}</div>}
 
-                <label htmlFor="track-src" className="field-label">{t('musique.form.src')}</label>
+                <label htmlFor="track-src" className="field-label" style={{marginTop: 12, display: 'block'}}>{t('musique.form.src')}</label>
                 <div className="file-row">
                     <div className="file-thumb"><IconUpload size={18}/></div>
                     <input
@@ -115,8 +111,8 @@ function MusiqueScreen() {
 
             <div className="tabs" role="group" aria-label="tag-filter">
                 <button type="button" className={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`} onClick={() => setActiveTag('all')}>{t('track.tag.all')}</button>
-                {TAGS.map((tag) => (
-                    <button key={tag} type="button" className={`btn btn-sm ${activeTag === tag ? 'is-active' : ''}`} onClick={() => setActiveTag(tag)}>{t(`track.tag.${tag}`)}</button>
+                {tags.map((tag) => (
+                    <button key={tag.id} type="button" className={`btn btn-sm ${activeTag === tag.id ? 'is-active' : ''}`} onClick={() => setActiveTag(tag.id)}>{tag.name}</button>
                 ))}
             </div>
 
@@ -125,9 +121,12 @@ function MusiqueScreen() {
             <div className="step-list">
                 {filtered.map((track) => (
                     <div key={track.id} className="step-row">
-                        <span className="dot" style={{ background: track.color }}/>
+                        <span className="dot" style={{ background: resolveTag(track.tags[0])?.color }}/>
                         <span className="step-name">{track.name}</span>
-                        <span className="pill">{t(`track.tag.${track.tag}`)}</span>
+                        {track.tags.map((tagId) => {
+                            const tag = resolveTag(tagId);
+                            return tag ? <span key={tagId} className="pill">{tag.name}</span> : null;
+                        })}
                         <button type="button" className="btn btn-sm" onClick={() => edit(track)}>{t('musique.edit')}</button>
                         <button type="button" className="btn btn-sm" onClick={() => remove(track)}>{t('musique.remove')}</button>
                     </div>

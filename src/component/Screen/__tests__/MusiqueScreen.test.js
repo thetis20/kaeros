@@ -1,6 +1,12 @@
 import '../../../lib/i18n';
-import {act, render, screen, fireEvent} from '@testing-library/react';
+import {act, render, screen, fireEvent, within} from '@testing-library/react';
 import MusiqueScreen from '../MusiqueScreen';
+
+const TAGS = [
+    {id: 'tag1', name: 'Musique', color: '#4C6EFF'},
+    {id: 'tag2', name: 'Bruitage', color: '#F76707'},
+    {id: 'tag3', name: 'Disco', color: '#AE3EC9'},
+];
 
 describe('MusiqueScreen', () => {
     beforeEach(() => {
@@ -8,6 +14,8 @@ describe('MusiqueScreen', () => {
             trackFetch: jest.fn(),
             trackSave: jest.fn(),
             trackRemove: jest.fn(),
+            tagFetch: jest.fn(),
+            tagCreate: jest.fn(),
         };
     });
 
@@ -17,30 +25,60 @@ describe('MusiqueScreen', () => {
         });
     }
 
+    function seedTags(tags) {
+        act(() => {
+            document.dispatchEvent(new CustomEvent('tag-onchange', {detail: tags}));
+        });
+    }
+
+    function selectTag(name) {
+        const input = screen.getByPlaceholderText('Rechercher ou créer un tag');
+        fireEvent.focus(input);
+        fireEvent.change(input, {target: {value: name}});
+        const dropdown = document.querySelector('.tag-multiselect-dropdown');
+        fireEvent.mouseDown(within(dropdown).getByRole('button', {name}));
+    }
+
     it('shows validation errors and does not save when the add form is submitted empty', () => {
         render(<MusiqueScreen/>);
         fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
 
         expect(screen.getByText('Le nom est obligatoire.')).toBeTruthy();
+        expect(screen.getByText('Veuillez sélectionner au moins un tag.')).toBeTruthy();
         expect(screen.getByText('Un fichier audio est obligatoire.')).toBeTruthy();
         expect(window.electronAPI.trackSave).not.toHaveBeenCalled();
     });
 
-    it('saves a new track with the entered name, selected tag, picked file and a tag-derived color', () => {
+    it('saves a new track with the entered name, selected tags and picked file', () => {
         render(<MusiqueScreen/>);
+        seedTags(TAGS);
         fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
-        fireEvent.change(screen.getByLabelText('Tag'), {target: {value: 'Disco'}});
+        selectTag('Disco');
         const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
         fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
         fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
 
         expect(window.electronAPI.trackSave).toHaveBeenCalledWith(expect.objectContaining({
             name: 'Générique',
-            tag: 'Disco',
+            tags: ['tag3'],
             file,
-            color: '#AE3EC9',
         }));
         expect(window.electronAPI.trackSave.mock.calls[0][0]).not.toHaveProperty('id');
+    });
+
+    it('allows selecting several tags on the same track', () => {
+        render(<MusiqueScreen/>);
+        seedTags(TAGS);
+        fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
+        selectTag('Disco');
+        selectTag('Bruitage');
+        const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
+        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(window.electronAPI.trackSave).toHaveBeenCalledWith(expect.objectContaining({
+            tags: ['tag3', 'tag2'],
+        }));
     });
 
     it('fills the empty name field with the picked file name (without extension)', () => {
@@ -62,9 +100,10 @@ describe('MusiqueScreen', () => {
 
     it('filters the track list by tag when a tab is clicked', () => {
         render(<MusiqueScreen/>);
+        seedTags(TAGS);
         seedTracks([
-            {id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'},
-            {id: 't2', name: 'Applaudissements', src: '/tmp/t2.mp3', tag: 'Bruitage', color: '#F76707'},
+            {id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tags: ['tag1']},
+            {id: 't2', name: 'Applaudissements', src: '/tmp/t2.mp3', tags: ['tag2']},
         ]);
 
         expect(screen.getByText('Générique')).toBeTruthy();
@@ -78,8 +117,9 @@ describe('MusiqueScreen', () => {
 
     it('populates the form for editing and calls trackSave with the existing id on submit', () => {
         render(<MusiqueScreen/>);
+        seedTags(TAGS);
         seedTracks([
-            {id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF', createdAt: '2024-01-01', updatedAt: '2024-01-01'},
+            {id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tags: ['tag1'], createdAt: '2024-01-01', updatedAt: '2024-01-01'},
         ]);
 
         fireEvent.click(screen.getByRole('button', {name: 'Modifier'}));
@@ -92,14 +132,14 @@ describe('MusiqueScreen', () => {
             id: 't1',
             name: 'Générique Remix',
             src: '/tmp/t1.mp3',
-            color: '#4C6EFF',
+            tags: ['tag1'],
         }));
     });
 
     it('removes a track when its delete button is clicked', () => {
         render(<MusiqueScreen/>);
         seedTracks([
-            {id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'},
+            {id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tags: ['tag1']},
         ]);
 
         fireEvent.click(screen.getByRole('button', {name: 'Supprimer'}));

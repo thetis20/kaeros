@@ -9,6 +9,7 @@ describe('Dashboard audio integration (unmocked)', () => {
             trackFetch: jest.fn(),
             trackPlay: jest.fn(),
             trackEnd: jest.fn(),
+            tagFetch: jest.fn(),
         };
         delete window.session;
     });
@@ -21,7 +22,7 @@ describe('Dashboard audio integration (unmocked)', () => {
 
     it('starts a track from RegieScreen\'s "Démarrer une musique" card, reflects it in "Audio en cours", and keeps it playing after navigating to another screen', () => {
         render(<Dashboard/>);
-        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'}]);
+        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tags: ['tag1']}]);
 
         expect(screen.queryByRole('button', {name: /stop/i})).toBeNull();
 

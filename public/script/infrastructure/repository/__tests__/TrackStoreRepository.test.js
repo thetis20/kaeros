@@ -28,26 +28,26 @@ describe('TrackStoreRepository', () => {
     });
 
     it('creates and lists a track', async () => {
-        const track = {id: 't1', name: 'Track One', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Musique'};
+        const track = {id: 't1', name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1']};
         await repository.create(track);
 
         expect(await repository.getAll()).toEqual([track]);
     });
 
     it('updates a track by id without touching other tracks', async () => {
-        await repository.create({id: 't1', name: 'Track One', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Musique'});
-        await repository.create({id: 't2', name: 'Track Two', src: '/tmp/t2.mp3', color: '#F76707', tag: 'Bruitage'});
+        await repository.create({id: 't1', name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1']});
+        await repository.create({id: 't2', name: 'Track Two', src: '/tmp/t2.mp3', tags: ['tag2']});
 
-        await repository.update('t1', {id: 't1', name: 'Track One Edited', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Disco'});
+        await repository.update('t1', {id: 't1', name: 'Track One Edited', src: '/tmp/t1.mp3', tags: ['tag3']});
 
         const all = await repository.getAll();
         expect(all).toHaveLength(2);
-        expect(all.find(t => t.id === 't1')).toEqual({id: 't1', name: 'Track One Edited', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Disco'});
+        expect(all.find(t => t.id === 't1')).toEqual({id: 't1', name: 'Track One Edited', src: '/tmp/t1.mp3', tags: ['tag3']});
         expect(all.find(t => t.id === 't2').name).toBe('Track Two');
     });
 
     it('deletes a track by id', async () => {
-        await repository.create({id: 't1', name: 'Track One', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Musique'});
+        await repository.create({id: 't1', name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1']});
         await repository.delete('t1');
 
         expect(await repository.getAll()).toEqual([]);

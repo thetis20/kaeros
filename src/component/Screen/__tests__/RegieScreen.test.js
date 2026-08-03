@@ -12,6 +12,7 @@ describe('RegieScreen', () => {
             sessionNext: jest.fn(),
             sessionPrevious: jest.fn(),
             sessionToStep: jest.fn(),
+            tagFetch: jest.fn(),
         };
         delete window.session;
     });
@@ -96,7 +97,7 @@ describe('RegieScreen', () => {
     it('shows the "Démarrer une musique" card with tracks from useTracks', () => {
         render(<RegieScreen/>);
         seedWorkflows([]);
-        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'}]);
+        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tags: ['tag1']}]);
 
         expect(screen.getByText('Démarrer une musique')).toBeTruthy();
         expect(screen.getByText('Générique')).toBeTruthy();
@@ -105,7 +106,7 @@ describe('RegieScreen', () => {
     it('dispatches audio-play and shows the track as playing when "Démarrer" is clicked', () => {
         render(<RegieScreen/>);
         seedWorkflows([]);
-        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tag: 'Musique', color: '#4C6EFF'}]);
+        seedTracks([{id: 't1', name: 'Générique', src: '/tmp/t1.mp3', tags: ['tag1']}]);
 
         fireEvent.click(screen.getByRole('button', {name: 'Démarrer'}));
 

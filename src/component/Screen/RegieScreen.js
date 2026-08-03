@@ -6,6 +6,7 @@ import useWorkflows from '../Hook/useWorkflows';
 import useSession from '../Hook/useSession';
 import useAudios from '../Hook/useAudios';
 import useTracks from '../Hook/useTracks';
+import useTags from '../Hook/useTags';
 import SessionController from '../Controller/SessionController';
 import RegieLiveController from './RegieLiveController';
 import RegieTrackPicker from '../Track/RegieTrackPicker';
@@ -34,6 +35,7 @@ function RegieScreen() {
     const session = useSession();
     const audios = useAudios();
     const tracks = useTracks();
+    const tags = useTags();
     const [collapsed, setCollapsed] = useState(false);
 
     function toggleCollapsed() {
@@ -85,7 +87,7 @@ function RegieScreen() {
 
             <div className="card">
                 <p style={{fontSize: 12, color: 'var(--text-secondary)', margin: '0 0 8px'}}>{t('regie.music.title')}</p>
-                <RegieTrackPicker tracks={tracks} playingIds={audios.map((audio) => audio.id)} onStart={startTrack}/>
+                <RegieTrackPicker tracks={tracks} tags={tags} playingIds={audios.map((audio) => audio.id)} onStart={startTrack}/>
             </div>
         </div>
     );

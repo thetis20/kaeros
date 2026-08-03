@@ -15,13 +15,18 @@ const ListStepByWorkflowUseCase = require('../application/useCase/step/ListStepB
 
 const CreateSessionUseCase = require('../application/useCase/session/CreateSessionUseCase.js');
 
+const ListTagUseCase = require('../application/useCase/tag/ListTagUseCase.js');
+const CreateTagUseCase = require('../application/useCase/tag/CreateTagUseCase.js');
+
 const TrackStoreRespository = require('./repository/TrackStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
 const StepStoreRespository = require('./repository/StepStoreRepository.js');
+const TagStoreRespository = require('./repository/TagStoreRepository.js');
 
 const trackStoreRespository = new TrackStoreRespository();
 const workflowStoreRespository = new WorkflowStoreRespository();
 const stepStoreRespository = new StepStoreRespository();
+const tagStoreRespository = new TagStoreRespository();
 
 const listTrackUseCase = new ListTrackUseCase(trackStoreRespository);
 const createTrackUseCase = new CreateTrackUseCase(trackStoreRespository);
@@ -40,6 +45,9 @@ const listStepByWorkflowUseCase = new ListStepByWorkflowUseCase(stepStoreResposi
 
 const createSessionUseCase = new CreateSessionUseCase(stepStoreRespository);
 
+const listTagUseCase = new ListTagUseCase(tagStoreRespository);
+const createTagUseCase = new CreateTagUseCase(tagStoreRespository);
+
 
 module.exports = {
     listTrackUseCase,
@@ -57,5 +65,8 @@ module.exports = {
     deleteStepUseCase,
     listStepByWorkflowUseCase,
 
-    createSessionUseCase
+    createSessionUseCase,
+
+    listTagUseCase,
+    createTagUseCase
 }

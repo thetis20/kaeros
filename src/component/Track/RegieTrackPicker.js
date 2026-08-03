@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const TAGS = ['Musique', 'Bruitage', 'Disco'];
-
-function RegieTrackPicker({ tracks, playingIds, onStart }) {
+function RegieTrackPicker({ tracks, tags, playingIds, onStart }) {
     const { t } = useTranslation();
     const [activeTag, setActiveTag] = useState('all');
 
-    const filtered = activeTag === 'all' ? tracks : tracks.filter((track) => track.tag === activeTag);
+    const filtered = activeTag === 'all' ? tracks : tracks.filter((track) => track.tags.includes(activeTag));
+
+    function resolveTag(id) {
+        return tags.find((tag) => tag.id === id);
+    }
 
     return (
         <div>
@@ -17,13 +19,13 @@ function RegieTrackPicker({ tracks, playingIds, onStart }) {
                     className={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`}
                     onClick={() => setActiveTag('all')}
                 >{t('track.tag.all')}</button>
-                {TAGS.map((tag) => (
+                {tags.map((tag) => (
                     <button
-                        key={tag}
+                        key={tag.id}
                         type="button"
-                        className={`btn btn-sm ${activeTag === tag ? 'is-active' : ''}`}
-                        onClick={() => setActiveTag(tag)}
-                    >{t(`track.tag.${tag}`)}</button>
+                        className={`btn btn-sm ${activeTag === tag.id ? 'is-active' : ''}`}
+                        onClick={() => setActiveTag(tag.id)}
+                    >{tag.name}</button>
                 ))}
             </div>
             <div className="step-list">
@@ -31,9 +33,12 @@ function RegieTrackPicker({ tracks, playingIds, onStart }) {
                     const playing = playingIds.includes(track.id);
                     return (
                         <div key={track.id} className="step-row">
-                            <span className="dot" style={{background: track.color}}/>
+                            <span className="dot" style={{background: resolveTag(track.tags[0])?.color}}/>
                             <span className="step-name">{track.name}</span>
-                            <span className="pill">{t(`track.tag.${track.tag}`)}</span>
+                            {track.tags.map((tagId) => {
+                                const tag = resolveTag(tagId);
+                                return tag ? <span key={tagId} className="pill">{tag.name}</span> : null;
+                            })}
                             <button
                                 type="button"
                                 className="btn btn-sm"

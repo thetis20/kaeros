@@ -223,13 +223,15 @@
     "form": {
       "title": "Ajouter un morceau",
       "name": "Nom",
-      "tag": "Tag",
+      "tags": "Tags",
+      "tagsPlaceholder": "Rechercher ou créer un tag",
+      "createTag": "Créer « {{name}} »",
       "src": "Fichier audio",
       "placeholder": "Rechercher dans mes fichiers",
       "submit": "Enregistrer",
       "error": {
         "name": "Le nom est obligatoire.",
-        "tag": "Veuillez sélectionner un tag.",
+        "tags": "Veuillez sélectionner au moins un tag.",
         "src": "Un fichier audio est obligatoire."
       }
     },
@@ -239,13 +241,13 @@
   },
   "track": {
     "tag": {
-      "all": "Tous",
-      "Musique": "Musique",
-      "Bruitage": "Bruitage",
-      "Disco": "Disco"
+      "all": "Tous"
     },
     "start": "Démarrer",
     "playing": "En cours"
+  },
+  "tagSelect": {
+    "remove": "Retirer {{name}}"
   },
   "sessionCreation": {
     "title": "Créer une session",

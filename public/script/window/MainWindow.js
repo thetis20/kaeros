@@ -13,7 +13,9 @@ const {
     createStepUseCase,
     updateStepUseCase,
     deleteStepUseCase,
-    createSessionUseCase
+    createSessionUseCase,
+    listTagUseCase,
+    createTagUseCase
 } = require('../infrastructure/useCase.js');
 const Workflow = require('../application/entity/Workflow.js');
 const StepFactory = require('../application/entity/step/StepFactory.js');
@@ -35,6 +37,8 @@ class MainWindow {
         this.sessionPlay = this.sessionPlay.bind(this)
         this.sessionFetch = this.sessionFetch.bind(this)
         this.sessionClose = this.sessionClose.bind(this)
+        this.tagFetch = this.tagFetch.bind(this)
+        this.tagCreate = this.tagCreate.bind(this)
     }
 
     open() {
@@ -71,6 +75,8 @@ class MainWindow {
             ipcMain.removeListener('step-remove', this.stepRemove)
             ipcMain.removeListener('step-save-main', this.stepSave)
             ipcMain.removeListener('session-play', this.sessionPlay)
+            ipcMain.removeListener('tag-fetch', this.tagFetch)
+            ipcMain.removeListener('tag-create', this.tagCreate)
         });
 
         this.initHandle()
@@ -89,6 +95,8 @@ class MainWindow {
         ipcMain.addListener('step-remove', this.stepRemove)
         ipcMain.addListener('step-save-main', this.stepSave)
         ipcMain.addListener('session-play', this.sessionPlay)
+        ipcMain.addListener('tag-fetch', this.tagFetch)
+        ipcMain.addListener('tag-create', this.tagCreate)
     }
 
     async workflowFetch() {
@@ -136,6 +144,15 @@ class MainWindow {
 
     async trackEnd(event, id) {
         this.window.webContents.send('track-onchange', await listTrackUseCase.execute());
+    }
+
+    async tagFetch() {
+        this.window.webContents.send('tag-onchange', await listTagUseCase.execute());
+    }
+
+    async tagCreate(event, value) {
+        await createTagUseCase.execute(value);
+        this.window.webContents.send('tag-onchange', await listTagUseCase.execute());
     }
 
     async stepFetch(event, workflowId) {

@@ -10,12 +10,12 @@ describe('CreateTrackUseCase', () => {
         const repository = fakeRepository();
         const createTrackUseCase = new CreateTrackUseCase(repository);
 
-        const result = await createTrackUseCase.execute({name: 'Track One', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Musique'});
+        const result = await createTrackUseCase.execute({name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1']});
 
         expect(result.id).toEqual(expect.any(String));
         expect(result.id.length).toBeGreaterThan(0);
         expect(result.name).toBe('Track One');
-        expect(result.tag).toBe('Musique');
+        expect(result.tags).toEqual(['tag1']);
         expect(repository.created).toEqual([result]);
     });
 
@@ -23,7 +23,7 @@ describe('CreateTrackUseCase', () => {
         const repository = fakeRepository();
         const createTrackUseCase = new CreateTrackUseCase(repository);
 
-        await expect(createTrackUseCase.execute({name: '', src: '/tmp/t1.mp3', color: '#4C6EFF', tag: 'Musique'})).rejects.toThrow('Invalid track name');
+        await expect(createTrackUseCase.execute({name: '', src: '/tmp/t1.mp3', tags: ['tag1']})).rejects.toThrow('Invalid track name');
         expect(repository.created).toEqual([]);
     });
 });

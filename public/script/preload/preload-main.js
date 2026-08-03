@@ -7,7 +7,8 @@ const events = [
     'track-onchange',
     'workflow-onchange',
     'step-onchange',
-    'session-onchange'
+    'session-onchange',
+    'tag-onchange'
 ]
 
 
@@ -61,4 +62,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     sessionPrevious: () => ipcRenderer.send('session-previous'),
     sessionToStep: (index) => ipcRenderer.send('session-toStep', index),
     trackChange: (changes) => ipcRenderer.send('track-change', changes),
+    tagFetch: () => ipcRenderer.send('tag-fetch'),
+    tagCreate: (value) => ipcRenderer.send('tag-create', value),
 })

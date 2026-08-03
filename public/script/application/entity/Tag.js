@@ -1,12 +1,11 @@
-class Audio {
-    constructor(id, name, src, tags, createdAt, updatedAt) {
+class Tag {
+    constructor(id, name, color, createdAt, updatedAt) {
         this.id = id;
         this.name = name;
-        this.src = src;
-        this.tags = tags;
+        this.color = color;
         this.createdAt = createdAt || new Date();
         this.updatedAt = updatedAt || new Date();
     }
 }
 
-module.exports = Audio
+module.exports = Tag

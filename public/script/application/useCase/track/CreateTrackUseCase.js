@@ -13,13 +13,13 @@ class CreateTrackUseCase {
     }
 
     /**
-     * @param {{name: string, src: string, color: string, tag: string}} track
+     * @param {{name: string, src: string, tags: string[]}} track
      * @returns {Promise<Audio>}
      */
     async execute(track) {
         this.validTrackUseCase.execute(track);
 
-        const newTrack = new Audio(uuidv4(), track.name, track.src, track.color, track.tag);
+        const newTrack = new Audio(uuidv4(), track.name, track.src, track.tags);
         await this.trackRepository.create(newTrack);
 
         return newTrack;

@@ -14,6 +14,12 @@ export function stripExtension(filename) {
     return filename.replace(/\.[^./]+$/, '');
 }
 
+export function resolveAutoFillName(currentName, defaultName, fileName) {
+    const isEmpty = !currentName || !currentName.trim();
+    const isUntouchedDefault = !!defaultName && currentName === defaultName;
+    return (isEmpty || isUntouchedDefault) ? stripExtension(fileName) : currentName;
+}
+
 export function hasSource(value) {
     return !!(value.file || value.src);
 }

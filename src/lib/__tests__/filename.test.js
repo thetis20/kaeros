@@ -1,4 +1,4 @@
-import {getFilename, hasSource, stripExtension} from '../filename';
+import {getFilename, hasSource, stripExtension, resolveAutoFillName} from '../filename';
 
 describe('getFilename', () => {
     it('prefers the File object name when present', () => {
@@ -29,6 +29,28 @@ describe('stripExtension', () => {
 
     it('only strips the last extension from a multi-dot filename', () => {
         expect(stripExtension('archive.tar.gz')).toBe('archive.tar');
+    });
+});
+
+describe('resolveAutoFillName', () => {
+    it('returns the stripped file name when currentName is empty', () => {
+        expect(resolveAutoFillName('', undefined, 'clip.mp4')).toBe('clip');
+    });
+
+    it('returns the stripped file name when currentName is whitespace-only', () => {
+        expect(resolveAutoFillName('   ', undefined, 'clip.mp4')).toBe('clip');
+    });
+
+    it('returns the stripped file name when currentName equals the provided defaultName', () => {
+        expect(resolveAutoFillName('Nouvelle image', 'Nouvelle image', 'clip.mp4')).toBe('clip');
+    });
+
+    it('keeps currentName unchanged when it differs from defaultName and is non-empty', () => {
+        expect(resolveAutoFillName('Mon titre', 'Nouvelle image', 'clip.mp4')).toBe('Mon titre');
+    });
+
+    it('keeps currentName unchanged when defaultName is not provided and currentName is non-empty', () => {
+        expect(resolveAutoFillName('Mon titre', undefined, 'clip.mp4')).toBe('Mon titre');
     });
 });
 

@@ -44,7 +44,7 @@ describe('DubbingVideoStep component', () => {
     });
 
     it('fills the empty step name with the picked file name (without extension) when a file is picked', () => {
-        const {setValue} = renderStep({name: ''});
+        const {setValue} = renderStep({type: 'dubbing-video', name: ''});
         const file = new File(['vid'], 'Sketch final.mp4', {type: 'video/mp4'});
         fireEvent.change(screen.getByLabelText('Image'), {target: {files: [file]}});
 
@@ -52,7 +52,7 @@ describe('DubbingVideoStep component', () => {
     });
 
     it('does not overwrite an already-set step name when a file is picked', () => {
-        const {setValue} = renderStep({name: 'Mon étape'});
+        const {setValue} = renderStep({type: 'dubbing-video', name: 'Mon étape'});
         const file = new File(['vid'], 'clip.mp4', {type: 'video/mp4'});
         fireEvent.change(screen.getByLabelText('Image'), {target: {files: [file]}});
 

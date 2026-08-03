@@ -38,7 +38,7 @@ describe('ImageStep component', () => {
     });
 
     it('fills the empty step name with the picked file name (without extension) when a file is picked', () => {
-        const {setValue} = renderStep({name: ''});
+        const {setValue} = renderStep({type: 'image', name: ''});
         const file = new File(['img'], 'Sketch final.png', {type: 'image/png'});
         fireEvent.change(screen.getByLabelText('Image'), {target: {files: [file]}});
 
@@ -46,7 +46,7 @@ describe('ImageStep component', () => {
     });
 
     it('does not overwrite an already-set step name when a file is picked', () => {
-        const {setValue} = renderStep({name: 'Mon étape'});
+        const {setValue} = renderStep({type: 'image', name: 'Mon étape'});
         const file = new File(['img'], 'photo.png', {type: 'image/png'});
         fireEvent.change(screen.getByLabelText('Image'), {target: {files: [file]}});
 

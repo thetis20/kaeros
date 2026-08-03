@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next';
 import { IconUpload } from '@tabler/icons-react';
-import { getFilename, hasSource } from '../../lib/filename';
+import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
 
 export function validate(value, t) {
     const errors = {};
@@ -13,9 +13,14 @@ function ImageStep({ value, setValue, errors = {}, setErrors = () => {} }) {
     const { t } = useTranslation();
 
     function handleFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const defaultName = t(`sessionCreation.newStepName.${value.type}`);
+        const name = resolveAutoFillName(value.name, defaultName, file.name);
         setValue({
             ...value,
-            file: e.target.files[0]
+            file,
+            name
         })
         if (errors.file) setErrors({...errors, file: undefined})
     }

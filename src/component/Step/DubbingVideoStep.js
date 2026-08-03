@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next';
 import { IconUpload } from '@tabler/icons-react';
-import { getFilename, hasSource, stripExtension } from '../../lib/filename';
+import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
 
 export function validate(value, t) {
     const errors = {};
@@ -16,7 +16,8 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
     function handleFile(e) {
         const file = e.target.files[0];
         if (!file) return;
-        const name = (!value.name || !value.name.trim()) ? stripExtension(file.name) : value.name;
+        const defaultName = t(`sessionCreation.newStepName.${value.type}`);
+        const name = resolveAutoFillName(value.name, defaultName, file.name);
         setValue({
             ...value,
             file,

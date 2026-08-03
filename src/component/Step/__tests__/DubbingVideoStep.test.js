@@ -59,6 +59,14 @@ describe('DubbingVideoStep component', () => {
         expect(setValue).toHaveBeenCalledWith(expect.objectContaining({name: 'Mon étape'}));
     });
 
+    it('fills the step name when it still equals the type default name (untouched since creation)', () => {
+        const {setValue} = renderStep({type: 'dubbing-video', name: 'Nouveau doublage'});
+        const file = new File(['vid'], 'Sketch final.mp4', {type: 'video/mp4'});
+        fireEvent.change(screen.getByLabelText('Image'), {target: {files: [file]}});
+
+        expect(setValue).toHaveBeenCalledWith(expect.objectContaining({name: 'Sketch final'}));
+    });
+
     it('editing the time field updates the value and clears the time error', () => {
         const {setValue, setErrors} = renderStep({time: '', errors: {time: 'missing'}});
         const timeInput = document.querySelector('input[name="time"]');

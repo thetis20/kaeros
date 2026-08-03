@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconUpload } from '@tabler/icons-react';
 import useTracks from '../Hook/useTracks';
-import { getFilename, hasSource } from '../../lib/filename';
+import { getFilename, hasSource, stripExtension } from '../../lib/filename';
 
 const TAGS = ['Musique', 'Bruitage', 'Disco'];
 const TAG_COLORS = {
@@ -23,7 +23,9 @@ function MusiqueScreen() {
 
     function handleFile(e) {
         const file = e.target.files[0];
-        setValue({ ...value, file });
+        if (!file) return;
+        const name = (!value.name || !value.name.trim()) ? stripExtension(file.name) : value.name;
+        setValue({ ...value, file, name });
         if (errors.src) setErrors({ ...errors, src: undefined });
     }
 

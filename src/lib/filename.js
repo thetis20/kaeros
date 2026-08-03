@@ -10,6 +10,10 @@ export function getFilename(value, placeholder) {
     return placeholder
 }
 
+export function stripExtension(filename) {
+    return filename.replace(/\.[^./]+$/, '');
+}
+
 export function hasSource(value) {
     return !!(value.file || value.src);
 }

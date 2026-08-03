@@ -1,4 +1,4 @@
-import {getFilename, hasSource} from '../filename';
+import {getFilename, hasSource, stripExtension} from '../filename';
 
 describe('getFilename', () => {
     it('prefers the File object name when present', () => {
@@ -15,6 +15,20 @@ describe('getFilename', () => {
 
     it('returns the placeholder when neither file nor src is set', () => {
         expect(getFilename({}, 'placeholder')).toBe('placeholder');
+    });
+});
+
+describe('stripExtension', () => {
+    it('removes a simple extension', () => {
+        expect(stripExtension('clip.mp4')).toBe('clip');
+    });
+
+    it('keeps a filename with no extension unchanged', () => {
+        expect(stripExtension('README')).toBe('README');
+    });
+
+    it('only strips the last extension from a multi-dot filename', () => {
+        expect(stripExtension('archive.tar.gz')).toBe('archive.tar');
     });
 });
 

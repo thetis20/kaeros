@@ -43,6 +43,23 @@ describe('MusiqueScreen', () => {
         expect(window.electronAPI.trackSave.mock.calls[0][0]).not.toHaveProperty('id');
     });
 
+    it('fills the empty name field with the picked file name (without extension)', () => {
+        render(<MusiqueScreen/>);
+        const file = new File(['sound'], 'Générique 1.mp3', {type: 'audio/mpeg'});
+        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+
+        expect(screen.getByLabelText('Nom').value).toBe('Générique 1');
+    });
+
+    it('does not overwrite an already-entered name when a file is picked', () => {
+        render(<MusiqueScreen/>);
+        fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Mon titre'}});
+        const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
+        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+
+        expect(screen.getByLabelText('Nom').value).toBe('Mon titre');
+    });
+
     it('filters the track list by tag when a tab is clicked', () => {
         render(<MusiqueScreen/>);
         seedTracks([

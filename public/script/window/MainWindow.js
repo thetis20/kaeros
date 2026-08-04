@@ -37,6 +37,7 @@ class MainWindow {
         this.sessionPlay = this.sessionPlay.bind(this)
         this.sessionFetch = this.sessionFetch.bind(this)
         this.sessionClose = this.sessionClose.bind(this)
+        this.sessionStop = this.sessionStop.bind(this)
         this.tagFetch = this.tagFetch.bind(this)
         this.tagCreate = this.tagCreate.bind(this)
     }
@@ -75,6 +76,7 @@ class MainWindow {
             ipcMain.removeListener('step-remove', this.stepRemove)
             ipcMain.removeListener('step-save-main', this.stepSave)
             ipcMain.removeListener('session-play', this.sessionPlay)
+            ipcMain.removeListener('session-stop', this.sessionStop)
             ipcMain.removeListener('tag-fetch', this.tagFetch)
             ipcMain.removeListener('tag-create', this.tagCreate)
         });
@@ -95,6 +97,7 @@ class MainWindow {
         ipcMain.addListener('step-remove', this.stepRemove)
         ipcMain.addListener('step-save-main', this.stepSave)
         ipcMain.addListener('session-play', this.sessionPlay)
+        ipcMain.addListener('session-stop', this.sessionStop)
         ipcMain.addListener('tag-fetch', this.tagFetch)
         ipcMain.addListener('tag-create', this.tagCreate)
     }
@@ -198,6 +201,11 @@ class MainWindow {
         this.sessionWindow = null;
         ipcMain.removeListener('session-fetch', this.sessionFetch)
         this.window.webContents.send('session-onchange', undefined);
+    }
+
+    sessionStop() {
+        if (!this.sessionWindow) return;
+        this.sessionWindow.window.close();
     }
 
     setRunning(value) {

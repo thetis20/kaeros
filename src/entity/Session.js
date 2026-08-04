@@ -41,6 +41,7 @@ export default class Session {
         this.minus = this.minus.bind(this);
         this.play = this.play.bind(this);
         this.pause = this.pause.bind(this);
+        this.stop = this.stop.bind(this);
     }
 
     hasNext() {
@@ -100,5 +101,9 @@ export default class Session {
         if (this.track.canPause()) {
             this.track.pause();
         }
+    }
+
+    stop() {
+        window.electronAPI.sessionStop();
     }
 }

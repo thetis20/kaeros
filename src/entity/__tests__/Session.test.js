@@ -12,6 +12,7 @@ describe('Session', () => {
             sessionNext: jest.fn(),
             sessionPrevious: jest.fn(),
             sessionToStep: jest.fn(),
+            sessionStop: jest.fn(),
         };
     });
 
@@ -58,6 +59,12 @@ describe('Session', () => {
     it('toStep() forwards the index to the Electron bridge', () => {
         new Session({steps: []}).toStep(3);
         expect(window.electronAPI.sessionToStep).toHaveBeenCalledWith(3);
+    });
+
+    it('stop() calls the Electron bridge', () => {
+        const session = new Session({steps: [1, 2], index: 0});
+        session.stop();
+        expect(window.electronAPI.sessionStop).toHaveBeenCalledTimes(1);
     });
 
     it('canPlus/canMinus/plus/minus/play/pause delegate to the track', () => {

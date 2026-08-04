@@ -4,6 +4,7 @@
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
+  "repository": "github:thetis20/kaeros",
   "scripts": {
     "start": "concurrently \"npm run react-start\" \"npm run electron-start\"",
     "build": "npm run react-build && npm run electron-build:mac",
@@ -12,6 +13,13 @@
     "electron-start": "wait-on http://localhost:3000 && electron .",
     "electron-build:mac": "electron-builder -m",
     "electron-build:win": "electron-builder -w",
+    "electron-build:linux": "electron-builder -l",
+    "build:mac": "npm run react-build && npm run electron-build:mac",
+    "build:win": "npm run react-build && npm run electron-build:win",
+    "build:linux": "npm run react-build && npm run electron-build:linux",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major",
     "test": "react-scripts test",
     "test:main": "jest --config jest.config.main.js",
     "eject": "react-scripts eject"
@@ -49,6 +57,9 @@
     ],
     "directories": {
       "buildResources": "assets"
+    },
+    "publish": {
+      "provider": "github"
     },
     "mac": {
       "category": "public.app-category.developer-tools"

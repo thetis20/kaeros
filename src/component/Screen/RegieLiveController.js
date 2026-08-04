@@ -1,12 +1,8 @@
 import 'react';
-import {useState, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {IconMinus, IconPlus, IconPlayerPlay, IconPlayerPause, IconPlayerStop, IconRepeat, IconRepeatOff} from '@tabler/icons-react';
+import {IconMinus, IconPlus, IconPlayerPlay, IconPlayerPause, IconRepeat, IconRepeatOff} from '@tabler/icons-react';
 import useSession from '../Hook/useSession';
 import BattleRoyalStepController from '../Controller/BattleRoyalStepController';
-import ConfirmDialog from './ConfirmDialog';
-
-const TYPES = ['image', 'dubbing-video', 'video', 'time', 'battle-royal'];
 
 function formatCountdown(seconds) {
     const total = Math.max(0, seconds || 0);
@@ -18,7 +14,6 @@ function formatCountdown(seconds) {
 function RegieLiveController() {
     const {t} = useTranslation();
     const session = useSession();
-    const [showStopConfirm, setShowStopConfirm] = useState(false);
 
     if (!session) {
         return null;
@@ -113,28 +108,7 @@ function RegieLiveController() {
         <div>
             <div id="regie-controller">
                 {renderPanel()}
-                <div style={{display: 'flex', justifyContent: 'center', marginTop: '1em'}}>
-                    <button
-                        type="button"
-                        className="btn btn-icon"
-                        aria-label={t('regie.controller.stop')}
-                        onClick={() => setShowStopConfirm(true)}
-                    ><IconPlayerStop/></button>
-                </div>
             </div>
-            {showStopConfirm && (
-                <ConfirmDialog
-                    title={t('regie.controller.stopConfirm.title')}
-                    message={t('regie.controller.stopConfirm.message')}
-                    confirmLabel={t('regie.controller.stopConfirm.confirm')}
-                    cancelLabel={t('regie.controller.stopConfirm.cancel')}
-                    onConfirm={() => {
-                        session.stop();
-                        setShowStopConfirm(false);
-                    }}
-                    onCancel={() => setShowStopConfirm(false)}
-                />
-            )}
         </div>
     );
 }

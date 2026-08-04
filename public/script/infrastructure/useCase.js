@@ -17,6 +17,7 @@ const CreateSessionUseCase = require('../application/useCase/session/CreateSessi
 
 const ListTagUseCase = require('../application/useCase/tag/ListTagUseCase.js');
 const CreateTagUseCase = require('../application/useCase/tag/CreateTagUseCase.js');
+const CleanTagUseCase = require('../application/useCase/tag/CleanTagUseCase.js');
 
 const TrackStoreRespository = require('./repository/TrackStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
@@ -28,10 +29,14 @@ const workflowStoreRespository = new WorkflowStoreRespository();
 const stepStoreRespository = new StepStoreRespository();
 const tagStoreRespository = new TagStoreRespository();
 
+const listTagUseCase = new ListTagUseCase(tagStoreRespository);
+const createTagUseCase = new CreateTagUseCase(tagStoreRespository);
+const cleanTagUseCase = new CleanTagUseCase(tagStoreRespository, trackStoreRespository);
+
 const listTrackUseCase = new ListTrackUseCase(trackStoreRespository);
 const createTrackUseCase = new CreateTrackUseCase(trackStoreRespository);
 const updateTrackUseCase = new UpdateTrackUseCase(trackStoreRespository);
-const deleteTrackUseCase = new DeleteTrackUseCase(trackStoreRespository);
+const deleteTrackUseCase = new DeleteTrackUseCase(trackStoreRespository, cleanTagUseCase);
 
 const createWorkflowUseCase = new CreateWorkflowUseCase(workflowStoreRespository);
 const updateWorkflowUseCase = new UpdateWorkflowUseCase(workflowStoreRespository);
@@ -44,9 +49,6 @@ const deleteStepUseCase = new DeleteStepUseCase(stepStoreRespository);
 const listStepByWorkflowUseCase = new ListStepByWorkflowUseCase(stepStoreRespository);
 
 const createSessionUseCase = new CreateSessionUseCase(stepStoreRespository);
-
-const listTagUseCase = new ListTagUseCase(tagStoreRespository);
-const createTagUseCase = new CreateTagUseCase(tagStoreRespository);
 
 
 module.exports = {

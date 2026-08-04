@@ -13,6 +13,13 @@ class TagRepository {
     async getAll() {
         throw new Error("Not implemented");
     }
+
+    /**
+     * @param {string} id
+     */
+    async delete(id) {
+        throw new Error("Not implemented");
+    }
 }
 
 module.exports = TagRepository;

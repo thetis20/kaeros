@@ -1,14 +1,16 @@
 import 'react';
-import {useEffect, Fragment} from 'react';
-import {IconPlayerTrackPrev, IconPlayerTrackNext, IconMinus, IconPlayerPause, IconPlayerPlay, IconPlus} from '@tabler/icons-react';
+import {useEffect, Fragment, useState} from 'react';
+import {IconPlayerTrackPrev, IconPlayerTrackNext, IconMinus, IconPlayerPause, IconPlayerPlay, IconPlus, IconPlayerStop} from '@tabler/icons-react';
 import {useTranslation} from 'react-i18next';
 import useSession from '../Hook/useSession';
 import StepController from "./StepController";
+import ConfirmDialog from "../Screen/ConfirmDialog";
 
 function SessionController({display}) {
     display = display === undefined ? true : display
     const {t} = useTranslation();
     const session = useSession()
+    const [showStopConfirm, setShowStopConfirm] = useState(false);
     const track = session?.track
 
     useEffect(() => {
@@ -52,6 +54,20 @@ function SessionController({display}) {
                 {track.canPause() && <button type="button" className="btn btn-icon btn-accent" aria-label="pause" onClick={session.pause}><IconPlayerPause/></button>}
                 {session.hasNext() && <button type="button" className="btn btn-icon" aria-label="next" onClick={session.next}><IconPlayerTrackNext/></button>}
                 {session.canPlus() && <button type="button" className="btn btn-icon" aria-label="plus" onClick={session.plus}><IconPlus/></button>}
+                <button type="button" className="btn btn-icon" aria-label={t('regie.controller.stop')} onClick={() => setShowStopConfirm(true)}><IconPlayerStop/></button>
+                {showStopConfirm && (
+                    <ConfirmDialog
+                        title={t('regie.controller.stopConfirm.title')}
+                        message={t('regie.controller.stopConfirm.message')}
+                        confirmLabel={t('regie.controller.stopConfirm.confirm')}
+                        cancelLabel={t('regie.controller.stopConfirm.cancel')}
+                        onConfirm={() => {
+                            session.stop();
+                            setShowStopConfirm(false);
+                        }}
+                        onCancel={() => setShowStopConfirm(false)}
+                    />
+                )}
             </div>
             <div className="step-list">
                 {session.steps.map((step, index) => <StepController

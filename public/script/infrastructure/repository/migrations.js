@@ -1,7 +1,7 @@
 const {v4: uuidv4} = require('uuid');
 const TAG_COLOR_PALETTE = require('../../application/entity/tagColorPalette');
 
-const FIXED_TAG_NAMES = ['Musique', 'Bruitage', 'Disco'];
+const FIXED_TAG_NAMES = ['Musique', 'Bruitage'];
 
 const migrations = {
     '0.0.1': store => {

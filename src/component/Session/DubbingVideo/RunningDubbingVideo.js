@@ -60,7 +60,7 @@ function RunningDubbingVideo({ track }) {
             alignItems: 'center',
             justifyContent: 'center'
         }}>
-            <video autoPlay ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} muted={true}>
+            <video autoPlay ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} onEnded={track.pause} muted={true}>
                 <source src={'file://' + track.src} type="video/mp4" />
             </video>
             <ProgressBar currentTime={time.currentTime} duration={time.duration} />

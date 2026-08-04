@@ -213,7 +213,14 @@
       "play": "Play",
       "pause": "Pause",
       "loopOn": "Désactiver la boucle",
-      "loopOff": "Activer la boucle"
+      "loopOff": "Activer la boucle",
+      "stop": "Arrêter la session",
+      "stopConfirm": {
+        "title": "Arrêter la session ?",
+        "message": "La diffusion en cours sera coupée.",
+        "confirm": "Arrêter",
+        "cancel": "Annuler"
+      }
     },
     "audios": {
       "title": "Audio en cours"

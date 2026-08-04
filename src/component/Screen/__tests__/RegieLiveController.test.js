@@ -204,3 +204,55 @@ describe('RegieLiveController - battle-royal tab', () => {
         });
     });
 });
+
+describe('RegieLiveController - stop session', () => {
+    beforeEach(() => {
+        window.electronAPI = {trackChange: jest.fn(), sessionStop: jest.fn()};
+    });
+    afterEach(() => {
+        delete window.session;
+    });
+
+    it('shows a confirmation dialog when the stop button is clicked, without stopping yet', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Arrêter la session'}));
+
+        expect(screen.getByText('Arrêter la session ?')).toBeTruthy();
+        expect(window.electronAPI.sessionStop).not.toHaveBeenCalled();
+    });
+
+    it('calls session.stop() (real sessionStop IPC) when the confirm button is clicked', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Arrêter la session'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Arrêter'}));
+
+        expect(window.electronAPI.sessionStop).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes the dialog without stopping when cancel is clicked', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Arrêter la session'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Annuler'}));
+
+        expect(window.electronAPI.sessionStop).not.toHaveBeenCalled();
+        expect(screen.queryByText('Arrêter la session ?')).toBeNull();
+    });
+});

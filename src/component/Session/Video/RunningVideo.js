@@ -79,7 +79,6 @@ function RunningVideo({ track }) {
             <video autoPlay loop={track.loop} ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} onEnded={onEnded}>
                 <source src={'file://' + track.src} type="video/mp4" />
             </video>
-            <ProgressBar currentTime={time.currentTime} duration={time.duration} />
         </div>
     );
 }

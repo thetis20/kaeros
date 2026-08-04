@@ -70,7 +70,7 @@ describe('migrations 0.3.0 (tag string -> tags[] + seed Tag store)', () => {
         if (legacyPath && fs.existsSync(legacyPath)) fs.unlinkSync(legacyPath);
     });
 
-    it('seeds the 3 fixed tags with their historical colors when the tag store is empty', () => {
+    it('seeds the 2 fixed tags with their historical colors when the tag store is empty', () => {
         const name = 'test-migration-030-seed-' + Date.now() + '-' + Math.random().toString(36).slice(2);
         const cwd = os.tmpdir();
 
@@ -80,9 +80,9 @@ describe('migrations 0.3.0 (tag string -> tags[] + seed Tag store)', () => {
         const migrated = new Store({name, cwd, projectVersion: '0.3.0', migrations});
 
         const tags = migrated.get('tags');
-        expect(tags).toHaveLength(3);
-        expect(tags.map(t => t.name)).toEqual(['Musique', 'Bruitage', 'Disco']);
-        expect(tags.map(t => t.color)).toEqual(['#4C6EFF', '#F76707', '#AE3EC9']);
+        expect(tags).toHaveLength(2);
+        expect(tags.map(t => t.name)).toEqual(['Musique', 'Bruitage']);
+        expect(tags.map(t => t.color)).toEqual(['#4C6EFF', '#F76707']);
         tags.forEach(t => expect(t.id).toEqual(expect.any(String)));
     });
 
@@ -99,7 +99,7 @@ describe('migrations 0.3.0 (tag string -> tags[] + seed Tag store)', () => {
         const tags = migrated.get('tags');
         expect(tags.filter(t => t.name === 'Musique')).toHaveLength(1);
         expect(tags.find(t => t.name === 'Musique').id).toBe('existing-musique');
-        expect(tags.map(t => t.name).sort()).toEqual(['Bruitage', 'Disco', 'Musique']);
+        expect(tags.map(t => t.name).sort()).toEqual(['Bruitage', 'Musique']);
     });
 
     it("rewrites each track's tag string into a tags id array, dropping the tag and color fields", () => {

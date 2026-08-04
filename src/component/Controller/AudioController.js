@@ -8,7 +8,7 @@ import useAudios from '../Hook/useAudios';
 function AudioControllerItem({audio, onStop}) {
     return <div className="audio-row" style={{flexDirection: 'column', alignItems: 'stretch'}}>
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
-            <span className="dot" style={{background: audio.color || 'var(--accent)'}}/>
+            <span className="dot" style={{background: audio.color || 'var(--accent)', marginRight:'.5em'}}/>
             <span style={{flex: 1}}>{audio.name}</span>
             <button className="btn btn-icon" aria-label="stop" onClick={() => onStop(audio)}>
                 <IconPlayerStop/>

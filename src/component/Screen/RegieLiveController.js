@@ -10,33 +10,23 @@ const TYPES = ['image', 'dubbing-video', 'time', 'battle-royal'];
 function formatCountdown(seconds) {
     const total = Math.max(0, seconds || 0);
     const minutes = Math.floor(total / 60);
-    const remaining = total % 60;
+    const remaining = Math.round(total % 60);
     return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
 }
 
 function RegieLiveController() {
     const {t} = useTranslation();
     const session = useSession();
-    const [activeType, setActiveType] = useState(session ? session.track.type : null);
-
-    useEffect(() => {
-        if (session) {
-            setActiveType(session.track.type);
-        }
-    }, [session && session.track.type]);
 
     if (!session) {
         return null;
     }
 
     function renderPanel() {
-        if (activeType === 'image') {
+        if (session.track.type === 'image') {
             return <div className="preview-box">{t('regie.controller.imagePreview')}</div>;
         }
-        if (activeType === 'dubbing-video') {
-            if (session.track.type !== 'dubbing-video') {
-                return <p>{t('regie.tabs.inactive')}</p>;
-            }
+        if (session.track.type === 'dubbing-video') {
             const track = session.track;
             const percent = track.duration ? (track.currentTime / track.duration) * 100 : 0;
             return (
@@ -58,10 +48,7 @@ function RegieLiveController() {
                 </>
             );
         }
-        if (activeType === 'time') {
-            if (session.track.type !== 'time') {
-                return <p>{t('regie.tabs.inactive')}</p>;
-            }
+        if (session.track.type === 'time') {
             const track = session.track;
             return (
                 <div style={{textAlign: 'center'}}>
@@ -86,10 +73,7 @@ function RegieLiveController() {
                 </div>
             );
         }
-        if (activeType === 'battle-royal') {
-            if (session.track.type !== 'battle-royal') {
-                return <p>{t('regie.tabs.inactive')}</p>;
-            }
+        if (session.track.type === 'battle-royal') {
             return <BattleRoyalStepController session={session} step={session.steps[session.index]} index={session.index}/>;
         }
         return null;
@@ -97,16 +81,6 @@ function RegieLiveController() {
 
     return (
         <div>
-            <div className="tabs">
-                {TYPES.map((type) => (
-                    <button
-                        key={type}
-                        type="button"
-                        className={`btn btn-sm ${activeType === type ? 'is-active' : ''}`}
-                        onClick={() => setActiveType(type)}
-                    >{t(`regie.tabs.${type}`)}</button>
-                ))}
-            </div>
             <div id="regie-controller">
                 {renderPanel()}
             </div>

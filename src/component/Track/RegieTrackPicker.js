@@ -16,7 +16,7 @@ function RegieTrackPicker({ tracks, tags, playingIds, onStart }) {
             <div className="tabs" role="group" aria-label="tag-filter">
                 <button
                     type="button"
-                    className={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`}
+                    classNworkflow-cardame={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`}
                     onClick={() => setActiveTag('all')}
                 >{t('track.tag.all')}</button>
                 {tags.map((tag) => (
@@ -25,6 +25,7 @@ function RegieTrackPicker({ tracks, tags, playingIds, onStart }) {
                         type="button"
                         className={`btn btn-sm ${activeTag === tag.id ? 'is-active' : ''}`}
                         onClick={() => setActiveTag(tag.id)}
+                        style={{ background: `${tag.color}22`, color: tag.color }}
                     >{tag.name}</button>
                 ))}
             </div>
@@ -37,7 +38,7 @@ function RegieTrackPicker({ tracks, tags, playingIds, onStart }) {
                             <span className="step-name">{track.name}</span>
                             {track.tags.map((tagId) => {
                                 const tag = resolveTag(tagId);
-                                return tag ? <span key={tagId} className="pill">{tag.name}</span> : null;
+                                return tag ? <span key={tagId} className="pill" style={{ background: `${tag.color}22`, color: tag.color }}>{tag.name}</span> : null;
                             })}
                             <button
                                 type="button"

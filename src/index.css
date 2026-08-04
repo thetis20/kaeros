@@ -13,7 +13,7 @@ code {
 }
 
 #root .rhap_container {
-    background-color: #212529;
+    box-shadow: none;
 }
 
 #root .rhap_controls-section,

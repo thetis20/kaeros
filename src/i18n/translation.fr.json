@@ -37,6 +37,8 @@
     "form": {
       "title": "Formulaire une étape",
       "name": "Nom",
+      "time": "Durée de l'extrait",
+      "description": "Description de l'extrait",
       "type": {
         "label": "Type",
         "option": {
@@ -196,13 +198,6 @@
       "label": "Session",
       "collapse": "Réduire la session",
       "expand": "Afficher la session"
-    },
-    "tabs": {
-      "image": "Image",
-      "dubbing-video": "Vidéo de doublage",
-      "time": "Time",
-      "battle-royal": "Battle Royal",
-      "inactive": "Cette étape n'est pas l'étape en cours."
     },
     "controller": {
       "imagePreview": "Aperçu image plein écran",

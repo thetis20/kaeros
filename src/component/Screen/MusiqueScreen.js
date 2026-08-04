@@ -58,6 +58,7 @@ function MusiqueScreen() {
     function remove(track) {
         window.electronAPI.trackRemove(track.id);
     }
+    console.log(filtered)
 
     return (
         <div className="content">
@@ -112,7 +113,7 @@ function MusiqueScreen() {
             <div className="tabs" role="group" aria-label="tag-filter">
                 <button type="button" className={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`} onClick={() => setActiveTag('all')}>{t('track.tag.all')}</button>
                 {tags.map((tag) => (
-                    <button key={tag.id} type="button" className={`btn btn-sm ${activeTag === tag.id ? 'is-active' : ''}`} onClick={() => setActiveTag(tag.id)}>{tag.name}</button>
+                    <button key={tag.id} type="button" className={`btn btn-sm ${activeTag === tag.id ? 'is-active' : ''}`} style={{ background: `${tag.color}22`, color: tag.color }} onClick={() => setActiveTag(tag.id)}>{tag.name}</button>
                 ))}
             </div>
 
@@ -125,7 +126,7 @@ function MusiqueScreen() {
                         <span className="step-name">{track.name}</span>
                         {track.tags.map((tagId) => {
                             const tag = resolveTag(tagId);
-                            return tag ? <span key={tagId} className="pill">{tag.name}</span> : null;
+                            return tag ? <span key={tagId} className="pill" style={{ background: `${tag.color}22`, color: tag.color }}>{tag.name}</span> : null;
                         })}
                         <button type="button" className="btn btn-sm" onClick={() => edit(track)}>{t('musique.edit')}</button>
                         <button type="button" className="btn btn-sm" onClick={() => remove(track)}>{t('musique.remove')}</button>

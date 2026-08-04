@@ -166,6 +166,39 @@ body {
   color: var(--accent-dark);
 }
 
+.confirm-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 30, 28, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.confirm-dialog-box {
+  background: var(--surface-2);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  max-width: 360px;
+}
+
+.confirm-dialog-box h3 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.confirm-dialog-box p {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 input[type="text"], input[type="number"], textarea, select {
   height: 34px;
   padding: 0 10px;

@@ -58,17 +58,30 @@
     "directories": {
       "buildResources": "assets"
     },
-    "publish": {
-      "provider": "github"
-    },
     "mac": {
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ]
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
     },
     "linux": {
-      "target": "deb"
+      "target": [
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ]
     }
   },
   "browserslist": {

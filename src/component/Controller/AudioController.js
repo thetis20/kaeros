@@ -12,7 +12,7 @@ function AudioControllerItem({audio, onStop}) {
         const audioEl = playerRef.current?.audio?.current;
         if (!audioEl) return;
         audioEl.currentTime = (audio.startOffsetMs || 0) / 1000;
-        audioEl.play();
+        audioEl.play()?.catch(() => {});
     }
 
     return <div className="audio-row" style={{flexDirection: 'column', alignItems: 'stretch'}}>

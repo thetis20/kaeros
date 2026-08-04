@@ -68,6 +68,19 @@ describe('AudioController', () => {
         expect(audioEl.currentTime).toBe(0);
     });
 
+    it('does not leave the play() promise unhandled when playback is interrupted by a pause', () => {
+        render(<AudioController/>);
+        play({id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'});
+
+        const audioEl = document.querySelector('audio');
+        const rejectedPlayResult = {catch: jest.fn(() => rejectedPlayResult)};
+        jest.spyOn(audioEl, 'play').mockReturnValue(rejectedPlayResult);
+
+        fireEvent(audioEl, new Event('loadedmetadata'));
+
+        expect(rejectedPlayResult.catch).toHaveBeenCalled();
+    });
+
     it('stops an audio when an audio-end event is dispatched for it', () => {
         render(<AudioController/>);
         play({id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'});

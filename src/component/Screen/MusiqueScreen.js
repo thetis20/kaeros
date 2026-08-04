@@ -17,6 +17,7 @@ function MusiqueScreen() {
     const [errors, setErrors] = useState({});
     const previewRef = useRef(null);
     const blobUrlRef = useRef(null);
+    const loadedMetadataListenerRef = useRef(null);
 
     function revokeBlobUrl() {
         if (blobUrlRef.current) {
@@ -31,6 +32,11 @@ function MusiqueScreen() {
         const audioEl = previewRef.current;
         if (!audioEl || !hasSource(value)) return;
 
+        if (loadedMetadataListenerRef.current) {
+            audioEl.removeEventListener('loadedmetadata', loadedMetadataListenerRef.current);
+            loadedMetadataListenerRef.current = null;
+        }
+
         revokeBlobUrl();
         if (value.file) {
             const url = URL.createObjectURL(value.file);
@@ -43,9 +49,11 @@ function MusiqueScreen() {
 
         function onLoadedMetadata() {
             audioEl.currentTime = (Number(value.startOffsetMs) || 0) / 1000;
-            audioEl.play();
+            audioEl.play()?.catch(() => {});
             audioEl.removeEventListener('loadedmetadata', onLoadedMetadata);
+            loadedMetadataListenerRef.current = null;
         }
+        loadedMetadataListenerRef.current = onLoadedMetadata;
         audioEl.addEventListener('loadedmetadata', onLoadedMetadata);
     }
 

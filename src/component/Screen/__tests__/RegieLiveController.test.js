@@ -20,16 +20,86 @@ describe('RegieLiveController', () => {
         expect(screen.getByText('Aperçu image plein écran')).toBeTruthy();
     });
 
-    it('renders all four tabs', () => {
+    it('renders all five tabs', () => {
         window.session = {track: {type: 'time', count: 1, impro: 3}, steps: [], index: 0};
         render(<RegieLiveController/>);
 
         expect(screen.getByRole('button', {name: 'Image'})).toBeTruthy();
         expect(screen.getByRole('button', {name: 'Vidéo de doublage'})).toBeTruthy();
+        expect(screen.getByRole('button', {name: 'Vidéo'})).toBeTruthy();
         expect(screen.getByRole('button', {name: 'Time'})).toBeTruthy();
         expect(screen.getByRole('button', {name: 'Battle Royal'})).toBeTruthy();
     });
 
+});
+
+describe('RegieLiveController - video tab', () => {
+    beforeEach(() => {
+        window.electronAPI = {trackChange: jest.fn()};
+    });
+    afterEach(() => {
+        delete window.session;
+    });
+
+    it('shows the real playback progress (MM:SS elapsed/total, slider position) from the running video', () => {
+        window.session = {
+            track: {type: 'video', src: '/tmp/clip.mp4', currentTime: 30, duration: 120, paused: false, loop: false},
+            steps: [{id: 's1', name: 'Sketch', type: 'video'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        expect(screen.getByText('00:30')).toBeTruthy();
+        expect(screen.getByText('02:00')).toBeTruthy();
+        expect(screen.getByRole('slider')).toHaveValue('25');
+        expect(screen.getByRole('slider')).toBeDisabled();
+    });
+
+    it('calls session.pause()/session.play() (real trackChange IPC) from the play/pause button', () => {
+        window.session = {
+            track: {type: 'video', src: '/tmp/clip.mp4', currentTime: 30, duration: 120, paused: false, loop: false},
+            steps: [{id: 's1', name: 'Sketch', type: 'video'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Pause'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: true});
+
+        act(() => {
+            document.dispatchEvent(new CustomEvent('session-onchange', {
+                detail: {track: {type: 'video', src: '/tmp/clip.mp4', currentTime: 30, duration: 120, paused: true, loop: false}, steps: [{id: 's1', name: 'Sketch', type: 'video'}], index: 0},
+            }));
+        });
+
+        fireEvent.click(screen.getByRole('button', {name: 'Play'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: false});
+    });
+
+    it('toggles loop live via the loop button (real trackChange IPC)', () => {
+        window.session = {
+            track: {type: 'video', src: '/tmp/clip.mp4', currentTime: 30, duration: 120, paused: false, loop: false},
+            steps: [{id: 's1', name: 'Sketch', type: 'video'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Activer la boucle'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({loop: true});
+    });
+
+    it('shows the inactive fallback on the video tab when the current step is not a video step', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Sketch', type: 'video'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Vidéo'}));
+
+        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
+    });
 });
 
 describe('RegieLiveController - dubbing-video tab', () => {

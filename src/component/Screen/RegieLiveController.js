@@ -1,11 +1,11 @@
 import 'react';
 import {useState, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {IconMinus, IconPlus, IconPlayerPlay, IconPlayerPause} from '@tabler/icons-react';
+import {IconMinus, IconPlus, IconPlayerPlay, IconPlayerPause, IconRepeat, IconRepeatOff} from '@tabler/icons-react';
 import useSession from '../Hook/useSession';
 import BattleRoyalStepController from '../Controller/BattleRoyalStepController';
 
-const TYPES = ['image', 'dubbing-video', 'time', 'battle-royal'];
+const TYPES = ['image', 'dubbing-video', 'video', 'time', 'battle-royal'];
 
 function formatCountdown(seconds) {
     const total = Math.max(0, seconds || 0);
@@ -44,6 +44,34 @@ function RegieLiveController() {
                             aria-label={track.paused ? t('regie.controller.play') : t('regie.controller.pause')}
                             onClick={track.paused ? session.play : session.pause}
                         >{track.paused ? <IconPlayerPlay/> : <IconPlayerPause/>}</button>
+                    </div>
+                </>
+            );
+        }
+        if (session.track.type === 'video') {
+            const track = session.track;
+            const percent = track.duration ? (track.currentTime / track.duration) * 100 : 0;
+            return (
+                <>
+                    <div className="preview-box">{t('regie.controller.videoPreview')}</div>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '.5em'}}>
+                        <span>{formatCountdown(track.currentTime)}</span>
+                        <input type="range" min="0" max="100" value={percent} disabled/>
+                        <span>{formatCountdown(track.duration)}</span>
+                    </div>
+                    <div style={{display: 'flex', justifyContent: 'center', gap: '1em'}}>
+                        <button
+                            type="button"
+                            className="btn btn-icon"
+                            aria-label={track.paused ? t('regie.controller.play') : t('regie.controller.pause')}
+                            onClick={track.paused ? session.play : session.pause}
+                        >{track.paused ? <IconPlayerPlay/> : <IconPlayerPause/>}</button>
+                        <button
+                            type="button"
+                            className="btn btn-icon"
+                            aria-label={track.loop ? t('regie.controller.loopOn') : t('regie.controller.loopOff')}
+                            onClick={() => track.setLoop(!track.loop)}
+                        >{track.loop ? <IconRepeat/> : <IconRepeatOff/>}</button>
                     </div>
                 </>
             );

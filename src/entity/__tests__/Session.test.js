@@ -2,6 +2,7 @@ import Session from '../Session';
 import ImageTrack from '../ImageTrack';
 import TimeTrack from '../TimeTrack';
 import DubbingVideoTrack from '../DubbingVideoTrack';
+import VideoTrack from '../VideoTrack';
 import BattleRoyalTrack from '../BattleRoyalTrack';
 
 describe('Session', () => {
@@ -18,6 +19,7 @@ describe('Session', () => {
         expect(new Session({track: {type: 'image'}, steps: []}).track).toBeInstanceOf(ImageTrack);
         expect(new Session({track: {type: 'time'}, steps: []}).track).toBeInstanceOf(TimeTrack);
         expect(new Session({track: {type: 'dubbing-video'}, steps: []}).track).toBeInstanceOf(DubbingVideoTrack);
+        expect(new Session({track: {type: 'video'}, steps: []}).track).toBeInstanceOf(VideoTrack);
         expect(new Session({
             track: {type: 'battle-royal', players: []},
             steps: [],

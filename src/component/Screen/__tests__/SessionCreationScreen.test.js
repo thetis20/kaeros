@@ -24,9 +24,19 @@ describe('SessionCreationScreen - new session, local step list', () => {
         render(<SessionCreationScreen workflowId={null} onDone={() => {}}/>);
         fireEvent.click(screen.getByRole('button', {name: 'Image'}));
         fireEvent.click(screen.getByRole('button', {name: 'Vidéo de doublage'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Vidéo'}));
 
         expect(screen.getByText('Nouvelle image')).toBeTruthy();
         expect(screen.getByText('Nouveau doublage')).toBeTruthy();
+        expect(screen.getByText('Nouvelle vidéo')).toBeTruthy();
+    });
+
+    it('adds a video step with loop defaulting to false', () => {
+        render(<SessionCreationScreen workflowId={null} onDone={() => {}}/>);
+        fireEvent.click(screen.getByRole('button', {name: 'Vidéo'}));
+        fireEvent.click(screen.getByRole('button', {name: "Modifier l'étape"}));
+
+        expect(screen.getByLabelText('Lecture en boucle').checked).toBe(false);
     });
 
     it('moves a step up and down with the chevron buttons', () => {

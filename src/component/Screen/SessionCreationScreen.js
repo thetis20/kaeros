@@ -1,19 +1,21 @@
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {v4 as uuidv4} from 'uuid';
-import {IconChevronUp, IconChevronDown, IconEdit, IconTrash, IconPhoto, IconMovie, IconClock, IconShield} from '@tabler/icons-react';
+import {IconChevronUp, IconChevronDown, IconEdit, IconTrash, IconPhoto, IconMovie, IconVideo, IconClock, IconShield} from '@tabler/icons-react';
 import useWorkflows from '../Hook/useWorkflows';
 import useSteps from '../Hook/useSteps';
 import ImageStep, {validate as validateImage} from '../Step/ImageStep';
 import DubbingVideoStep, {validate as validateDubbingVideo} from '../Step/DubbingVideoStep';
+import VideoStep, {validate as validateVideo} from '../Step/VideoStep';
 import TimeStep, {validate as validateTime} from '../Step/TimeStep';
 import BattleRoyalStep, {validate as validateBattleRoyal} from '../Step/BattleRoyalStep';
 
-const STEP_TYPES = ['image', 'dubbing-video', 'time', 'battle-royal'];
+const STEP_TYPES = ['image', 'dubbing-video', 'video', 'time', 'battle-royal'];
 
 const stepIcons = {
     image: IconPhoto,
     'dubbing-video': IconMovie,
+    video: IconVideo,
     time: IconClock,
     'battle-royal': IconShield,
 };
@@ -21,6 +23,7 @@ const stepIcons = {
 const variantComponents = {
     image: ImageStep,
     'dubbing-video': DubbingVideoStep,
+    video: VideoStep,
     time: TimeStep,
     'battle-royal': BattleRoyalStep,
 };
@@ -28,6 +31,7 @@ const variantComponents = {
 const variantValidators = {
     image: validateImage,
     'dubbing-video': validateDubbingVideo,
+    video: validateVideo,
     time: validateTime,
     'battle-royal': validateBattleRoyal,
 };
@@ -39,6 +43,7 @@ const variantValidators = {
 const stepTypeLabelKeys = {
     image: 'step.form.type.option.images',
     'dubbing-video': 'step.form.type.option.dubbing-video',
+    video: 'step.form.type.option.video',
     time: 'step.form.type.option.time',
     'battle-royal': 'step.form.type.option.battle-royal',
 };
@@ -60,6 +65,7 @@ function hydrateStepForEditing(step) {
 function newStep(type, t) {
     const base = {id: uuidv4(), type, name: t(`sessionCreation.newStepName.${type}`), open: false};
     if (type === 'dubbing-video') return {...base, time: '', description: ''};
+    if (type === 'video') return {...base, loop: false};
     if (type === 'time') return {...base, impro: '1', minutes: '2'};
     if (type === 'battle-royal') return {...base, players: ''};
     return base;

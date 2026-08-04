@@ -44,6 +44,7 @@
         "option": {
           "images": "Image",
           "dubbing-video": "Vidéo de doublage",
+          "video": "Vidéo",
           "time": "Time",
           "battle-royal": "Battle Royal"
         }
@@ -51,6 +52,9 @@
       "src": {
         "label": "Image",
         "placeholder": "Rechercher dans mes fichiers"
+      },
+      "loop": {
+        "label": "Lecture en boucle"
       },
       "impro": "Nombre d'impros",
       "minutes": "Minutes",
@@ -202,11 +206,14 @@
     "controller": {
       "imagePreview": "Aperçu image plein écran",
       "dubbingPreview": "Lecture vidéo (muet)",
+      "videoPreview": "Lecture vidéo",
       "impro": "Impro {{current}} / {{total}}",
       "improPrevious": "Impro précédente",
       "improNext": "Impro suivante",
       "play": "Play",
-      "pause": "Pause"
+      "pause": "Pause",
+      "loopOn": "Désactiver la boucle",
+      "loopOff": "Activer la boucle"
     },
     "audios": {
       "title": "Audio en cours"
@@ -259,6 +266,7 @@
     "newStepName": {
       "image": "Nouvelle image",
       "dubbing-video": "Nouveau doublage",
+      "video": "Nouvelle vidéo",
       "time": "Nouveau time",
       "battle-royal": "Nouveau battle royal"
     }

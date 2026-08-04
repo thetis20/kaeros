@@ -1,5 +1,6 @@
 const ImageTrack = require('./ImageTrack')
 const DubbingVideoTrack = require("./DubbingVideoTrack");
+const VideoTrack = require("./VideoTrack");
 const TimeTrack = require("./TimeTrack");
 const BattleRoyalTrack = require("./BattleRoyalTrack");
 
@@ -11,6 +12,8 @@ class TrackFactory {
                 return new ImageTrack(step)
             case 'dubbing-video':
                 return new DubbingVideoTrack(step)
+            case 'video':
+                return new VideoTrack(step)
             case 'time':
                 return new TimeTrack(step)
             case 'battle-royal':

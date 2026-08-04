@@ -1,5 +1,6 @@
 import ImageTrack from "./ImageTrack";
 import DubbingVideoTrack from "./DubbingVideoTrack";
+import VideoTrack from "./VideoTrack";
 import TimeTrack from "./TimeTrack";
 import BattleRoyalTrack from "./BattleRoyalTrack";
 
@@ -16,6 +17,9 @@ export default class Session {
                     break;
                 case 'dubbing-video':
                     this.track = new DubbingVideoTrack(this.track)
+                    break;
+                case 'video':
+                    this.track = new VideoTrack(this.track)
                     break;
                 case 'time':
                     this.track = new TimeTrack(this.track)

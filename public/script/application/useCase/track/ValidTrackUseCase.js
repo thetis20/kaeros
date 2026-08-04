@@ -13,6 +13,16 @@ class ValidTrackUseCase {
             throw new Error('Invalid track tags');
         }
 
+        if (track.startOffsetMs === undefined || track.startOffsetMs === null || track.startOffsetMs === '') {
+            track.startOffsetMs = 0;
+        } else {
+            const startOffsetMs = Number(track.startOffsetMs);
+            if (!Number.isInteger(startOffsetMs) || startOffsetMs < 0) {
+                throw new Error('Invalid track start offset');
+            }
+            track.startOffsetMs = startOffsetMs;
+        }
+
         return track
     }
 }

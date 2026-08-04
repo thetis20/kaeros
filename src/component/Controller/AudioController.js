@@ -1,11 +1,20 @@
 import 'react';
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import {IconPlayerStop} from '@tabler/icons-react';
 import useAudios from '../Hook/useAudios';
 
 function AudioControllerItem({audio, onStop}) {
+    const playerRef = useRef(null);
+
+    function handleLoadedMetaData() {
+        const audioEl = playerRef.current?.audio?.current;
+        if (!audioEl) return;
+        audioEl.currentTime = (audio.startOffsetMs || 0) / 1000;
+        audioEl.play();
+    }
+
     return <div className="audio-row" style={{flexDirection: 'column', alignItems: 'stretch'}}>
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
             <span className="dot" style={{background: audio.color || 'var(--accent)', marginRight:'.5em'}}/>
@@ -15,8 +24,9 @@ function AudioControllerItem({audio, onStop}) {
             </button>
         </div>
         <AudioPlayer
-            autoPlay
+            ref={playerRef}
             src={'file://' + audio.src}
+            onLoadedMetaData={handleLoadedMetaData}
             onEnded={() => onStop(audio)}
         />
     </div>

@@ -19,7 +19,7 @@ class CreateTrackUseCase {
     async execute(track) {
         this.validTrackUseCase.execute(track);
 
-        const newTrack = new Audio(uuidv4(), track.name, track.src, track.tags);
+        const newTrack = new Audio(uuidv4(), track.name, track.src, track.tags, track.startOffsetMs);
         await this.trackRepository.create(newTrack);
 
         return newTrack;

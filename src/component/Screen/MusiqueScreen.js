@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconUpload } from '@tabler/icons-react';
 import useTracks from '../Hook/useTracks';
@@ -6,7 +6,7 @@ import useTags from '../Hook/useTags';
 import TagMultiSelect from '../Tag/TagMultiSelect';
 import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
 
-const EMPTY_FORM = { name: '', tags: [] };
+const EMPTY_FORM = { name: '', tags: [], startOffsetMs: 0 };
 
 function MusiqueScreen() {
     const { t } = useTranslation();
@@ -15,6 +15,39 @@ function MusiqueScreen() {
     const [activeTag, setActiveTag] = useState('all');
     const [value, setValue] = useState(EMPTY_FORM);
     const [errors, setErrors] = useState({});
+    const previewRef = useRef(null);
+    const blobUrlRef = useRef(null);
+
+    function revokeBlobUrl() {
+        if (blobUrlRef.current) {
+            URL.revokeObjectURL(blobUrlRef.current);
+            blobUrlRef.current = null;
+        }
+    }
+
+    useEffect(() => () => revokeBlobUrl(), [value.file]);
+
+    function testPlayback() {
+        const audioEl = previewRef.current;
+        if (!audioEl || !hasSource(value)) return;
+
+        revokeBlobUrl();
+        if (value.file) {
+            const url = URL.createObjectURL(value.file);
+            blobUrlRef.current = url;
+            audioEl.src = url;
+        } else {
+            audioEl.src = 'file://' + value.src;
+        }
+        audioEl.load();
+
+        function onLoadedMetadata() {
+            audioEl.currentTime = (Number(value.startOffsetMs) || 0) / 1000;
+            audioEl.play();
+            audioEl.removeEventListener('loadedmetadata', onLoadedMetadata);
+        }
+        audioEl.addEventListener('loadedmetadata', onLoadedMetadata);
+    }
 
     const filtered = activeTag === 'all' ? tracks : tracks.filter((track) => track.tags.includes(activeTag));
 
@@ -35,6 +68,9 @@ function MusiqueScreen() {
         if (!value.name || !value.name.trim()) errors.name = t('musique.form.error.name');
         if (!Array.isArray(value.tags) || value.tags.length === 0) errors.tags = t('musique.form.error.tags');
         if (!hasSource(value)) errors.src = t('musique.form.error.src');
+        if (value.startOffsetMs !== undefined && value.startOffsetMs !== '' && (!Number.isInteger(Number(value.startOffsetMs)) || Number(value.startOffsetMs) < 0)) {
+            errors.startOffsetMs = t('musique.form.error.startOffset');
+        }
         return errors;
     }
 
@@ -58,7 +94,6 @@ function MusiqueScreen() {
     function remove(track) {
         window.electronAPI.trackRemove(track.id);
     }
-    console.log(filtered)
 
     return (
         <div className="content">
@@ -106,6 +141,28 @@ function MusiqueScreen() {
                     <label className="btn btn-sm" htmlFor="track-src"><IconUpload size={14}/>{getFilename(value, t('musique.form.placeholder'))}</label>
                 </div>
                 {errors.src && <div className="invalid-feedback">{errors.src}</div>}
+
+                <label htmlFor="track-start-offset" className="field-label" style={{marginTop: 12, display: 'block'}}>{t('musique.form.startOffset')}</label>
+                <input
+                    type="number"
+                    id="track-start-offset"
+                    min="0"
+                    style={{ width: '100%', marginBottom: 10 }}
+                    className={errors.startOffsetMs ? 'is-invalid' : ''}
+                    value={value.startOffsetMs ?? ''}
+                    onChange={(e) => {
+                        setValue({ ...value, startOffsetMs: e.target.value });
+                        if (errors.startOffsetMs) setErrors({ ...errors, startOffsetMs: undefined });
+                    }}
+                />
+                {errors.startOffsetMs && <div className="invalid-feedback">{errors.startOffsetMs}</div>}
+
+                {hasSource(value) && (
+                    <div style={{ marginTop: 8 }}>
+                        <audio ref={previewRef} controls style={{ width: '100%', marginBottom: 8 }}/>
+                        <button type="button" className="btn btn-sm" onClick={testPlayback}>{t('musique.form.test')}</button>
+                    </div>
+                )}
 
                 <button type="submit" className="btn btn-accent-solid" style={{ marginTop: 8 }}>{t('musique.form.submit')}</button>
             </form>

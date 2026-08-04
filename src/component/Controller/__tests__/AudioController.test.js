@@ -45,6 +45,29 @@ describe('AudioController', () => {
         expect(window.electronAPI.trackEnd).toHaveBeenCalledWith('a1');
     });
 
+    it('seeks to the track startOffsetMs and plays once metadata is loaded', () => {
+        render(<AudioController/>);
+        play({id: 'a1', name: 'Track One', src: '/tmp/track1.mp3', startOffsetMs: 5000});
+
+        const audioEl = document.querySelector('audio');
+        const playSpy = jest.spyOn(audioEl, 'play').mockImplementation(() => Promise.resolve());
+        fireEvent(audioEl, new Event('loadedmetadata'));
+
+        expect(audioEl.currentTime).toBe(5);
+        expect(playSpy).toHaveBeenCalled();
+    });
+
+    it('starts from the beginning when the track has no startOffsetMs', () => {
+        render(<AudioController/>);
+        play({id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'});
+
+        const audioEl = document.querySelector('audio');
+        jest.spyOn(audioEl, 'play').mockImplementation(() => Promise.resolve());
+        fireEvent(audioEl, new Event('loadedmetadata'));
+
+        expect(audioEl.currentTime).toBe(0);
+    });
+
     it('stops an audio when an audio-end event is dispatched for it', () => {
         render(<AudioController/>);
         play({id: 'a1', name: 'Track One', src: '/tmp/track1.mp3'});

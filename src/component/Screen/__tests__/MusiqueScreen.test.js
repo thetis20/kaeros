@@ -49,6 +49,58 @@ describe('MusiqueScreen', () => {
         expect(window.electronAPI.trackSave).not.toHaveBeenCalled();
     });
 
+    it('shows a validation error and does not save when the start offset is negative', () => {
+        render(<MusiqueScreen/>);
+        seedTags(TAGS);
+        fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
+        selectTag('Disco');
+        const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
+        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+        fireEvent.change(screen.getByLabelText('Démarrage (ms)'), {target: {value: '-1'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(screen.getByText('Le point de départ doit être un nombre entier positif (en millisecondes).')).toBeTruthy();
+        expect(window.electronAPI.trackSave).not.toHaveBeenCalled();
+    });
+
+    it('saves a new track with the entered start offset in milliseconds', () => {
+        render(<MusiqueScreen/>);
+        seedTags(TAGS);
+        fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
+        selectTag('Disco');
+        const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
+        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+        fireEvent.change(screen.getByLabelText('Démarrage (ms)'), {target: {value: '250'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(window.electronAPI.trackSave).toHaveBeenCalledWith(expect.objectContaining({
+            startOffsetMs: '250',
+        }));
+    });
+
+    it('does not show the test-playback button when no audio source is selected yet', () => {
+        render(<MusiqueScreen/>);
+        expect(screen.queryByRole('button', {name: 'Tester'})).toBeNull();
+    });
+
+    it('seeks the preview player to the entered offset and plays it when Tester is clicked', () => {
+        render(<MusiqueScreen/>);
+        global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
+        global.URL.revokeObjectURL = jest.fn();
+        const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
+        fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+        fireEvent.change(screen.getByLabelText('Démarrage (ms)'), {target: {value: '250'}});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Tester'}));
+        const previewEl = document.querySelector('audio');
+        const playSpy = jest.spyOn(previewEl, 'play').mockImplementation(() => Promise.resolve());
+        fireEvent(previewEl, new Event('loadedmetadata'));
+
+        expect(global.URL.createObjectURL).toHaveBeenCalledWith(file);
+        expect(previewEl.currentTime).toBe(0.25);
+        expect(playSpy).toHaveBeenCalled();
+    });
+
     it('saves a new track with the entered name, selected tags and picked file', () => {
         render(<MusiqueScreen/>);
         seedTags(TAGS);

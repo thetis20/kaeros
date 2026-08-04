@@ -239,11 +239,14 @@
       "createTag": "Créer « {{name}} »",
       "src": "Fichier audio",
       "placeholder": "Rechercher dans mes fichiers",
+      "startOffset": "Démarrage (ms)",
+      "test": "Tester",
       "submit": "Enregistrer",
       "error": {
         "name": "Le nom est obligatoire.",
         "tags": "Veuillez sélectionner au moins un tag.",
-        "src": "Un fichier audio est obligatoire."
+        "src": "Un fichier audio est obligatoire.",
+        "startOffset": "Le point de départ doit être un nombre entier positif (en millisecondes)."
       }
     },
     "edit": "Modifier",

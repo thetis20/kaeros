@@ -19,6 +19,24 @@ describe('CreateTrackUseCase', () => {
         expect(repository.created).toEqual([result]);
     });
 
+    it('defaults startOffsetMs to 0 when omitted', async () => {
+        const repository = fakeRepository();
+        const createTrackUseCase = new CreateTrackUseCase(repository);
+
+        const result = await createTrackUseCase.execute({name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1']});
+
+        expect(result.startOffsetMs).toBe(0);
+    });
+
+    it('persists a normalized startOffsetMs when provided', async () => {
+        const repository = fakeRepository();
+        const createTrackUseCase = new CreateTrackUseCase(repository);
+
+        const result = await createTrackUseCase.execute({name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1'], startOffsetMs: '250'});
+
+        expect(result.startOffsetMs).toBe(250);
+    });
+
     it('throws and does not persist when the track is invalid', async () => {
         const repository = fakeRepository();
         const createTrackUseCase = new CreateTrackUseCase(repository);

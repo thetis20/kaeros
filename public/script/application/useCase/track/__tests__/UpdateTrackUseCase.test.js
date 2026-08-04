@@ -18,6 +18,16 @@ describe('UpdateTrackUseCase', () => {
         expect(repository.updated[0].track.updatedAt).toBeInstanceOf(Date);
     });
 
+    it('normalizes startOffsetMs before persisting', async () => {
+        const repository = fakeRepository();
+        const updateTrackUseCase = new UpdateTrackUseCase(repository);
+        const track = {id: 't1', name: 'Track One', src: '/tmp/t1.mp3', tags: ['tag1'], startOffsetMs: '250'};
+
+        await updateTrackUseCase.execute('t1', track);
+
+        expect(repository.updated[0].track.startOffsetMs).toBe(250);
+    });
+
     it('throws and does not persist when the tags are invalid', async () => {
         const repository = fakeRepository();
         const updateTrackUseCase = new UpdateTrackUseCase(repository);

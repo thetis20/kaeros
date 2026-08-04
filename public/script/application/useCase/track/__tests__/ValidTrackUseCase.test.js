@@ -22,4 +22,30 @@ describe('ValidTrackUseCase', () => {
         expect(() => validTrackUseCase.execute({name: 'Track One'})).toThrow('Invalid track tags');
         expect(() => validTrackUseCase.execute({name: 'Track One', tags: 'tag1'})).toThrow('Invalid track tags');
     });
+
+    it('defaults a missing startOffsetMs to 0', () => {
+        const track = {name: 'Track One', tags: ['tag1']};
+        const result = validTrackUseCase.execute(track);
+        expect(result.startOffsetMs).toBe(0);
+    });
+
+    it('keeps a valid non-negative integer startOffsetMs', () => {
+        const track = {name: 'Track One', tags: ['tag1'], startOffsetMs: 250};
+        const result = validTrackUseCase.execute(track);
+        expect(result.startOffsetMs).toBe(250);
+    });
+
+    it('coerces a numeric string startOffsetMs to a number', () => {
+        const track = {name: 'Track One', tags: ['tag1'], startOffsetMs: '250'};
+        const result = validTrackUseCase.execute(track);
+        expect(result.startOffsetMs).toBe(250);
+    });
+
+    it('rejects a negative startOffsetMs', () => {
+        expect(() => validTrackUseCase.execute({name: 'Track One', tags: ['tag1'], startOffsetMs: -1})).toThrow('Invalid track start offset');
+    });
+
+    it('rejects a non-integer startOffsetMs', () => {
+        expect(() => validTrackUseCase.execute({name: 'Track One', tags: ['tag1'], startOffsetMs: 1.5})).toThrow('Invalid track start offset');
+    });
 });

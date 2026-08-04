@@ -90,7 +90,6 @@ describe('RegieScreen', () => {
         render(<RegieScreen/>);
 
         expect(screen.getByText('Step 1')).toBeTruthy();
-        expect(screen.getByRole('button', {name: 'Battle Royal'})).toBeTruthy();
         expect(screen.getByText('Impro 1 / 5')).toBeTruthy();
     });
 

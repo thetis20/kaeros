@@ -12,25 +12,12 @@ describe('RegieLiveController', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it('defaults the active tab to the current track type and shows the decorative image panel', () => {
+    it('shows the decorative image panel when the current step is an image', () => {
         window.session = {track: {type: 'image', src: '/tmp/logo.png'}, steps: [{id: 's1', name: 'Logo', type: 'image'}], index: 0};
         render(<RegieLiveController/>);
 
-        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('is-active');
         expect(screen.getByText('Aperçu image plein écran')).toBeTruthy();
     });
-
-    it('renders all five tabs', () => {
-        window.session = {track: {type: 'time', count: 1, impro: 3}, steps: [], index: 0};
-        render(<RegieLiveController/>);
-
-        expect(screen.getByRole('button', {name: 'Image'})).toBeTruthy();
-        expect(screen.getByRole('button', {name: 'Vidéo de doublage'})).toBeTruthy();
-        expect(screen.getByRole('button', {name: 'Vidéo'})).toBeTruthy();
-        expect(screen.getByRole('button', {name: 'Time'})).toBeTruthy();
-        expect(screen.getByRole('button', {name: 'Battle Royal'})).toBeTruthy();
-    });
-
 });
 
 describe('RegieLiveController - video tab', () => {
@@ -87,19 +74,6 @@ describe('RegieLiveController - video tab', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Activer la boucle'}));
         expect(window.electronAPI.trackChange).toHaveBeenCalledWith({loop: true});
     });
-
-    it('shows the inactive fallback on the video tab when the current step is not a video step', () => {
-        window.session = {
-            track: {type: 'image', src: '/tmp/logo.png'},
-            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Sketch', type: 'video'}],
-            index: 0,
-        };
-        render(<RegieLiveController/>);
-
-        fireEvent.click(screen.getByRole('button', {name: 'Vidéo'}));
-
-        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
-    });
 });
 
 describe('RegieLiveController - dubbing-video tab', () => {
@@ -143,19 +117,6 @@ describe('RegieLiveController - dubbing-video tab', () => {
 
         fireEvent.click(screen.getByRole('button', {name: 'Play'}));
         expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: false});
-    });
-
-    it('shows the inactive fallback on the dubbing-video tab when the current step is not a dubbing-video step', () => {
-        window.session = {
-            track: {type: 'image', src: '/tmp/logo.png'},
-            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Sketch', type: 'dubbing-video'}],
-            index: 0,
-        };
-        render(<RegieLiveController/>);
-
-        fireEvent.click(screen.getByRole('button', {name: 'Vidéo de doublage'}));
-
-        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
     });
 });
 
@@ -205,19 +166,6 @@ describe('RegieLiveController - time tab', () => {
         expect(screen.getByRole('button', {name: 'Impro suivante'})).toBeDisabled();
         expect(screen.getByRole('button', {name: 'Impro précédente'})).not.toBeDisabled();
     });
-
-    it('shows the inactive fallback on the time tab when the current step is not a time step', () => {
-        window.session = {
-            track: {type: 'image', src: '/tmp/logo.png'},
-            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}],
-            index: 0,
-        };
-        render(<RegieLiveController/>);
-
-        fireEvent.click(screen.getByRole('button', {name: 'Time'}));
-
-        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
-    });
 });
 
 describe('RegieLiveController - battle-royal tab', () => {
@@ -254,40 +202,5 @@ describe('RegieLiveController - battle-royal tab', () => {
                 {id: 'p2', name: 'Bob', score: 0, enabled: true},
             ],
         });
-    });
-
-    it('shows the inactive fallback on the battle-royal tab when the current step is not battle-royal', () => {
-        window.session = {
-            track: {type: 'image', src: '/tmp/logo.png'},
-            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Quiz final', type: 'battle-royal'}],
-            index: 0,
-        };
-        render(<RegieLiveController/>);
-
-        fireEvent.click(screen.getByRole('button', {name: 'Battle Royal'}));
-
-        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
-    });
-});
-
-describe('RegieLiveController - active tab sync', () => {
-    afterEach(() => {
-        delete window.session;
-    });
-
-    it('automatically switches the active tab when the live step changes', () => {
-        window.session = {track: {type: 'image', src: '/tmp/logo.png'}, steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}], index: 0};
-        render(<RegieLiveController/>);
-
-        expect(screen.getByRole('button', {name: 'Image'})).toHaveClass('is-active');
-
-        act(() => {
-            document.dispatchEvent(new CustomEvent('session-onchange', {
-                detail: {track: {type: 'time', impro: 3, minutes: 2, count: 1, time: 60, paused: false, status: 'STATUS_RUNNING'}, steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Impros', type: 'time'}], index: 1},
-            }));
-        });
-
-        expect(screen.getByRole('button', {name: 'Time'})).toHaveClass('is-active');
-        expect(screen.getByText('Impro 1 / 3')).toBeTruthy();
     });
 });

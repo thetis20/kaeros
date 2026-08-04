@@ -1,7 +1,7 @@
 import 'react';
 import {useState, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {IconMinus, IconPlus} from '@tabler/icons-react';
+import {IconMinus, IconPlus, IconPlayerPlay, IconPlayerPause} from '@tabler/icons-react';
 import useSession from '../Hook/useSession';
 import BattleRoyalStepController from '../Controller/BattleRoyalStepController';
 
@@ -34,13 +34,26 @@ function RegieLiveController() {
             return <div className="preview-box">{t('regie.controller.imagePreview')}</div>;
         }
         if (activeType === 'dubbing-video') {
+            if (session.track.type !== 'dubbing-video') {
+                return <p>{t('regie.tabs.inactive')}</p>;
+            }
+            const track = session.track;
+            const percent = track.duration ? (track.currentTime / track.duration) * 100 : 0;
             return (
                 <>
                     <div className="preview-box">{t('regie.controller.dubbingPreview')}</div>
                     <div style={{display: 'flex', alignItems: 'center', gap: '.5em'}}>
-                        <span>00:00</span>
-                        <input type="range" min="0" max="100" defaultValue="0" disabled/>
-                        <span>00:00</span>
+                        <span>{formatCountdown(track.currentTime)}</span>
+                        <input type="range" min="0" max="100" value={percent} disabled/>
+                        <span>{formatCountdown(track.duration)}</span>
+                    </div>
+                    <div style={{display: 'flex', justifyContent: 'center', gap: '1em'}}>
+                        <button
+                            type="button"
+                            className="btn btn-icon"
+                            aria-label={track.paused ? t('regie.controller.play') : t('regie.controller.pause')}
+                            onClick={track.paused ? session.play : session.pause}
+                        >{track.paused ? <IconPlayerPlay/> : <IconPlayerPause/>}</button>
                     </div>
                 </>
             );

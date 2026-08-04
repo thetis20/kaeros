@@ -11,6 +11,8 @@ export default class DubbingVideoTrack extends Track {
         this.description = track.description
         this.paused = track.paused || false
         this.status = track.status || STATUS_DESCRIPTION
+        this.currentTime = track.currentTime || 0
+        this.duration = track.duration || 0
     }
 
     canPlay() {

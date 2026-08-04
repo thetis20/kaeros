@@ -43,4 +43,14 @@ describe('DubbingVideoTrack', () => {
         new DubbingVideoTrack({}).pause();
         expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: true});
     });
+
+    it('captures currentTime/duration when present, defaulting both to 0', () => {
+        const track = new DubbingVideoTrack({src: '/tmp/video.mp4', currentTime: 12.5, duration: 90});
+        expect(track.currentTime).toBe(12.5);
+        expect(track.duration).toBe(90);
+
+        const empty = new DubbingVideoTrack({});
+        expect(empty.currentTime).toBe(0);
+        expect(empty.duration).toBe(0);
+    });
 });

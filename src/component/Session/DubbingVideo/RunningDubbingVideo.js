@@ -52,6 +52,17 @@ function RunningDubbingVideo({ track }) {
 
     }, [ref, track])
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const { currentTime, duration } = ref.current
+            if (!isNaN(duration)) {
+                window.electronAPI.trackChange({ currentTime, duration })
+            }
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [ref])
+
     return (
         <div style={{
             display: 'flex',

@@ -209,7 +209,9 @@
       "dubbingPreview": "Lecture vidéo (muet)",
       "impro": "Impro {{current}} / {{total}}",
       "improPrevious": "Impro précédente",
-      "improNext": "Impro suivante"
+      "improNext": "Impro suivante",
+      "play": "Play",
+      "pause": "Pause"
     },
     "audios": {
       "title": "Audio en cours"

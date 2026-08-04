@@ -30,14 +30,62 @@ describe('RegieLiveController', () => {
         expect(screen.getByRole('button', {name: 'Battle Royal'})).toBeTruthy();
     });
 
-    it('switches to the decorative, non-interactive dubbing-video panel when its tab is clicked', () => {
-        window.session = {track: {type: 'image', src: '/tmp/logo.png'}, steps: [{id: 's1', name: 'Logo', type: 'image'}], index: 0};
+});
+
+describe('RegieLiveController - dubbing-video tab', () => {
+    beforeEach(() => {
+        window.electronAPI = {trackChange: jest.fn()};
+    });
+    afterEach(() => {
+        delete window.session;
+    });
+
+    it('shows the real playback progress (MM:SS elapsed/total, slider position) from the running video', () => {
+        window.session = {
+            track: {type: 'dubbing-video', src: '/tmp/video.mp4', currentTime: 30, duration: 120, paused: false, status: 'STATUS_RUNNING'},
+            steps: [{id: 's1', name: 'Sketch', type: 'dubbing-video'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        expect(screen.getByText('00:30')).toBeTruthy();
+        expect(screen.getByText('02:00')).toBeTruthy();
+        expect(screen.getByRole('slider')).toHaveValue('25');
+        expect(screen.getByRole('slider')).toBeDisabled();
+    });
+
+    it('calls session.pause()/session.play() (real trackChange IPC) from the play/pause button', () => {
+        window.session = {
+            track: {type: 'dubbing-video', src: '/tmp/video.mp4', currentTime: 30, duration: 120, paused: false, status: 'STATUS_RUNNING'},
+            steps: [{id: 's1', name: 'Sketch', type: 'dubbing-video'}],
+            index: 0,
+        };
+        render(<RegieLiveController/>);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Pause'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: true});
+
+        act(() => {
+            document.dispatchEvent(new CustomEvent('session-onchange', {
+                detail: {track: {type: 'dubbing-video', src: '/tmp/video.mp4', currentTime: 30, duration: 120, paused: true, status: 'STATUS_RUNNING'}, steps: [{id: 's1', name: 'Sketch', type: 'dubbing-video'}], index: 0},
+            }));
+        });
+
+        fireEvent.click(screen.getByRole('button', {name: 'Play'}));
+        expect(window.electronAPI.trackChange).toHaveBeenCalledWith({paused: false});
+    });
+
+    it('shows the inactive fallback on the dubbing-video tab when the current step is not a dubbing-video step', () => {
+        window.session = {
+            track: {type: 'image', src: '/tmp/logo.png'},
+            steps: [{id: 's1', name: 'Logo', type: 'image'}, {id: 's2', name: 'Sketch', type: 'dubbing-video'}],
+            index: 0,
+        };
         render(<RegieLiveController/>);
 
         fireEvent.click(screen.getByRole('button', {name: 'Vidéo de doublage'}));
 
-        expect(screen.getByText('Lecture vidéo (muet)')).toBeTruthy();
-        expect(screen.getByRole('slider')).toBeDisabled();
+        expect(screen.getByText("Cette étape n'est pas l'étape en cours.")).toBeTruthy();
     });
 });
 

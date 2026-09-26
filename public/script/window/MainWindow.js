@@ -15,7 +15,9 @@ const {
     deleteStepUseCase,
     createSessionUseCase,
     listTagUseCase,
-    createTagUseCase
+    createTagUseCase,
+    checkMediaFilesUseCase,
+    checkWorkflowMediaUseCase
 } = require('../infrastructure/useCase.js');
 const Workflow = require('../application/entity/Workflow.js');
 const StepFactory = require('../application/entity/step/StepFactory.js');
@@ -79,6 +81,8 @@ class MainWindow {
             ipcMain.removeListener('session-stop', this.sessionStop)
             ipcMain.removeListener('tag-fetch', this.tagFetch)
             ipcMain.removeListener('tag-create', this.tagCreate)
+            ipcMain.removeHandler('media-check-workflow')
+            ipcMain.removeHandler('media-check-paths')
         });
 
         this.initHandle()
@@ -100,6 +104,8 @@ class MainWindow {
         ipcMain.addListener('session-stop', this.sessionStop)
         ipcMain.addListener('tag-fetch', this.tagFetch)
         ipcMain.addListener('tag-create', this.tagCreate)
+        ipcMain.handle('media-check-workflow', (event, workflowId) => checkWorkflowMediaUseCase.execute(workflowId))
+        ipcMain.handle('media-check-paths', (event, items) => checkMediaFilesUseCase.execute(items))
     }
 
     async workflowFetch() {

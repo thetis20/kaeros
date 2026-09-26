@@ -54,13 +54,23 @@ describe('WorkflowDashboard', () => {
         expect(window.electronAPI.workflowRemove).toHaveBeenCalledWith('wf-1');
     });
 
-    it('plays the workflow via IPC when its Démarrer button is clicked', () => {
-        render(<WorkflowDashboard onCreateNew={() => {}} onEditWorkflow={() => {}}/>);
+    it('calls onPlay with the workflow when its Démarrer button is clicked', () => {
+        const onPlay = jest.fn();
+        render(<WorkflowDashboard onCreateNew={() => {}} onEditWorkflow={() => {}} onPlay={onPlay} checking={false}/>);
         const workflow = {id: 'wf-1', name: 'Soirée', color: '#1D9E75'};
         seedWorkflows([workflow]);
 
-        fireEvent.click(screen.getByRole('button', {name: /Démarrer/}));
+        fireEvent.click(screen.getByRole('button', {name: 'Démarrer'}));
 
-        expect(window.electronAPI.sessionPlay).toHaveBeenCalledWith(workflow);
+        expect(onPlay).toHaveBeenCalledWith(workflow);
+        expect(window.electronAPI.sessionPlay).not.toHaveBeenCalled();
+    });
+
+    it('disables the play button and shows the checking label while media is being checked', () => {
+        render(<WorkflowDashboard onCreateNew={() => {}} onEditWorkflow={() => {}} onPlay={() => {}} checking={true}/>);
+        const workflow = {id: 'wf-1', name: 'Soirée', color: '#1D9E75'};
+        seedWorkflows([workflow]);
+
+        expect(screen.getByRole('button', {name: 'Vérification des médias…'})).toBeDisabled();
     });
 });

@@ -263,6 +263,28 @@
   "tagSelect": {
     "remove": "Retirer {{name}}"
   },
+  "mediaCheck": {
+    "error": {
+      "no-source": "Aucun fichier sélectionné",
+      "missing": "Fichier introuvable : {{path}}",
+      "unreadable": "Fichier illisible (droits d'accès) : {{path}}",
+      "not-a-file": "Le chemin ne pointe pas sur un fichier : {{path}}",
+      "empty": "Fichier vide (0 octet) : {{path}}",
+      "decode-failed": "Fichier illisible par le lecteur (format non supporté ou corrompu) : {{name}}",
+      "timeout": "Fichier trop lent à charger (disque réseau ou externe ?) : {{name}}",
+      "check-failed": "La vérification des fichiers a échoué, impossible de garantir la session"
+    },
+    "badge": "Fichier inutilisable",
+    "banner": "{{count}} étape(s) ont un fichier inutilisable",
+    "dialog": {
+      "title": "La session ne peut pas démarrer",
+      "message": "Des fichiers de cette session sont introuvables ou illisibles. Corrigez-les dans l'édition de la session avant de relancer.",
+      "steps": "Étapes",
+      "audios": "Musiques d'ambiance",
+      "close": "Fermer"
+    },
+    "checking": "Vérification des médias…"
+  },
   "sessionCreation": {
     "title": "Créer une session",
     "titleEdit": "Modifier une session",

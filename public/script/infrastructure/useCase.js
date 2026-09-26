@@ -19,6 +19,9 @@ const ListTagUseCase = require('../application/useCase/tag/ListTagUseCase.js');
 const CreateTagUseCase = require('../application/useCase/tag/CreateTagUseCase.js');
 const CleanTagUseCase = require('../application/useCase/tag/CleanTagUseCase.js');
 
+const CheckMediaFilesUseCase = require('../application/useCase/media/CheckMediaFilesUseCase.js');
+const CheckWorkflowMediaUseCase = require('../application/useCase/media/CheckWorkflowMediaUseCase.js');
+
 const TrackStoreRespository = require('./repository/TrackStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
 const StepStoreRespository = require('./repository/StepStoreRepository.js');
@@ -50,6 +53,9 @@ const listStepByWorkflowUseCase = new ListStepByWorkflowUseCase(stepStoreResposi
 
 const createSessionUseCase = new CreateSessionUseCase(stepStoreRespository);
 
+const checkMediaFilesUseCase = new CheckMediaFilesUseCase();
+const checkWorkflowMediaUseCase = new CheckWorkflowMediaUseCase(listStepByWorkflowUseCase, listTrackUseCase, checkMediaFilesUseCase);
+
 
 module.exports = {
     listTrackUseCase,
@@ -70,5 +76,8 @@ module.exports = {
     createSessionUseCase,
 
     listTagUseCase,
-    createTagUseCase
+    createTagUseCase,
+
+    checkMediaFilesUseCase,
+    checkWorkflowMediaUseCase
 }

@@ -2,7 +2,7 @@ import {IconEdit, IconPlayerPlay, IconTrash} from '@tabler/icons-react';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
 
-function WorkflowItem({workflow, onPlay, onEdit, onRemove}) {
+function WorkflowItem({workflow, onPlay, onEdit, onRemove, checking}) {
     const {t} = useTranslation();
     const updatedAt = moment(workflow.updatedAt);
 
@@ -17,8 +17,9 @@ function WorkflowItem({workflow, onPlay, onEdit, onRemove}) {
                 type="button"
                 className="btn btn-sm"
                 style={{flex: 1, display: 'flex', justifyContent: 'center'}}
-                aria-label={t('workflow.play')}
-                onClick={() => onPlay(workflow)}><IconPlayerPlay/></button>
+                aria-label={checking ? t('mediaCheck.checking') : t('workflow.play')}
+                disabled={checking}
+                onClick={() => onPlay(workflow)}>{checking ? t('mediaCheck.checking') : <IconPlayerPlay/>}</button>
             <button
                 type="button"
                 className="btn btn-sm"

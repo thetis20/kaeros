@@ -65,4 +65,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     trackChange: (changes) => ipcRenderer.send('track-change', changes),
     tagFetch: () => ipcRenderer.send('tag-fetch'),
     tagCreate: (value) => ipcRenderer.send('tag-create', value),
+    mediaCheckWorkflow: (workflowId) => ipcRenderer.invoke('media-check-workflow', workflowId),
+    mediaCheckPaths: (items) => ipcRenderer.invoke('media-check-paths', items),
 })

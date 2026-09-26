@@ -8,7 +8,9 @@ import WorkflowDashboard from './WorkflowDashboard';
 import SessionCreationScreen from '../Screen/SessionCreationScreen';
 import useSession from '../Hook/useSession';
 import useAudios from '../Hook/useAudios';
+import useSessionLaunch from '../Hook/useSessionLaunch';
 import AudioController from '../Controller/AudioController';
+import MediaErrorDialog from '../Screen/MediaErrorDialog';
 
 function Dashboard() {
     const {t} = useTranslation();
@@ -16,6 +18,7 @@ function Dashboard() {
     const [editingWorkflowId, setEditingWorkflowId] = useState(null);
     const session = useSession();
     const audios = useAudios();
+    const {launch, checking, issues, dismiss} = useSessionLaunch();
 
     function createNew() {
         setEditingWorkflowId(null);
@@ -45,9 +48,17 @@ function Dashboard() {
                     <p style={{fontWeight: 500, margin: '0 0 .75em'}}>{t('regie.audios.title')}</p>
                     <AudioController/>
                 </div>
-                {screen === 'regie' && <RegieScreen/>}
+                {issues.length > 0 && <MediaErrorDialog issues={issues} onClose={dismiss}/>}
+                {screen === 'regie' && <RegieScreen onPlay={launch} checking={checking}/>}
                 {screen === 'musique' && <MusiqueScreen/>}
-                {screen === 'sessions' && <WorkflowDashboard onCreateNew={createNew} onEditWorkflow={editWorkflow}/>}
+                {screen === 'sessions' && (
+                    <WorkflowDashboard
+                        onCreateNew={createNew}
+                        onEditWorkflow={editWorkflow}
+                        onPlay={launch}
+                        checking={checking}
+                    />
+                )}
                 {screen === 'creation' && <SessionCreationScreen workflowId={editingWorkflowId} onDone={doneCreating}/>}
             </main>
         </div>

@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {v4 as uuidv4} from 'uuid';
-import {IconChevronUp, IconChevronDown, IconEdit, IconTrash, IconPhoto, IconMovie, IconVideo, IconClock, IconShield} from '@tabler/icons-react';
+import {IconChevronUp, IconChevronDown, IconEdit, IconTrash, IconPhoto, IconMovie, IconVideo, IconClock, IconShield, IconAlertTriangle} from '@tabler/icons-react';
 import useWorkflows from '../Hook/useWorkflows';
 import useSteps from '../Hook/useSteps';
 import ImageStep, {validate as validateImage} from '../Step/ImageStep';
@@ -9,6 +9,9 @@ import DubbingVideoStep, {validate as validateDubbingVideo} from '../Step/Dubbin
 import VideoStep, {validate as validateVideo} from '../Step/VideoStep';
 import TimeStep, {validate as validateTime} from '../Step/TimeStep';
 import BattleRoyalStep, {validate as validateBattleRoyal} from '../Step/BattleRoyalStep';
+import {checkLocalSteps, messageKeyFor} from '../../lib/mediaCheck';
+
+const MEDIA_CHECK_DEBOUNCE_MS = 300;
 
 const STEP_TYPES = ['image', 'dubbing-video', 'video', 'time', 'battle-royal'];
 
@@ -79,6 +82,7 @@ function SessionCreationScreen({workflowId, onDone}) {
     const [color, setColor] = useState(() => workflowId === null ? randomColor() : null);
     const [steps, setSteps] = useState([]);
     const [errorsByStepId, setErrorsByStepId] = useState({});
+    const [mediaIssuesByStepId, setMediaIssuesByStepId] = useState({});
     const [nameError, setNameError] = useState(null);
     const nameLoadedRef = useRef(false);
     const stepsLoadedRef = useRef(false);
@@ -102,6 +106,28 @@ function SessionCreationScreen({workflowId, onDone}) {
             stepsLoadedRef.current = true;
         }
     }, [workflowId, fetchedSteps]);
+
+    const stepsSignature = steps.map(s => s.id + '|' + (s.src ?? '') + '|' + (s.file?.name ?? '')).join(',');
+
+    useEffect(() => {
+        let cancelled = false;
+        const timer = setTimeout(() => {
+            checkLocalSteps(steps).then(results => {
+                if (cancelled) return;
+                const nextIssues = {};
+                results.forEach(issue => {
+                    if (issue.code !== 'ok') nextIssues[issue.stepId] = issue;
+                });
+                setMediaIssuesByStepId(nextIssues);
+            }).catch(() => {});
+        }, MEDIA_CHECK_DEBOUNCE_MS);
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
+        // Keyed on the signature, not on `steps`: the array identity changes on every
+        // keystroke, and each run costs a real disk read plus a media decode.
+    }, [stepsSignature]);
 
     function updateStep(index, nextValue) {
         setSteps(current => current.map((step, i) => i === index ? nextValue : step));
@@ -202,6 +228,9 @@ function SessionCreationScreen({workflowId, onDone}) {
         <div className="content">
             <p className="screen-title">{t(workflowId === null ? 'sessionCreation.title' : 'sessionCreation.titleEdit')}</p>
             <p className="screen-sub">{t('sessionCreation.subtitle')}</p>
+            {Object.keys(mediaIssuesByStepId).length > 0 && (
+                <div className="media-banner-error">{t('mediaCheck.banner', {count: Object.keys(mediaIssuesByStepId).length})}</div>
+            )}
             <div style={{marginBottom: 20}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: 10}}>
                     <input
@@ -223,6 +252,7 @@ function SessionCreationScreen({workflowId, onDone}) {
                     const Icon = stepIcons[step.type];
                     const Variant = variantComponents[step.type];
                     const errors = errorsByStepId[step.id] || {};
+                    const mediaIssue = mediaIssuesByStepId[step.id];
                     return (
                         <div key={step.id} className="accordion-item">
                             <div className="accordion-header">
@@ -230,6 +260,15 @@ function SessionCreationScreen({workflowId, onDone}) {
                                 <Icon/>
                                 <span style={{flex: 1}}>{step.name}</span>
                                 <span>{t(stepTypeLabelKeys[step.type])}</span>
+                                {mediaIssue && (
+                                    <span
+                                        className="media-badge-error"
+                                        title={t(messageKeyFor(mediaIssue.code), {path: mediaIssue.src, name: mediaIssue.name})}
+                                    >
+                                        <IconAlertTriangle size={14}/>
+                                        {t('mediaCheck.badge')}
+                                    </span>
+                                )}
                                 <button className="btn btn-icon" aria-label={t('sessionCreation.up')} onClick={() => moveUp(index)} disabled={index === 0}><IconChevronUp/></button>
                                 <button className="btn btn-icon" aria-label={t('sessionCreation.down')} onClick={() => moveDown(index)} disabled={index === steps.length - 1}><IconChevronDown/></button>
                                 <button className="btn btn-icon" aria-label={t('sessionCreation.editToggle')} onClick={() => toggleOpen(index)}><IconEdit/></button>
@@ -254,6 +293,11 @@ function SessionCreationScreen({workflowId, onDone}) {
                                         errors={errors}
                                         setErrors={(nextErrors) => setErrorsByStepId(current => ({...current, [step.id]: nextErrors}))}
                                     />
+                                    {mediaIssue && (
+                                        <div className="media-error">
+                                            {t(messageKeyFor(mediaIssue.code), {path: mediaIssue.src, name: mediaIssue.name})}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

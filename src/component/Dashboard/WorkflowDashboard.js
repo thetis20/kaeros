@@ -2,12 +2,12 @@ import { useTranslation } from 'react-i18next';
 import useWorkflows from '../Hook/useWorkflows.js';
 import WorkflowItem from '../Workflow/WorkflowItem.js';
 
-function WorkflowDashboard({ onCreateNew, onEditWorkflow }) {
+function WorkflowDashboard({ onCreateNew, onEditWorkflow, onPlay, checking }) {
   const { t } = useTranslation();
   const workflows = useWorkflows()
 
   function play(workflow) {
-    window.electronAPI.sessionPlay(workflow)
+    onPlay(workflow)
   }
 
   function edit(workflow) {
@@ -26,7 +26,7 @@ function WorkflowDashboard({ onCreateNew, onEditWorkflow }) {
       </div>
       <div className="grid grid-cards">
         {workflows.map((workflow) => (
-          <WorkflowItem key={workflow.id} workflow={workflow} onPlay={play} onEdit={edit} onRemove={remove}/>
+          <WorkflowItem key={workflow.id} workflow={workflow} onPlay={play} onEdit={edit} onRemove={remove} checking={checking}/>
         ))}
       </div>
     </div>

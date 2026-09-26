@@ -1,6 +1,12 @@
 import '../../../lib/i18n';
 import {act, render, screen, fireEvent} from '@testing-library/react';
 import SessionCreationScreen from '../SessionCreationScreen';
+import {checkLocalSteps} from '../../../lib/mediaCheck';
+
+jest.mock('../../../lib/mediaCheck', () => ({
+    checkLocalSteps: jest.fn(),
+    messageKeyFor: (code) => `mediaCheck.error.${code}`,
+}));
 
 describe('SessionCreationScreen - new session, local step list', () => {
     beforeEach(() => {
@@ -11,6 +17,7 @@ describe('SessionCreationScreen - new session, local step list', () => {
             stepSave: jest.fn(),
             stepRemove: jest.fn(),
         };
+        checkLocalSteps.mockReset().mockResolvedValue([]);
     });
 
     it('starts empty and lets the user type a name', () => {
@@ -94,6 +101,7 @@ describe('SessionCreationScreen - editing an existing workflow', () => {
             stepSave: jest.fn(),
             stepRemove: jest.fn(),
         };
+        checkLocalSteps.mockReset().mockResolvedValue([]);
     });
 
     function seedWorkflows(workflows) {
@@ -140,6 +148,7 @@ describe('SessionCreationScreen - saving', () => {
             stepSave: jest.fn(),
             stepRemove: jest.fn(),
         };
+        checkLocalSteps.mockReset().mockResolvedValue([]);
     });
 
     it('blocks save and shows a validation error when a step is invalid', () => {
@@ -240,5 +249,84 @@ describe('SessionCreationScreen - saving', () => {
         }));
         expect(window.electronAPI.stepSave.mock.calls[1][0].value.createdAt).toBeUndefined();
         expect(onDone).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('SessionCreationScreen - media issue highlighting', () => {
+    beforeEach(() => {
+        window.electronAPI = {
+            workflowFetch: jest.fn(),
+            stepFetch: jest.fn(),
+            workflowSave: jest.fn(),
+            stepSave: jest.fn(),
+            stepRemove: jest.fn(),
+        };
+        checkLocalSteps.mockReset().mockResolvedValue([]);
+    });
+
+    // the media check is debounced ~300ms after the steps signature settles; wait it out inside
+    // act() so the resulting setState is flushed before assertions run
+    async function flushMediaCheck() {
+        await act(async () => {
+            await new Promise(resolve => setTimeout(resolve, 350));
+        });
+    }
+
+    function seedExistingSession(step) {
+        act(() => {
+            document.dispatchEvent(new CustomEvent('workflow-onchange', {detail: [
+                {id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', createdAt: '2026-01-01'},
+            ]}));
+        });
+        act(() => {
+            document.dispatchEvent(new CustomEvent('step-onchange', {detail: [step]}));
+        });
+    }
+
+    it('highlights a step whose media check reports "missing": badge in the closed header, message and path once opened, banner with the right count', async () => {
+        checkLocalSteps.mockResolvedValue([
+            {id: 'step-1', stepId: 'step-1', name: 'Logo établissement', src: '/tmp/logo.png', code: 'missing', type: 'image'},
+        ]);
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}}/>);
+        seedExistingSession({id: 'step-1', type: 'image', name: 'Logo établissement', src: '/tmp/logo.png', createdAt: '2026-01-01'});
+
+        await flushMediaCheck();
+
+        // badge visible with the accordion still closed
+        expect(screen.getByText('Fichier inutilisable')).toBeTruthy();
+        // summary banner with the right count
+        expect(screen.getByText('1 étape(s) ont un fichier inutilisable')).toBeTruthy();
+
+        // open the accordion: the full message with the path appears in the body
+        fireEvent.click(screen.getByRole('button', {name: "Modifier l'étape"}));
+        expect(screen.getByText('Fichier introuvable : /tmp/logo.png')).toBeTruthy();
+    });
+
+    it('shows no badge and no banner when every media step checks out ok', async () => {
+        checkLocalSteps.mockResolvedValue([
+            {id: 'step-1', stepId: 'step-1', name: 'Logo établissement', src: '/tmp/logo.png', code: 'ok', type: 'image'},
+        ]);
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}}/>);
+        seedExistingSession({id: 'step-1', type: 'image', name: 'Logo établissement', src: '/tmp/logo.png', createdAt: '2026-01-01'});
+
+        await flushMediaCheck();
+
+        expect(screen.queryByText('Fichier inutilisable')).toBeNull();
+        expect(screen.queryByText(/étape\(s\) ont un fichier inutilisable/)).toBeNull();
+    });
+
+    it('does not warn about a state update on an unmounted component when the media check resolves after unmount', async () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        checkLocalSteps.mockResolvedValue([
+            {id: 'step-1', stepId: 'step-1', name: 'Logo établissement', src: '/tmp/logo.png', code: 'missing', type: 'image'},
+        ]);
+        const {unmount} = render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}}/>);
+        seedExistingSession({id: 'step-1', type: 'image', name: 'Logo établissement', src: '/tmp/logo.png', createdAt: '2026-01-01'});
+
+        unmount();
+        await flushMediaCheck();
+
+        expect(consoleError).not.toHaveBeenCalled();
+        consoleError.mockRestore();
     });
 });

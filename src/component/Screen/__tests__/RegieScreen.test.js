@@ -30,7 +30,7 @@ describe('RegieScreen', () => {
     }
 
     it('shows the empty state with one card per workflow when no session is running', () => {
-        render(<RegieScreen/>);
+        render(<RegieScreen onPlay={() => {}} checking={false}/>);
         seedWorkflows([
             {id: 'wf-1', name: 'Remise des diplômes'},
             {id: 'wf-2', name: 'Gala annuel'},
@@ -42,14 +42,23 @@ describe('RegieScreen', () => {
         expect(screen.getAllByRole('button', {name: 'Démarrer'})).toHaveLength(2);
     });
 
-    it('starts the session for the workflow whose card was clicked', () => {
-        render(<RegieScreen/>);
+    it('calls onPlay with the workflow whose card was clicked', () => {
+        const onPlay = jest.fn();
+        render(<RegieScreen onPlay={onPlay} checking={false}/>);
         const workflow = {id: 'wf-1', name: 'Remise des diplômes'};
         seedWorkflows([workflow]);
 
         fireEvent.click(screen.getByRole('button', {name: 'Démarrer'}));
 
-        expect(window.electronAPI.sessionPlay).toHaveBeenCalledWith(workflow);
+        expect(onPlay).toHaveBeenCalledWith(workflow);
+        expect(window.electronAPI.sessionPlay).not.toHaveBeenCalled();
+    });
+
+    it('disables the play button and shows the checking label while media is being checked', () => {
+        render(<RegieScreen onPlay={() => {}} checking={true}/>);
+        seedWorkflows([{id: 'wf-1', name: 'Remise des diplômes'}]);
+
+        expect(screen.getByRole('button', {name: 'Vérification des médias…'})).toBeDisabled();
     });
 
     it('renders the live session controller instead of the empty state once a session is running', () => {
@@ -58,7 +67,7 @@ describe('RegieScreen', () => {
             steps: [{id: 's1', name: 'Step 1'}],
             index: 0,
         };
-        render(<RegieScreen/>);
+        render(<RegieScreen onPlay={() => {}} checking={false}/>);
 
         expect(screen.queryByText('Aucune session en cours. Choisis une session à démarrer.')).toBeNull();
         expect(screen.getByText('Step 1')).toBeTruthy();

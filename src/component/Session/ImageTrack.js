@@ -1,4 +1,5 @@
 import 'react';
+import {toFileUrl} from '../../lib/mediaUrl';
 
 function ImageTrack({track}) {
 
@@ -15,7 +16,7 @@ function ImageTrack({track}) {
                     width: '100%',
                     objectFit: 'contain'
                 }}
-                src={'file://' + track.src}
+                src={toFileUrl(track.src)}
                 alt={track.name}/>
         </div>
     );

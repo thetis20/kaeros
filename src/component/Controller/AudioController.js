@@ -4,6 +4,7 @@ import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import {IconPlayerStop} from '@tabler/icons-react';
 import useAudios from '../Hook/useAudios';
+import {toFileUrl} from '../../lib/mediaUrl';
 
 function AudioControllerItem({audio, onStop}) {
     const playerRef = useRef(null);
@@ -25,7 +26,7 @@ function AudioControllerItem({audio, onStop}) {
         </div>
         <AudioPlayer
             ref={playerRef}
-            src={'file://' + audio.src}
+            src={toFileUrl(audio.src)}
             onLoadedMetaData={handleLoadedMetaData}
             onEnded={() => onStop(audio)}
         />

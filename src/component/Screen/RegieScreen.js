@@ -11,11 +11,11 @@ import SessionController from '../Controller/SessionController';
 import RegieLiveController from './RegieLiveController';
 import RegieTrackPicker from '../Track/RegieTrackPicker';
 
-function RegieSessionCard({workflow}) {
+function RegieSessionCard({workflow, onPlay, checking}) {
     const {t} = useTranslation();
 
     function start() {
-        window.electronAPI.sessionPlay(workflow);
+        onPlay(workflow);
     }
 
     return (
@@ -24,12 +24,14 @@ function RegieSessionCard({workflow}) {
                 <div className="color-chip" style={{background: workflow.color}}/>
                 <p style={{fontSize: 13, fontWeight: 500, margin: 0, flex: 1}}>{workflow.name}</p>
             </div>
-            <button className="btn btn-accent" style={{width: '100%'}} onClick={start}>{t('workflow.play')}</button>
+            <button className="btn btn-accent" style={{width: '100%'}} onClick={start} disabled={checking}>
+                {checking ? t('mediaCheck.checking') : t('workflow.play')}
+            </button>
         </div>
     );
 }
 
-function RegieScreen() {
+function RegieScreen({onPlay, checking}) {
     const {t} = useTranslation();
     const workflows = useWorkflows();
     const session = useSession();
@@ -77,7 +79,9 @@ function RegieScreen() {
                             <>
                                 <p className="screen-sub" style={{margin: '0 0 12px'}}>{t('regie.empty.title')}</p>
                                 <div className="grid grid-cards">
-                                    {workflows.map((workflow) => <RegieSessionCard key={workflow.id} workflow={workflow}/>)}
+                                    {workflows.map((workflow) => (
+                                        <RegieSessionCard key={workflow.id} workflow={workflow} onPlay={onPlay} checking={checking}/>
+                                    ))}
                                 </div>
                             </>
                         )}

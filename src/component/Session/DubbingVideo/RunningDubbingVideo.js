@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { redBg } from '../../../enum/COLOR'
+import { toFileUrl } from '../../../lib/mediaUrl';
 
 function ProgressBar({ currentTime, duration }) {
     const percent = currentTime / duration * 100
@@ -72,7 +73,7 @@ function RunningDubbingVideo({ track }) {
             justifyContent: 'center'
         }}>
             <video autoPlay ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} onEnded={track.pause} muted={true}>
-                <source src={'file://' + track.src} type="video/mp4" />
+                <source src={toFileUrl(track.src)} type="video/mp4" />
             </video>
             <ProgressBar currentTime={time.currentTime} duration={time.duration} />
         </div>

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { toFileUrl } from '../../../lib/mediaUrl';
 
 function ProgressBar({ currentTime, duration }) {
     const percent = currentTime / duration * 100
@@ -77,7 +78,7 @@ function RunningVideo({ track }) {
             justifyContent: 'center'
         }}>
             <video autoPlay loop={track.loop} ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} onEnded={onEnded}>
-                <source src={'file://' + track.src} type="video/mp4" />
+                <source src={toFileUrl(track.src)} type="video/mp4" />
             </video>
         </div>
     );

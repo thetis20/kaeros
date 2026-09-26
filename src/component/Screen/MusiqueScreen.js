@@ -5,6 +5,7 @@ import useTracks from '../Hook/useTracks';
 import useTags from '../Hook/useTags';
 import TagMultiSelect from '../Tag/TagMultiSelect';
 import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
+import { toFileUrl } from '../../lib/mediaUrl';
 
 const EMPTY_FORM = { name: '', tags: [], startOffsetMs: 0 };
 
@@ -43,7 +44,7 @@ function MusiqueScreen() {
             blobUrlRef.current = url;
             audioEl.src = url;
         } else {
-            audioEl.src = 'file://' + value.src;
+            audioEl.src = toFileUrl(value.src);
         }
         audioEl.load();
 

@@ -16,7 +16,7 @@ function RegieTrackPicker({ tracks, tags, playingIds, onStart }) {
             <div className="tabs" role="group" aria-label="tag-filter">
                 <button
                     type="button"
-                    classNworkflow-cardame={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`}
+                    className={`btn btn-sm ${activeTag === 'all' ? 'is-active' : ''}`}
                     onClick={() => setActiveTag('all')}
                 >{t('track.tag.all')}</button>
                 {tags.map((tag) => (

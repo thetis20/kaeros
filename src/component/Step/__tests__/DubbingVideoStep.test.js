@@ -1,6 +1,7 @@
 import '../../../lib/i18n';
 import {render, screen, fireEvent} from '@testing-library/react';
 import DubbingVideoStep, {validate} from '../DubbingVideoStep';
+import {previewWindow} from '../../../lib/mediaWindow';
 
 const mockPlay = jest.fn();
 jest.mock('../../Hook/useMediaPreview', () => () => ({mediaRef: {current: null}, play: mockPlay}));
@@ -60,8 +61,9 @@ describe('DubbingVideoStep component', () => {
         const value = {id: 'step-1', ...overrides};
         const setValue = jest.fn();
         const setErrors = jest.fn();
-        render(<DubbingVideoStep value={value} setValue={setValue} errors={overrides.errors || {}} setErrors={setErrors}/>);
-        return {value, setValue, setErrors};
+        const errors = overrides.errors || {};
+        const utils = render(<DubbingVideoStep value={value} setValue={setValue} errors={errors} setErrors={setErrors}/>);
+        return {value, setValue, setErrors, errors, ...utils};
     }
 
     it('shows the placeholder label when no file is set', () => {
@@ -120,8 +122,58 @@ describe('DubbingVideoStep component', () => {
         expect(setErrors).not.toHaveBeenCalled();
     });
 
-    it('editing the start offset field updates the value and clears its error', () => {
+    it('shows the current start offset value, defaulting to 0', () => {
+        renderStep();
+        expect(screen.getByText('Début : 0 ms')).toBeTruthy();
+    });
+
+    it('shows the current end offset value when set', () => {
+        renderStep({endOffsetMs: '9000'});
+        expect(screen.getByText('Fin : 9000 ms')).toBeTruthy();
+    });
+
+    it('shows the "until the end" label when the end offset is empty', () => {
+        renderStep({endOffsetMs: ''});
+        expect(screen.getByText("Fin : jusqu'à la fin de la vidéo")).toBeTruthy();
+    });
+
+    it('does not render the offset fields or the popin while it is closed', () => {
+        renderStep();
+        expect(document.querySelector('input[name="startOffsetMs"]')).toBeNull();
+        expect(document.querySelector('input[name="endOffsetMs"]')).toBeNull();
+        expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('opens the start offset popin when its gear button is clicked', () => {
+        renderStep();
+        fireEvent.click(screen.getByLabelText("Configurer le début de l'extrait"));
+
+        expect(screen.getByRole('dialog')).toBeTruthy();
+        expect(document.querySelector('input[name="startOffsetMs"]')).toBeTruthy();
+        expect(document.querySelector('input[name="endOffsetMs"]')).toBeNull();
+    });
+
+    it('opens the end offset popin when its gear button is clicked', () => {
+        renderStep();
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+
+        expect(screen.getByRole('dialog')).toBeTruthy();
+        expect(document.querySelector('input[name="endOffsetMs"]')).toBeTruthy();
+        expect(document.querySelector('input[name="startOffsetMs"]')).toBeNull();
+    });
+
+    it('closes the popin when its close button is clicked', () => {
+        renderStep();
+        fireEvent.click(screen.getByLabelText("Configurer le début de l'extrait"));
+        expect(screen.getByRole('dialog')).toBeTruthy();
+
+        fireEvent.click(screen.getByText('Fermer'));
+        expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('editing the start offset field from the popin updates the value and clears its error', () => {
         const {setValue, setErrors} = renderStep({startOffsetMs: '', errors: {startOffsetMs: 'missing'}});
+        fireEvent.click(screen.getByLabelText("Configurer le début de l'extrait"));
         const startInput = document.querySelector('input[name="startOffsetMs"]');
         fireEvent.change(startInput, {target: {value: '100'}});
 
@@ -129,8 +181,9 @@ describe('DubbingVideoStep component', () => {
         expect(setErrors).toHaveBeenCalledWith(expect.objectContaining({startOffsetMs: undefined}));
     });
 
-    it('editing the end offset field updates the value and clears its error', () => {
+    it('editing the end offset field from the popin updates the value and clears its error', () => {
         const {setValue, setErrors} = renderStep({endOffsetMs: '', errors: {endOffsetMs: 'missing'}});
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
         const endInput = document.querySelector('input[name="endOffsetMs"]');
         fireEvent.change(endInput, {target: {value: '500'}});
 
@@ -138,21 +191,55 @@ describe('DubbingVideoStep component', () => {
         expect(setErrors).toHaveBeenCalledWith(expect.objectContaining({endOffsetMs: undefined}));
     });
 
-    it('does not show the test-playback button when no source is selected yet', () => {
-        renderStep();
-        expect(screen.queryByText('Tester')).toBeNull();
+    it('keeps the start offset error visible on the row while the popin is closed', () => {
+        renderStep({errors: {startOffsetMs: 'invalide'}});
+        expect(screen.getByText('invalide')).toBeTruthy();
+        expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('shows the test-playback button once a source is selected', () => {
-        renderStep({file: {name: 'clip.mp4'}});
-        expect(screen.getByText('Tester')).toBeTruthy();
+    it('keeps the end offset error visible on the row while the popin is closed', () => {
+        renderStep({errors: {endOffsetMs: 'invalide'}});
+        expect(screen.getByText('invalide')).toBeTruthy();
+        expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('calls play() from the media preview hook with the current value when Tester is clicked', () => {
+    it('calls play() with a resolver producing start -> start+5s from the start popin', () => {
         mockPlay.mockClear();
-        const {value} = renderStep({file: {name: 'clip.mp4'}, startOffsetMs: '100', endOffsetMs: '500'});
+        const {value} = renderStep({file: {name: 'clip.mp4'}, startOffsetMs: '2000'});
+        fireEvent.click(screen.getByLabelText("Configurer le début de l'extrait"));
         fireEvent.click(screen.getByText('Tester'));
 
-        expect(mockPlay).toHaveBeenCalledWith(value);
+        expect(mockPlay).toHaveBeenCalledWith(value, expect.any(Function));
+        const resolveWindow = mockPlay.mock.calls[0][1];
+
+        expect(resolveWindow(10)).toEqual(previewWindow(value, 'start', 10));
+        expect(resolveWindow(10)).toEqual({startSec: 2, endSec: 7});
+
+        // clamps to duration when the 5s window would run past the end of the media
+        expect(resolveWindow(5)).toEqual({startSec: 2, endSec: 5});
+    });
+
+    it('calls play() with a resolver producing end-5s -> end from the end popin', () => {
+        mockPlay.mockClear();
+        const {value} = renderStep({file: {name: 'clip.mp4'}, startOffsetMs: '0', endOffsetMs: '9000'});
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+        fireEvent.click(screen.getByText('Tester'));
+
+        expect(mockPlay).toHaveBeenCalledWith(value, expect.any(Function));
+        const resolveWindow = mockPlay.mock.calls[0][1];
+
+        expect(resolveWindow(999)).toEqual(previewWindow(value, 'end', 999));
+        expect(resolveWindow(999)).toEqual({startSec: 4, endSec: 9});
+    });
+
+    it('falls back to the media duration from the end popin when no endOffsetMs is set', () => {
+        mockPlay.mockClear();
+        const {value} = renderStep({file: {name: 'clip.mp4'}, startOffsetMs: '0'});
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+        fireEvent.click(screen.getByText('Tester'));
+
+        const resolveWindow = mockPlay.mock.calls[0][1];
+        expect(resolveWindow(12)).toEqual(previewWindow(value, 'end', 12));
+        expect(resolveWindow(12)).toEqual({startSec: 7, endSec: 12});
     });
 });

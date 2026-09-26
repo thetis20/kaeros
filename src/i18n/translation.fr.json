@@ -64,6 +64,12 @@
       },
       "startOffset": "Début de l'extrait (ms)",
       "endOffset": "Fin de l'extrait (ms, vide = jusqu'à la fin)",
+      "startOffsetValue": "Début : {{ms}} ms",
+      "endOffsetValue": "Fin : {{ms}} ms",
+      "endOffsetNone": "Fin : jusqu'à la fin de la vidéo",
+      "configureStart": "Configurer le début de l'extrait",
+      "configureEnd": "Configurer la fin de l'extrait",
+      "close": "Fermer",
       "test": "Tester",
       "submit": "Enregistrer",
       "error": {

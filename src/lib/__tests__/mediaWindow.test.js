@@ -1,4 +1,4 @@
-import { toWindow, isPastEnd, windowedProgress } from '../mediaWindow';
+import { toWindow, isPastEnd, windowedProgress, previewWindow } from '../mediaWindow';
 
 describe('toWindow', () => {
     it('converts start and end offsets from milliseconds to seconds', () => {
@@ -64,5 +64,31 @@ describe('windowedProgress', () => {
 
     it('still computes a duration from the end boundary when duration is NaN', () => {
         expect(windowedProgress(3, NaN, 2, 10)).toEqual({ currentTime: 1, duration: 8 });
+    });
+});
+
+describe('previewWindow', () => {
+    it('anchors on the start: plays 5s from the configured start when duration is unknown', () => {
+        expect(previewWindow({ startOffsetMs: 2000 }, 'start', undefined)).toEqual({ startSec: 2, endSec: 7 });
+    });
+
+    it('anchors on the start: clamps the 5s preview to the media duration', () => {
+        expect(previewWindow({ startOffsetMs: 8000 }, 'start', 10)).toEqual({ startSec: 8, endSec: 10 });
+    });
+
+    it('anchors on the end: uses the configured end boundary', () => {
+        expect(previewWindow({ startOffsetMs: 1000, endOffsetMs: 20000 }, 'end', 999)).toEqual({ startSec: 15, endSec: 20 });
+    });
+
+    it('anchors on the end: falls back to the media duration when no end boundary is configured', () => {
+        expect(previewWindow({ startOffsetMs: 1000 }, 'end', 30)).toEqual({ startSec: 25, endSec: 30 });
+    });
+
+    it('anchors on the end: never moves the lower bound before the configured start on a clip shorter than 5s', () => {
+        expect(previewWindow({ startOffsetMs: 1000, endOffsetMs: 3000 }, 'end', 999)).toEqual({ startSec: 1, endSec: 3 });
+    });
+
+    it('anchors on the end: falls back to toWindow when duration is unusable and there is no end boundary', () => {
+        expect(previewWindow({ startOffsetMs: 1000 }, 'end', NaN)).toEqual({ startSec: 1, endSec: null });
     });
 });

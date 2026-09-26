@@ -147,4 +147,112 @@ describe('useMediaPreview', () => {
 
         expect(rejectedPlayResult.catch).toHaveBeenCalled();
     });
+
+    describe('play(value, resolveWindow)', () => {
+        it('calls resolveWindow with the loaded media duration only after loadedmetadata', () => {
+            const { result } = renderHook(() => useMediaPreview());
+            const mediaEl = attach(result);
+            jest.spyOn(mediaEl, 'play').mockImplementation(() => Promise.resolve());
+            const file = new File(['sound'], 'track.mp3', { type: 'audio/mpeg' });
+            const resolveWindow = jest.fn(() => ({ startSec: 1, endSec: null }));
+
+            act(() => {
+                result.current.play({ file, startOffsetMs: 250 }, resolveWindow);
+            });
+            expect(resolveWindow).not.toHaveBeenCalled();
+
+            Object.defineProperty(mediaEl, 'duration', { value: 42, configurable: true });
+            fireEvent(mediaEl, new Event('loadedmetadata'));
+
+            expect(resolveWindow).toHaveBeenCalledTimes(1);
+            expect(resolveWindow).toHaveBeenCalledWith(42);
+        });
+
+        it('seeks to the startSec returned by resolveWindow', () => {
+            const { result } = renderHook(() => useMediaPreview());
+            const mediaEl = attach(result);
+            jest.spyOn(mediaEl, 'play').mockImplementation(() => Promise.resolve());
+            const file = new File(['sound'], 'track.mp3', { type: 'audio/mpeg' });
+            const resolveWindow = jest.fn(() => ({ startSec: 3.5, endSec: null }));
+
+            act(() => {
+                result.current.play({ file, startOffsetMs: 0 }, resolveWindow);
+            });
+            fireEvent(mediaEl, new Event('loadedmetadata'));
+
+            expect(mediaEl.currentTime).toBe(3.5);
+        });
+
+        it('pauses at the endSec returned by resolveWindow', () => {
+            const { result } = renderHook(() => useMediaPreview());
+            const mediaEl = attach(result);
+            jest.spyOn(mediaEl, 'play').mockImplementation(() => Promise.resolve());
+            const pauseSpy = jest.spyOn(mediaEl, 'pause').mockImplementation(() => {});
+            const file = new File(['video'], 'clip.mp4', { type: 'video/mp4' });
+            const resolveWindow = jest.fn(() => ({ startSec: 25, endSec: 30 }));
+
+            act(() => {
+                result.current.play({ file, startOffsetMs: 0 }, resolveWindow);
+            });
+            fireEvent(mediaEl, new Event('loadedmetadata'));
+
+            mediaEl.currentTime = 29;
+            fireEvent(mediaEl, new Event('timeupdate'));
+            expect(pauseSpy).not.toHaveBeenCalled();
+
+            mediaEl.currentTime = 30;
+            fireEvent(mediaEl, new Event('timeupdate'));
+            expect(pauseSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it('never pauses when resolveWindow returns a null endSec', () => {
+            const { result } = renderHook(() => useMediaPreview());
+            const mediaEl = attach(result);
+            jest.spyOn(mediaEl, 'play').mockImplementation(() => Promise.resolve());
+            const pauseSpy = jest.spyOn(mediaEl, 'pause').mockImplementation(() => {});
+            const file = new File(['sound'], 'track.mp3', { type: 'audio/mpeg' });
+            const resolveWindow = jest.fn(() => ({ startSec: 25, endSec: null }));
+
+            act(() => {
+                result.current.play({ file, startOffsetMs: 0 }, resolveWindow);
+            });
+            fireEvent(mediaEl, new Event('loadedmetadata'));
+
+            mediaEl.currentTime = 99999;
+            fireEvent(mediaEl, new Event('timeupdate'));
+            expect(pauseSpy).not.toHaveBeenCalled();
+        });
+
+        it('behaves exactly like play(value) without a resolver: seeks to the start offset', () => {
+            const { result } = renderHook(() => useMediaPreview());
+            const mediaEl = attach(result);
+            const playSpy = jest.spyOn(mediaEl, 'play').mockImplementation(() => Promise.resolve());
+            const file = new File(['sound'], 'track.mp3', { type: 'audio/mpeg' });
+
+            act(() => {
+                result.current.play({ file, startOffsetMs: 250 });
+            });
+            fireEvent(mediaEl, new Event('loadedmetadata'));
+
+            expect(mediaEl.currentTime).toBe(0.25);
+            expect(playSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it('behaves exactly like play(value) without a resolver: pauses at the plain end offset', () => {
+            const { result } = renderHook(() => useMediaPreview());
+            const mediaEl = attach(result);
+            jest.spyOn(mediaEl, 'play').mockImplementation(() => Promise.resolve());
+            const pauseSpy = jest.spyOn(mediaEl, 'pause').mockImplementation(() => {});
+            const file = new File(['video'], 'clip.mp4', { type: 'video/mp4' });
+
+            act(() => {
+                result.current.play({ file, startOffsetMs: 0, endOffsetMs: 4000 });
+            });
+            fireEvent(mediaEl, new Event('loadedmetadata'));
+
+            mediaEl.currentTime = 4;
+            fireEvent(mediaEl, new Event('timeupdate'));
+            expect(pauseSpy).toHaveBeenCalledTimes(1);
+        });
+    });
 });

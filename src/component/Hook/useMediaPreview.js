@@ -35,7 +35,7 @@ function useMediaPreview() {
         // array is what we want here, not a re-run on every render.
     }, []);
 
-    function play(value) {
+    function play(value, resolveWindow) {
         const mediaEl = mediaRef.current;
         if (!mediaEl || !hasSource(value)) return;
 
@@ -51,28 +51,28 @@ function useMediaPreview() {
         }
         mediaEl.load();
 
-        const { startSec, endSec } = toWindow(value);
-
         function onLoadedMetadata() {
+            const { startSec, endSec } = resolveWindow ? resolveWindow(mediaEl.duration) : toWindow(value);
+
             mediaEl.currentTime = startSec;
             mediaEl.play()?.catch(() => {});
             mediaEl.removeEventListener('loadedmetadata', onLoadedMetadata);
             loadedMetadataListenerRef.current = null;
+
+            if (endSec !== null) {
+                function onTimeUpdate() {
+                    if (isPastEnd(mediaEl.currentTime, endSec)) {
+                        mediaEl.pause();
+                        mediaEl.removeEventListener('timeupdate', onTimeUpdate);
+                        timeUpdateListenerRef.current = null;
+                    }
+                }
+                timeUpdateListenerRef.current = onTimeUpdate;
+                mediaEl.addEventListener('timeupdate', onTimeUpdate);
+            }
         }
         loadedMetadataListenerRef.current = onLoadedMetadata;
         mediaEl.addEventListener('loadedmetadata', onLoadedMetadata);
-
-        if (endSec !== null) {
-            function onTimeUpdate() {
-                if (isPastEnd(mediaEl.currentTime, endSec)) {
-                    mediaEl.pause();
-                    mediaEl.removeEventListener('timeupdate', onTimeUpdate);
-                    timeUpdateListenerRef.current = null;
-                }
-            }
-            timeUpdateListenerRef.current = onTimeUpdate;
-            mediaEl.addEventListener('timeupdate', onTimeUpdate);
-        }
     }
 
     return { mediaRef, play };

@@ -1,8 +1,8 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next';
-import { IconUpload } from '@tabler/icons-react';
+import { IconUpload, IconSettings } from '@tabler/icons-react';
 import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
-import useMediaPreview from '../Hook/useMediaPreview';
+import OffsetDialog from './OffsetDialog';
 
 export function validate(value, t) {
     const errors = {};
@@ -19,11 +19,7 @@ export function validate(value, t) {
 
 function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }) {
     const { t } = useTranslation();
-    const { mediaRef: previewRef, play } = useMediaPreview();
-
-    function testPlayback() {
-        play(value);
-    }
+    const [dialog, setDialog] = useState(null);
 
     function handleFile(e) {
         const file = e.target.files[0];
@@ -62,43 +58,27 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
         </div>
         {errors.file && <div className="invalid-feedback">{errors.file}</div>}
 
-        <div style={{display: 'flex', gap: 10, marginBottom: 10}}>
-            <div>
-                <label htmlFor={`step-start-offset-${value.id}`} className="field-label">{t('step.form.startOffset')}</label>
-                <input
-                    type="number"
-                    min="0"
-                    id={`step-start-offset-${value.id}`}
-                    className={errors.startOffsetMs ? 'is-invalid' : ''}
-                    value={value.startOffsetMs ?? ''}
-                    name='startOffsetMs'
-                    onChange={handleChange}
-                />
-                {errors.startOffsetMs && <div className="invalid-feedback">{errors.startOffsetMs}</div>}
-            </div>
-            <div>
-                <label htmlFor={`step-end-offset-${value.id}`} className="field-label">{t('step.form.endOffset')}</label>
-                <input
-                    type="number"
-                    min="0"
-                    id={`step-end-offset-${value.id}`}
-                    className={errors.endOffsetMs ? 'is-invalid' : ''}
-                    value={value.endOffsetMs ?? ''}
-                    name='endOffsetMs'
-                    onChange={handleChange}
-                />
-                {errors.endOffsetMs && <div className="invalid-feedback">{errors.endOffsetMs}</div>}
-            </div>
+        <div className="file-row">
+            <span>{t('step.form.startOffsetValue', {ms: value.startOffsetMs || 0})}</span>
+            <button
+                type="button"
+                className="btn btn-icon"
+                aria-label={t('step.form.configureStart')}
+                onClick={() => setDialog('start')}
+            ><IconSettings/></button>
         </div>
+        {errors.startOffsetMs && <div className="invalid-feedback">{errors.startOffsetMs}</div>}
 
-        {hasSource(value) && (
-            <div style={{marginBottom: 10}}>
-                <video ref={previewRef} controls style={{width: 320, marginBottom: 8}}/>
-                <div>
-                    <button type="button" className="btn btn-sm" onClick={testPlayback}>{t('step.form.test')}</button>
-                </div>
-            </div>
-        )}
+        <div className="file-row">
+            <span>{value.endOffsetMs ? t('step.form.endOffsetValue', {ms: value.endOffsetMs}) : t('step.form.endOffsetNone')}</span>
+            <button
+                type="button"
+                className="btn btn-icon"
+                aria-label={t('step.form.configureEnd')}
+                onClick={() => setDialog('end')}
+            ><IconSettings/></button>
+        </div>
+        {errors.endOffsetMs && <div className="invalid-feedback">{errors.endOffsetMs}</div>}
 
         <label htmlFor={`step-time-${value.id}`} className="field-label">{t('step.form.time')}</label>
         <input
@@ -120,6 +100,16 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
             name='description'
             onChange={handleChange}
         />
+
+        {dialog && (
+            <OffsetDialog
+                anchor={dialog}
+                value={value}
+                onChange={handleChange}
+                error={dialog === 'start' ? errors.startOffsetMs : errors.endOffsetMs}
+                onClose={() => setDialog(null)}
+            />
+        )}
     </Fragment>
 }
 

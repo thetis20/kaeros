@@ -53,4 +53,14 @@ describe('DubbingVideoTrack', () => {
         expect(empty.currentTime).toBe(0);
         expect(empty.duration).toBe(0);
     });
+
+    it('captures startOffsetMs/endOffsetMs when present, defaulting to 0 and null', () => {
+        const track = new DubbingVideoTrack({src: '/tmp/video.mp4', startOffsetMs: 250, endOffsetMs: 5000});
+        expect(track.startOffsetMs).toBe(250);
+        expect(track.endOffsetMs).toBe(5000);
+
+        const empty = new DubbingVideoTrack({});
+        expect(empty.startOffsetMs).toBe(0);
+        expect(empty.endOffsetMs).toBeNull();
+    });
 });

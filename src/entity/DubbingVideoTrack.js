@@ -9,6 +9,8 @@ export default class DubbingVideoTrack extends Track {
         this.src = track.src
         this.time = track.time
         this.description = track.description
+        this.startOffsetMs = track.startOffsetMs || 0
+        this.endOffsetMs = track.endOffsetMs === undefined ? null : track.endOffsetMs
         this.paused = track.paused || false
         this.status = track.status || STATUS_DESCRIPTION
         this.currentTime = track.currentTime || 0

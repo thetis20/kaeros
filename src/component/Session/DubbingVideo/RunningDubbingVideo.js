@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { redBg } from '../../../enum/COLOR'
 import { toFileUrl } from '../../../lib/mediaUrl';
+import { toWindow, isPastEnd, windowedProgress } from '../../../lib/mediaWindow';
 
 function ProgressBar({ currentTime, duration }) {
     const percent = currentTime / duration * 100
@@ -33,12 +34,18 @@ function ProgressBar({ currentTime, duration }) {
 function RunningDubbingVideo({ track }) {
     const [time, setTime] = useState({currentTime: 0, duration: 0})
     const ref = useRef()
+    const { startSec, endSec } = toWindow(track)
+
+    function onLoadedMetadata() {
+        ref.current.currentTime = startSec
+    }
 
     function onTimeUpdate(e) {
-        setTime({
-            currentTime: e.target.currentTime,
-            duration: e.target.duration
-        })
+        if (isPastEnd(e.target.currentTime, endSec)) {
+            ref.current.pause()
+            track.pause()
+        }
+        setTime(windowedProgress(e.target.currentTime, e.target.duration, startSec, endSec))
     }
 
     useEffect(() => {
@@ -57,12 +64,14 @@ function RunningDubbingVideo({ track }) {
         const interval = setInterval(() => {
             const { currentTime, duration } = ref.current
             if (!isNaN(duration)) {
-                window.electronAPI.trackChange({ currentTime, duration })
+                window.electronAPI.trackChange(windowedProgress(currentTime, duration, startSec, endSec))
             }
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [ref])
+        // startSec/endSec belong here: two dubbing steps in a row reuse this
+        // component instance, so the interval would keep the previous window.
+    }, [ref, startSec, endSec])
 
     return (
         <div style={{
@@ -72,7 +81,7 @@ function RunningDubbingVideo({ track }) {
             alignItems: 'center',
             justifyContent: 'center'
         }}>
-            <video autoPlay ref={ref} style={{ width: '100%' }} onTimeUpdate={onTimeUpdate} onEnded={track.pause} muted={true}>
+            <video autoPlay ref={ref} style={{ width: '100%' }} onLoadedMetadata={onLoadedMetadata} onTimeUpdate={onTimeUpdate} onEnded={track.pause} muted={true}>
                 <source src={toFileUrl(track.src)} type="video/mp4" />
             </video>
             <ProgressBar currentTime={time.currentTime} duration={time.duration} />

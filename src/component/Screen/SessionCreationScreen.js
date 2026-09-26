@@ -67,7 +67,7 @@ function hydrateStepForEditing(step) {
 
 function newStep(type, t) {
     const base = {id: uuidv4(), type, name: t(`sessionCreation.newStepName.${type}`), open: false};
-    if (type === 'dubbing-video') return {...base, time: '', description: ''};
+    if (type === 'dubbing-video') return {...base, time: '', description: '', startOffsetMs: 0, endOffsetMs: ''};
     if (type === 'video') return {...base, loop: false};
     if (type === 'time') return {...base, impro: '1', minutes: '2'};
     if (type === 'battle-royal') return {...base, players: ''};

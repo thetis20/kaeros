@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconUpload } from '@tabler/icons-react';
 import useTracks from '../Hook/useTracks';
 import useTags from '../Hook/useTags';
+import useMediaPreview from '../Hook/useMediaPreview';
 import TagMultiSelect from '../Tag/TagMultiSelect';
 import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
-import { toFileUrl } from '../../lib/mediaUrl';
 
 const EMPTY_FORM = { name: '', tags: [], startOffsetMs: 0 };
 
@@ -16,46 +16,10 @@ function MusiqueScreen() {
     const [activeTag, setActiveTag] = useState('all');
     const [value, setValue] = useState(EMPTY_FORM);
     const [errors, setErrors] = useState({});
-    const previewRef = useRef(null);
-    const blobUrlRef = useRef(null);
-    const loadedMetadataListenerRef = useRef(null);
-
-    function revokeBlobUrl() {
-        if (blobUrlRef.current) {
-            URL.revokeObjectURL(blobUrlRef.current);
-            blobUrlRef.current = null;
-        }
-    }
-
-    useEffect(() => () => revokeBlobUrl(), [value.file]);
+    const { mediaRef: previewRef, play } = useMediaPreview();
 
     function testPlayback() {
-        const audioEl = previewRef.current;
-        if (!audioEl || !hasSource(value)) return;
-
-        if (loadedMetadataListenerRef.current) {
-            audioEl.removeEventListener('loadedmetadata', loadedMetadataListenerRef.current);
-            loadedMetadataListenerRef.current = null;
-        }
-
-        revokeBlobUrl();
-        if (value.file) {
-            const url = URL.createObjectURL(value.file);
-            blobUrlRef.current = url;
-            audioEl.src = url;
-        } else {
-            audioEl.src = toFileUrl(value.src);
-        }
-        audioEl.load();
-
-        function onLoadedMetadata() {
-            audioEl.currentTime = (Number(value.startOffsetMs) || 0) / 1000;
-            audioEl.play()?.catch(() => {});
-            audioEl.removeEventListener('loadedmetadata', onLoadedMetadata);
-            loadedMetadataListenerRef.current = null;
-        }
-        loadedMetadataListenerRef.current = onLoadedMetadata;
-        audioEl.addEventListener('loadedmetadata', onLoadedMetadata);
+        play(value);
     }
 
     const filtered = activeTag === 'all' ? tracks : tracks.filter((track) => track.tags.includes(activeTag));

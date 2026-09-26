@@ -62,6 +62,9 @@
         "label": "Joueurs",
         "help": "Séparer les jouers par un ;"
       },
+      "startOffset": "Début de l'extrait (ms)",
+      "endOffset": "Fin de l'extrait (ms, vide = jusqu'à la fin)",
+      "test": "Tester",
       "submit": "Enregistrer",
       "error": {
         "name": "Le nom est obligatoire.",
@@ -70,7 +73,9 @@
         "time": "La durée est obligatoire.",
         "impro": "Doit être un nombre entier positif (1 ou plus).",
         "minutes": "Doit être un nombre entier positif (1 ou plus).",
-        "players": "Merci d'indiquer au moins un nom de joueur (séparés par ;)."
+        "players": "Merci d'indiquer au moins un nom de joueur (séparés par ;).",
+        "startOffset": "Le début doit être un nombre entier positif (en millisecondes).",
+        "endOffset": "La fin doit être un nombre entier supérieur au début."
       }
     }
   },

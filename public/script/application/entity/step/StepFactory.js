@@ -11,7 +11,7 @@ class StepFactory {
             case 'image':
                 return new ImageStep(data.id, data.name, data.src, data.createdAt, data.updatedAt)
             case 'dubbing-video':
-                return new DubbingVideoStep(data.id, data.name, data.src, data.description, data.time, data.startOffsetMs, data.endOffsetMs, data.createdAt, data.updatedAt)
+                return new DubbingVideoStep(data.id, data.name, data.src, data.description, data.time, data.startOffsetMs, data.endOffsetMs, data.fadeOutMs, data.fadeInMs, data.createdAt, data.updatedAt)
             case 'video':
                 return new VideoStep(data.id, data.name, data.src, data.loop, data.createdAt, data.updatedAt)
             case 'time':

@@ -32,6 +32,26 @@ class ValidStepUseCase {
                 step.endOffsetMs = endOffsetMs;
             }
 
+            if (step.fadeOutMs === undefined || step.fadeOutMs === null || step.fadeOutMs === '') {
+                step.fadeOutMs = 1000;
+            } else {
+                const fadeOutMs = Number(step.fadeOutMs);
+                if (!Number.isInteger(fadeOutMs) || fadeOutMs < 0) {
+                    throw new Error('Invalid dubbing fade out');
+                }
+                step.fadeOutMs = fadeOutMs;
+            }
+
+            if (step.fadeInMs === undefined || step.fadeInMs === null || step.fadeInMs === '') {
+                step.fadeInMs = 1000;
+            } else {
+                const fadeInMs = Number(step.fadeInMs);
+                if (!Number.isInteger(fadeInMs) || fadeInMs < 0) {
+                    throw new Error('Invalid dubbing fade in');
+                }
+                step.fadeInMs = fadeInMs;
+            }
+
             if (step.endOffsetMs !== null && step.endOffsetMs <= step.startOffsetMs) {
                 throw new Error('Invalid dubbing offsets range');
             }

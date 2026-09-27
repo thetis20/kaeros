@@ -8,6 +8,8 @@ class DubbingVideoTrack extends Track {
         this.time = step.time
         this.startOffsetMs = step.startOffsetMs
         this.endOffsetMs = step.endOffsetMs
+        this.fadeOutMs = step.fadeOutMs
+        this.fadeInMs = step.fadeInMs
         this.paused = true
     }
 }

@@ -14,6 +14,12 @@ export function validate(value, t) {
     if (value.endOffsetMs !== undefined && value.endOffsetMs !== null && value.endOffsetMs !== '' && (!Number.isInteger(Number(value.endOffsetMs)) || Number(value.endOffsetMs) <= Number(value.startOffsetMs || 0))) {
         errors.endOffsetMs = t('step.form.error.endOffset');
     }
+    if (value.fadeOutMs !== undefined && value.fadeOutMs !== null && value.fadeOutMs !== '' && (!Number.isInteger(Number(value.fadeOutMs)) || Number(value.fadeOutMs) < 0)) {
+        errors.fadeOutMs = t('step.form.error.fadeOut');
+    }
+    if (value.fadeInMs !== undefined && value.fadeInMs !== null && value.fadeInMs !== '' && (!Number.isInteger(Number(value.fadeInMs)) || Number(value.fadeInMs) < 0)) {
+        errors.fadeInMs = t('step.form.error.fadeIn');
+    }
     return errors;
 }
 
@@ -60,6 +66,7 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
 
         <div className="file-row">
             <span>{t('step.form.startOffsetValue', {ms: value.startOffsetMs || 0})}</span>
+            <span>{Number(value.fadeInMs ?? 1000) > 0 ? t('step.form.fadeInValue', {ms: value.fadeInMs ?? 1000}) : t('step.form.fadeInNone')}</span>
             <button
                 type="button"
                 className="btn btn-icon"
@@ -68,9 +75,11 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
             ><IconSettings/></button>
         </div>
         {errors.startOffsetMs && <div className="invalid-feedback">{errors.startOffsetMs}</div>}
+        {errors.fadeInMs && <div className="invalid-feedback">{errors.fadeInMs}</div>}
 
         <div className="file-row">
             <span>{value.endOffsetMs ? t('step.form.endOffsetValue', {ms: value.endOffsetMs}) : t('step.form.endOffsetNone')}</span>
+            <span>{Number(value.fadeOutMs ?? 1000) > 0 ? t('step.form.fadeOutValue', {ms: value.fadeOutMs ?? 1000}) : t('step.form.fadeOutNone')}</span>
             <button
                 type="button"
                 className="btn btn-icon"
@@ -79,6 +88,7 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
             ><IconSettings/></button>
         </div>
         {errors.endOffsetMs && <div className="invalid-feedback">{errors.endOffsetMs}</div>}
+        {errors.fadeOutMs && <div className="invalid-feedback">{errors.fadeOutMs}</div>}
 
         <label htmlFor={`step-time-${value.id}`} className="field-label">{t('step.form.time')}</label>
         <input
@@ -107,6 +117,7 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
                 value={value}
                 onChange={handleChange}
                 error={dialog === 'start' ? errors.startOffsetMs : errors.endOffsetMs}
+                fadeError={dialog === 'start' ? errors.fadeInMs : errors.fadeOutMs}
                 onClose={() => setDialog(null)}
             />
         )}

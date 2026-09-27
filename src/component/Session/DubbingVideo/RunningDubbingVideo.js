@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { redBg } from '../../../enum/COLOR'
 import { toFileUrl } from '../../../lib/mediaUrl';
-import { toWindow, isPastEnd, windowedProgress } from '../../../lib/mediaWindow';
+import { toWindow, isPastEnd, windowedProgress, fadeWindow, fadeOpacity, fadeInWindow, fadeInOpacity } from '../../../lib/mediaWindow';
+import BlackFadeOverlay from '../../Media/BlackFadeOverlay';
 
 function ProgressBar({ currentTime, duration }) {
     const percent = currentTime / duration * 100
@@ -33,20 +34,41 @@ function ProgressBar({ currentTime, duration }) {
 
 function RunningDubbingVideo({ track }) {
     const [time, setTime] = useState({currentTime: 0, duration: 0})
+    const [fadeOpacityValue, setFadeOpacityValue] = useState((Number(track.fadeInMs) || 0) > 0 ? 1 : 0)
+    const [duration, setDuration] = useState(NaN)
     const ref = useRef()
     const { startSec, endSec } = toWindow(track)
+    const fadeOut = fadeWindow(startSec, endSec, duration, track.fadeOutMs)
+    const fadeIn = fadeInWindow(startSec, endSec, duration, track.fadeInMs)
 
     function onLoadedMetadata() {
         ref.current.currentTime = startSec
+        setDuration(ref.current.duration)
+        setFadeOpacityValue(fadeIn ? 1 : 0)
     }
 
     function onTimeUpdate(e) {
+        setFadeOpacityValue(Math.max(fadeInOpacity(e.target.currentTime, fadeIn), fadeOpacity(e.target.currentTime, fadeOut)))
         if (isPastEnd(e.target.currentTime, endSec)) {
             ref.current.pause()
             track.pause()
         }
         setTime(windowedProgress(e.target.currentTime, e.target.duration, startSec, endSec))
     }
+
+    function onEnded() {
+        setFadeOpacityValue(fadeOut ? 1 : 0)
+        track.pause()
+    }
+
+    useEffect(() => {
+        setFadeOpacityValue(fadeIn ? 1 : 0)
+        setDuration(NaN)
+        // two dubbing steps in a row reuse this component instance, so without
+        // a reset the second extract would carry over the opacity left by the
+        // first one -- fully black after its fade out. It must start at the
+        // level its own fade in asks for.
+    }, [track.src, startSec, endSec, track.fadeOutMs, track.fadeInMs])
 
     useEffect(() => {
 
@@ -79,12 +101,14 @@ function RunningDubbingVideo({ track }) {
             width: '100%',
             height: '100%',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            position: 'relative'
         }}>
-            <video autoPlay ref={ref} style={{ width: '100%' }} onLoadedMetadata={onLoadedMetadata} onTimeUpdate={onTimeUpdate} onEnded={track.pause} muted={true}>
+            <video autoPlay ref={ref} style={{ width: '100%' }} onLoadedMetadata={onLoadedMetadata} onTimeUpdate={onTimeUpdate} onEnded={onEnded} muted={true}>
                 <source src={toFileUrl(track.src)} type="video/mp4" />
             </video>
             <ProgressBar currentTime={time.currentTime} duration={time.duration} />
+            <BlackFadeOverlay opacity={fadeOpacityValue}/>
         </div>
     );
 }

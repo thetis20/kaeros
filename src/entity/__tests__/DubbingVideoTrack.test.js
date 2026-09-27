@@ -63,4 +63,16 @@ describe('DubbingVideoTrack', () => {
         expect(empty.startOffsetMs).toBe(0);
         expect(empty.endOffsetMs).toBeNull();
     });
+
+    it('captures fadeOutMs when present, defaulting to 1000, and keeps an explicit 0 as a hard cut', () => {
+        expect(new DubbingVideoTrack({src: '/tmp/video.mp4', fadeOutMs: 2500}).fadeOutMs).toBe(2500);
+        expect(new DubbingVideoTrack({}).fadeOutMs).toBe(1000);
+        expect(new DubbingVideoTrack({fadeOutMs: 0}).fadeOutMs).toBe(0);
+    });
+
+    it('captures fadeInMs when present, defaulting to 1000, and keeps an explicit 0 as a hard cut', () => {
+        expect(new DubbingVideoTrack({src: '/tmp/video.mp4', fadeInMs: 2500}).fadeInMs).toBe(2500);
+        expect(new DubbingVideoTrack({}).fadeInMs).toBe(1000);
+        expect(new DubbingVideoTrack({fadeInMs: 0}).fadeInMs).toBe(0);
+    });
 });

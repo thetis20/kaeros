@@ -19,6 +19,8 @@ describe('StepFactory', () => {
             time: '2min',
             startOffsetMs: 250,
             endOffsetMs: 5000,
+            fadeOutMs: 2000,
+            fadeInMs: 1500,
             createdAt,
             updatedAt,
         };
@@ -28,6 +30,8 @@ describe('StepFactory', () => {
         expect(step).toBeInstanceOf(DubbingVideoStep);
         expect(step.startOffsetMs).toBe(250);
         expect(step.endOffsetMs).toBe(5000);
+        expect(step.fadeOutMs).toBe(2000);
+        expect(step.fadeInMs).toBe(1500);
     });
 
     it('defaults startOffsetMs and endOffsetMs when data was stored before the fields existed', () => {

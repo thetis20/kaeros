@@ -37,3 +37,33 @@ export function previewWindow(value, anchor, duration, previewMs = 5000) {
     const lowBound = Math.max(startSec, highBound - previewSec);
     return { startSec: lowBound, endSec: highBound };
 }
+
+export function fadeWindow(startSec, endSec, duration, fadeOutMs) {
+    const fadeSec = (Number(fadeOutMs) || 0) / 1000;
+    if (fadeSec <= 0) return null;
+    const toSec = endSec !== null && endSec !== undefined ? endSec : duration;
+    if (!Number.isFinite(toSec)) return null;
+    const fromSec = Math.max(startSec, toSec - fadeSec);
+    if (fromSec >= toSec) return null;
+    return {fromSec, toSec};
+}
+
+export function fadeOpacity(currentTime, fade) {
+    if (!fade) return 0;
+    const ratio = (currentTime - fade.fromSec) / (fade.toSec - fade.fromSec);
+    return Math.min(1, Math.max(0, ratio));
+}
+
+export function fadeInWindow(startSec, endSec, duration, fadeInMs) {
+    const fadeSec = (Number(fadeInMs) || 0) / 1000;
+    if (fadeSec <= 0) return null;
+    const limit = endSec !== null && endSec !== undefined ? endSec : duration;
+    const toSec = Number.isFinite(limit) ? Math.min(startSec + fadeSec, limit) : startSec + fadeSec;
+    if (toSec <= startSec) return null;
+    return {fromSec: startSec, toSec};
+}
+
+export function fadeInOpacity(currentTime, fade) {
+    if (!fade) return 0;
+    return 1 - fadeOpacity(currentTime, fade);
+}

@@ -82,4 +82,78 @@ describe('ValidStepUseCase', () => {
             expect(timeStep.endOffsetMs).toBeUndefined();
         });
     });
+
+    describe('dubbing-video fadeOutMs', () => {
+        it('defaults fadeOutMs to 1000 when omitted, null or empty', () => {
+            const step = {name: 'Step One', type: 'dubbing-video'};
+            expect(validStepUseCase.execute(step).fadeOutMs).toBe(1000);
+
+            const step2 = {name: 'Step One', type: 'dubbing-video', fadeOutMs: null};
+            expect(validStepUseCase.execute(step2).fadeOutMs).toBe(1000);
+
+            const step3 = {name: 'Step One', type: 'dubbing-video', fadeOutMs: ''};
+            expect(validStepUseCase.execute(step3).fadeOutMs).toBe(1000);
+        });
+
+        it('coerces a numeric string fadeOutMs to a number', () => {
+            const step = {name: 'Step One', type: 'dubbing-video', fadeOutMs: '2000'};
+            expect(validStepUseCase.execute(step).fadeOutMs).toBe(2000);
+        });
+
+        it('accepts 0 as a valid fadeOutMs', () => {
+            const step = {name: 'Step One', type: 'dubbing-video', fadeOutMs: 0};
+            expect(validStepUseCase.execute(step).fadeOutMs).toBe(0);
+        });
+
+        it('rejects a negative fadeOutMs', () => {
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'dubbing-video', fadeOutMs: -1})).toThrow('Invalid dubbing fade out');
+        });
+
+        it('rejects a non-integer fadeOutMs', () => {
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'dubbing-video', fadeOutMs: 1.5})).toThrow('Invalid dubbing fade out');
+        });
+
+        it('does not touch fadeOutMs on a step of another type', () => {
+            const imageStep = {name: 'Step One', type: 'image', fadeOutMs: undefined};
+            const result = validStepUseCase.execute(imageStep);
+            expect(result.fadeOutMs).toBeUndefined();
+        });
+    });
+
+    describe('dubbing-video fadeInMs', () => {
+        it('defaults fadeInMs to 1000 when omitted, null or empty', () => {
+            const step = {name: 'Step One', type: 'dubbing-video'};
+            expect(validStepUseCase.execute(step).fadeInMs).toBe(1000);
+
+            const step2 = {name: 'Step One', type: 'dubbing-video', fadeInMs: null};
+            expect(validStepUseCase.execute(step2).fadeInMs).toBe(1000);
+
+            const step3 = {name: 'Step One', type: 'dubbing-video', fadeInMs: ''};
+            expect(validStepUseCase.execute(step3).fadeInMs).toBe(1000);
+        });
+
+        it('coerces a numeric string fadeInMs to a number', () => {
+            const step = {name: 'Step One', type: 'dubbing-video', fadeInMs: '2000'};
+            expect(validStepUseCase.execute(step).fadeInMs).toBe(2000);
+        });
+
+        it('accepts 0 as a valid fadeInMs', () => {
+            const step = {name: 'Step One', type: 'dubbing-video', fadeInMs: 0};
+            expect(validStepUseCase.execute(step).fadeInMs).toBe(0);
+        });
+
+        it('rejects a negative fadeInMs', () => {
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'dubbing-video', fadeInMs: -1})).toThrow('Invalid dubbing fade in');
+        });
+
+        it('rejects a non-integer fadeInMs', () => {
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'dubbing-video', fadeInMs: 1.5})).toThrow('Invalid dubbing fade in');
+        });
+
+        it('does not touch fadeInMs on a step of another type', () => {
+            const imageStep = {name: 'Step One', type: 'image', fadeInMs: undefined};
+            const result = validStepUseCase.execute(imageStep);
+            expect(result.fadeInMs).toBeUndefined();
+        });
+    });
 });

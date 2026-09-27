@@ -54,6 +54,46 @@ describe('DubbingVideoStep validate()', () => {
         expect(errors.startOffsetMs).toBeUndefined();
         expect(errors.endOffsetMs).toBeUndefined();
     });
+
+    it('accepts a fadeOutMs of 0 (hard cut)', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeOutMs: '0'}, (key) => key);
+        expect(errors.fadeOutMs).toBeUndefined();
+    });
+
+    it('accepts a fadeOutMs of 2000', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeOutMs: '2000'}, (key) => key);
+        expect(errors.fadeOutMs).toBeUndefined();
+    });
+
+    it('rejects a negative fadeOutMs', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeOutMs: '-1'}, (key) => key);
+        expect(errors.fadeOutMs).toBe('step.form.error.fadeOut');
+    });
+
+    it('rejects a decimal fadeOutMs', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeOutMs: '1.5'}, (key) => key);
+        expect(errors.fadeOutMs).toBe('step.form.error.fadeOut');
+    });
+
+    it('accepts a fadeInMs of 0 (hard cut)', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeInMs: '0'}, (key) => key);
+        expect(errors.fadeInMs).toBeUndefined();
+    });
+
+    it('accepts a fadeInMs of 2000', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeInMs: '2000'}, (key) => key);
+        expect(errors.fadeInMs).toBeUndefined();
+    });
+
+    it('rejects a negative fadeInMs', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeInMs: '-1'}, (key) => key);
+        expect(errors.fadeInMs).toBe('step.form.error.fadeIn');
+    });
+
+    it('rejects a decimal fadeInMs', () => {
+        const errors = validate({file: {name: 'clip.mp4'}, time: '2min', fadeInMs: '1.5'}, (key) => key);
+        expect(errors.fadeInMs).toBe('step.form.error.fadeIn');
+    });
 });
 
 describe('DubbingVideoStep component', () => {
@@ -241,5 +281,53 @@ describe('DubbingVideoStep component', () => {
         const resolveWindow = mockPlay.mock.calls[0][1];
         expect(resolveWindow(12)).toEqual(previewWindow(value, 'end', 12));
         expect(resolveWindow(12)).toEqual({startSec: 7, endSec: 12});
+    });
+
+    it('shows the default fade-out recap of 1000 ms when fadeOutMs is not set', () => {
+        renderStep();
+        expect(screen.getByText('fondu sortant : 1000 ms')).toBeTruthy();
+    });
+
+    it('shows "sans fondu sortant" when fadeOutMs is 0', () => {
+        renderStep({fadeOutMs: '0'});
+        expect(screen.getByText('sans fondu sortant')).toBeTruthy();
+    });
+
+    it('shows a custom fade-out recap when fadeOutMs is set', () => {
+        renderStep({fadeOutMs: '2000'});
+        expect(screen.getByText('fondu sortant : 2000 ms')).toBeTruthy();
+    });
+
+    it('keeps the fadeOutMs error visible on the row while the popin is closed', () => {
+        renderStep({errors: {fadeOutMs: 'invalide'}});
+        expect(screen.getByText('invalide')).toBeTruthy();
+        expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('shows the default fade-in recap of 1000 ms when fadeInMs is not set', () => {
+        renderStep();
+        expect(screen.getByText('fondu entrant : 1000 ms')).toBeTruthy();
+    });
+
+    it('shows "sans fondu entrant" when fadeInMs is 0', () => {
+        renderStep({fadeInMs: '0'});
+        expect(screen.getByText('sans fondu entrant')).toBeTruthy();
+    });
+
+    it('shows a custom fade-in recap when fadeInMs is set', () => {
+        renderStep({fadeInMs: '2000'});
+        expect(screen.getByText('fondu entrant : 2000 ms')).toBeTruthy();
+    });
+
+    it('recaps both fades with distinct labels so the two rows cannot be confused', () => {
+        renderStep({fadeInMs: '500', fadeOutMs: '1500'});
+        expect(screen.getByText('fondu entrant : 500 ms')).toBeTruthy();
+        expect(screen.getByText('fondu sortant : 1500 ms')).toBeTruthy();
+    });
+
+    it('keeps the fadeInMs error visible on the row while the popin is closed', () => {
+        renderStep({errors: {fadeInMs: 'invalide'}});
+        expect(screen.getByText('invalide')).toBeTruthy();
+        expect(screen.queryByRole('dialog')).toBeNull();
     });
 });

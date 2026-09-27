@@ -67,6 +67,12 @@
       "startOffsetValue": "Début : {{ms}} ms",
       "endOffsetValue": "Fin : {{ms}} ms",
       "endOffsetNone": "Fin : jusqu'à la fin de la vidéo",
+      "fadeOut": "Fondu noir (ms avant la fin)",
+      "fadeOutValue": "fondu sortant : {{ms}} ms",
+      "fadeOutNone": "sans fondu sortant",
+      "fadeIn": "Fondu noir (ms après le début)",
+      "fadeInValue": "fondu entrant : {{ms}} ms",
+      "fadeInNone": "sans fondu entrant",
       "configureStart": "Configurer le début de l'extrait",
       "configureEnd": "Configurer la fin de l'extrait",
       "close": "Fermer",
@@ -81,7 +87,9 @@
         "minutes": "Doit être un nombre entier positif (1 ou plus).",
         "players": "Merci d'indiquer au moins un nom de joueur (séparés par ;).",
         "startOffset": "Le début doit être un nombre entier positif (en millisecondes).",
-        "endOffset": "La fin doit être un nombre entier supérieur au début."
+        "endOffset": "La fin doit être un nombre entier supérieur au début.",
+        "fadeOut": "Le fondu doit être un nombre entier positif (en millisecondes).",
+        "fadeIn": "Le fondu doit être un nombre entier positif (en millisecondes)."
       }
     }
   },

@@ -1,6 +1,6 @@
 {
   "name": "kaeros",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -70,7 +70,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ]
     },
@@ -78,7 +81,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -86,7 +91,9 @@
       "target": [
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     }

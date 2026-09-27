@@ -58,6 +58,13 @@
     "directories": {
       "buildResources": "assets"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "thetis20",
+        "repo": "kaeros"
+      }
+    ],
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [

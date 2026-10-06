@@ -1,20 +1,12 @@
 import {useCallback, useRef, useState} from 'react';
 import {checkWorkflowMedia} from '../../lib/mediaCheck';
 
-// Media verification before launch is disabled: it blocked sessions whose files
-// were fine. Flip back to true (or pass {checkMedia: true}) to re-enable it.
-export const MEDIA_CHECK_ON_LAUNCH = false;
-
-function useSessionLaunch({checkMedia = MEDIA_CHECK_ON_LAUNCH} = {}) {
+function useSessionLaunch() {
     const [checking, setChecking] = useState(false);
     const [issues, setIssues] = useState([]);
     const checkingRef = useRef(false);
 
     const launch = useCallback(async (workflow) => {
-        if (!checkMedia) {
-            window.electronAPI.sessionPlay(workflow);
-            return;
-        }
         if (checkingRef.current) return;
         checkingRef.current = true;
         setChecking(true);
@@ -41,7 +33,7 @@ function useSessionLaunch({checkMedia = MEDIA_CHECK_ON_LAUNCH} = {}) {
             checkingRef.current = false;
             setChecking(false);
         }
-    }, [checkMedia]);
+    }, []);
 
     const dismiss = useCallback(() => {
         setIssues([]);

@@ -17,22 +17,9 @@ describe('useSessionLaunch', () => {
         checkWorkflowMedia.mockReset();
     });
 
-    it('plays directly without checking media by default (check disabled)', async () => {
-        const {result} = renderHook(() => useSessionLaunch());
-
-        await act(async () => {
-            await result.current.launch(workflow);
-        });
-
-        expect(checkWorkflowMedia).not.toHaveBeenCalled();
-        expect(window.electronAPI.sessionPlay).toHaveBeenCalledWith(workflow);
-        expect(result.current.issues).toEqual([]);
-        expect(result.current.checking).toBe(false);
-    });
-
     it('plays the session when the media check reports no issues', async () => {
         checkWorkflowMedia.mockResolvedValue([{id: 'e1', kind: 'step', name: 'Etape 1', src: '/a.mp4', code: 'ok'}]);
-        const {result} = renderHook(() => useSessionLaunch({checkMedia: true}));
+        const {result} = renderHook(() => useSessionLaunch());
 
         await act(async () => {
             await result.current.launch(workflow);
@@ -47,7 +34,7 @@ describe('useSessionLaunch', () => {
         const okEntry = {id: 'e1', kind: 'step', name: 'Etape 1', src: '/a.mp4', code: 'ok'};
         const badEntry = {id: 'e2', kind: 'step', name: 'Etape 2', src: '/missing.mp4', code: 'missing'};
         checkWorkflowMedia.mockResolvedValue([okEntry, badEntry]);
-        const {result} = renderHook(() => useSessionLaunch({checkMedia: true}));
+        const {result} = renderHook(() => useSessionLaunch());
 
         await act(async () => {
             await result.current.launch(workflow);
@@ -60,7 +47,7 @@ describe('useSessionLaunch', () => {
 
     it('does not play and surfaces a problem when the media check rejects', async () => {
         checkWorkflowMedia.mockRejectedValue(new Error('disk error'));
-        const {result} = renderHook(() => useSessionLaunch({checkMedia: true}));
+        const {result} = renderHook(() => useSessionLaunch());
 
         await act(async () => {
             await result.current.launch(workflow);
@@ -76,7 +63,7 @@ describe('useSessionLaunch', () => {
         checkWorkflowMedia.mockReturnValue(new Promise((resolve) => {
             resolveCheck = resolve;
         }));
-        const {result} = renderHook(() => useSessionLaunch({checkMedia: true}));
+        const {result} = renderHook(() => useSessionLaunch());
 
         act(() => {
             result.current.launch(workflow);
@@ -96,7 +83,7 @@ describe('useSessionLaunch', () => {
         checkWorkflowMedia.mockReturnValue(new Promise((resolve) => {
             resolveCheck = resolve;
         }));
-        const {result} = renderHook(() => useSessionLaunch({checkMedia: true}));
+        const {result} = renderHook(() => useSessionLaunch());
 
         act(() => {
             result.current.launch(workflow);
@@ -113,7 +100,7 @@ describe('useSessionLaunch', () => {
     it('clears the issues when dismiss is called', async () => {
         const badEntry = {id: 'e2', kind: 'step', name: 'Etape 2', src: '/missing.mp4', code: 'missing'};
         checkWorkflowMedia.mockResolvedValue([badEntry]);
-        const {result} = renderHook(() => useSessionLaunch({checkMedia: true}));
+        const {result} = renderHook(() => useSessionLaunch());
 
         await act(async () => {
             await result.current.launch(workflow);

@@ -11,37 +11,7 @@ jest.mock('../../../lib/mediaCheck', () => {
     };
 });
 
-describe('Dashboard with media check on launch disabled', () => {
-    const workflow = {id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', updatedAt: new Date().toISOString()};
-
-    beforeEach(() => {
-        window.electronAPI = {
-            workflowFetch: jest.fn(),
-            workflowRemove: jest.fn(),
-            sessionPlay: jest.fn(),
-            trackFetch: jest.fn(),
-            tagFetch: jest.fn(),
-        };
-        delete window.session;
-        checkWorkflowMedia.mockReset();
-    });
-
-    it('plays directly without checking media from the Régie entry point', () => {
-        render(<Dashboard/>);
-        act(() => {
-            document.dispatchEvent(new CustomEvent('workflow-onchange', {detail: [workflow]}));
-        });
-
-        fireEvent.click(screen.getByRole('button', {name: 'Démarrer'}));
-
-        expect(checkWorkflowMedia).not.toHaveBeenCalled();
-        expect(window.electronAPI.sessionPlay).toHaveBeenCalledWith(workflow);
-        expect(screen.queryByRole('dialog')).toBeNull();
-    });
-});
-
-// Skipped while MEDIA_CHECK_ON_LAUNCH is false - re-enable together with the flag.
-describe.skip('Dashboard media check integration (real RegieScreen and WorkflowDashboard)', () => {
+describe('Dashboard media check integration (real RegieScreen and WorkflowDashboard)', () => {
     const workflow = {id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', updatedAt: new Date().toISOString()};
 
     beforeEach(() => {

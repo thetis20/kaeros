@@ -20,4 +20,20 @@ describe('toFileUrl', () => {
     it('leaves a simple path untouched aside from the file:// prefix', () => {
         expect(toFileUrl('/tmp/video.mp4')).toBe('file:///tmp/video.mp4');
     });
+
+    it('converts a Windows drive path', () => {
+        expect(toFileUrl('C:\\Users\\me\\Images\\photo.png')).toBe('file:///C:/Users/me/Images/photo.png');
+    });
+
+    it('encodes special characters in a Windows path', () => {
+        expect(toFileUrl('D:\\Mes vidéos\\clip#1.mp4')).toBe('file:///D:/Mes%20vid%C3%A9os/clip%231.mp4');
+    });
+
+    it('converts a Windows path with forward slashes', () => {
+        expect(toFileUrl('C:/Users/me/photo.png')).toBe('file:///C:/Users/me/photo.png');
+    });
+
+    it('converts a Windows UNC path', () => {
+        expect(toFileUrl('\\\\server\\share\\photo.png')).toBe('file://server/share/photo.png');
+    });
 });

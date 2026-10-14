@@ -1,5 +1,5 @@
 import 'react';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Sidebar from '../Sidebar/Sidebar';
 import RegieScreen from '../Screen/RegieScreen';
@@ -11,11 +11,14 @@ import useAudios from '../Hook/useAudios';
 import useSessionLaunch from '../Hook/useSessionLaunch';
 import AudioController from '../Controller/AudioController';
 import MediaErrorDialog from '../Screen/MediaErrorDialog';
+import UnsavedChangesDialog from '../Screen/UnsavedChangesDialog';
 
 function Dashboard() {
     const {t} = useTranslation();
     const [screen, setScreen] = useState('regie');
     const [editingWorkflowId, setEditingWorkflowId] = useState(null);
+    const [pendingScreen, setPendingScreen] = useState(null);
+    const guardRef = useRef(null);
     const session = useSession();
     const audios = useAudios();
     const {launch, checking, issues, dismiss} = useSessionLaunch();
@@ -35,11 +38,33 @@ function Dashboard() {
         setScreen('sessions');
     }
 
+    function requestNavigate(target) {
+        if (target === screen) return;
+        if (guardRef.current?.isDirty()) {
+            setPendingScreen(target);
+            return;
+        }
+        setScreen(target);
+    }
+
+    function saveAndContinue() {
+        const target = pendingScreen;
+        setPendingScreen(null);
+        if (guardRef.current?.save()) {
+            setScreen(target);
+        }
+    }
+
+    function discardAndContinue() {
+        setScreen(pendingScreen);
+        setPendingScreen(null);
+    }
+
     return (
         <div className="app height-full" style={{height: '100vh'}}>
             <Sidebar
                 screen={screen}
-                onNavigate={setScreen}
+                onNavigate={requestNavigate}
                 sessionRunning={session !== null}
                 musicPlaying={audios.length > 0}
             />
@@ -50,7 +75,14 @@ function Dashboard() {
                 </div>
                 {issues.length > 0 && <MediaErrorDialog issues={issues} onClose={dismiss}/>}
                 {screen === 'regie' && <RegieScreen onPlay={launch} checking={checking}/>}
-                {screen === 'musique' && <MusiqueScreen/>}
+                {pendingScreen !== null && (
+                    <UnsavedChangesDialog
+                        onSave={saveAndContinue}
+                        onDiscard={discardAndContinue}
+                        onCancel={() => setPendingScreen(null)}
+                    />
+                )}
+                {screen === 'musique' && <MusiqueScreen guardRef={guardRef}/>}
                 {screen === 'sessions' && (
                     <WorkflowDashboard
                         onCreateNew={createNew}
@@ -59,7 +91,7 @@ function Dashboard() {
                         checking={checking}
                     />
                 )}
-                {screen === 'creation' && <SessionCreationScreen workflowId={editingWorkflowId} onDone={doneCreating}/>}
+                {screen === 'creation' && <SessionCreationScreen workflowId={editingWorkflowId} onDone={doneCreating} guardRef={guardRef}/>}
             </main>
         </div>
     );

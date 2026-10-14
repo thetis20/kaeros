@@ -9,6 +9,7 @@ import DubbingVideoStep, {validate as validateDubbingVideo} from '../Step/Dubbin
 import VideoStep, {validate as validateVideo} from '../Step/VideoStep';
 import TimeStep, {validate as validateTime} from '../Step/TimeStep';
 import BattleRoyalStep, {validate as validateBattleRoyal} from '../Step/BattleRoyalStep';
+import useNavigationGuard from '../Hook/useNavigationGuard';
 import {checkLocalSteps, messageKeyFor} from '../../lib/mediaCheck';
 
 const MEDIA_CHECK_DEBOUNCE_MS = 300;
@@ -74,7 +75,7 @@ function newStep(type, t) {
     return base;
 }
 
-function SessionCreationScreen({workflowId, onDone}) {
+function SessionCreationScreen({workflowId, onDone, guardRef}) {
     const {t} = useTranslation();
     const workflows = useWorkflows();
     const fetchedSteps = useSteps(workflowId);
@@ -84,6 +85,7 @@ function SessionCreationScreen({workflowId, onDone}) {
     const [errorsByStepId, setErrorsByStepId] = useState({});
     const [mediaIssuesByStepId, setMediaIssuesByStepId] = useState({});
     const [nameError, setNameError] = useState(null);
+    const [dirty, setDirty] = useState(false);
     const nameLoadedRef = useRef(false);
     const stepsLoadedRef = useRef(false);
     const existingWorkflowRef = useRef(null);
@@ -133,12 +135,19 @@ function SessionCreationScreen({workflowId, onDone}) {
         setSteps(current => current.map((step, i) => i === index ? nextValue : step));
     }
 
+    function editStep(index, nextValue) {
+        setDirty(true);
+        updateStep(index, nextValue);
+    }
+
     function addStep(type) {
+        setDirty(true);
         setSteps(current => [...current, newStep(type, t)]);
     }
 
     function removeStep(index) {
         const removedId = steps[index].id;
+        setDirty(true);
         setSteps(current => current.filter((_, i) => i !== index));
         setErrorsByStepId(current => {
             const next = {...current};
@@ -149,6 +158,7 @@ function SessionCreationScreen({workflowId, onDone}) {
 
     function moveUp(index) {
         if (index === 0) return;
+        setDirty(true);
         setSteps(current => {
             const next = [...current];
             [next[index - 1], next[index]] = [next[index], next[index - 1]];
@@ -157,6 +167,7 @@ function SessionCreationScreen({workflowId, onDone}) {
     }
 
     function moveDown(index) {
+        setDirty(true);
         setSteps(current => {
             if (index >= current.length - 1) return current;
             const next = [...current];
@@ -177,7 +188,7 @@ function SessionCreationScreen({workflowId, onDone}) {
         return errors;
     }
 
-    function handleSave() {
+    function save() {
         const nameIsInvalid = !name || !name.trim();
         setNameError(nameIsInvalid ? t('workflow.form.error.name') : null);
 
@@ -194,7 +205,7 @@ function SessionCreationScreen({workflowId, onDone}) {
         if (hasErrors) {
             setSteps(current => current.map(step => nextErrorsByStepId[step.id] ? {...step, open: true} : step));
         }
-        if (nameIsInvalid || hasErrors) return;
+        if (nameIsInvalid || hasErrors) return false;
 
         const workflowIdToSave = workflowId === null ? uuidv4() : workflowId;
         const workflowPayload = workflowId === null
@@ -221,8 +232,11 @@ function SessionCreationScreen({workflowId, onDone}) {
             });
         });
 
-        onDone();
+        setDirty(false);
+        return true;
     }
+
+    useNavigationGuard(guardRef, {isDirty: () => dirty, save});
 
     return (
         <div className="content">
@@ -239,9 +253,12 @@ function SessionCreationScreen({workflowId, onDone}) {
                         style={{flex: 1, fontWeight: 500}}
                         className={nameError ? 'is-invalid' : undefined}
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => {
+                            setDirty(true);
+                            setName(e.target.value);
+                        }}
                     />
-                    <button className="btn btn-accent-solid" onClick={handleSave}>
+                    <button className="btn btn-accent-solid" onClick={() => { if (save()) onDone(); }}>
                         {t('sessionCreation.save')}
                     </button>
                 </div>
@@ -283,13 +300,13 @@ function SessionCreationScreen({workflowId, onDone}) {
                                             type="text"
                                             className={errors.name ? 'is-invalid' : undefined}
                                             value={step.name}
-                                            onChange={(e) => updateStep(index, {...step, name: e.target.value})}
+                                            onChange={(e) => editStep(index, {...step, name: e.target.value})}
                                         />
                                         {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                     </div>
                                     <Variant
                                         value={step}
-                                        setValue={(nextValue) => updateStep(index, nextValue)}
+                                        setValue={(nextValue) => editStep(index, nextValue)}
                                         errors={errors}
                                         setErrors={(nextErrors) => setErrorsByStepId(current => ({...current, [step.id]: nextErrors}))}
                                     />

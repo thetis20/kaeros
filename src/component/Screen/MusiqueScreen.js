@@ -4,18 +4,20 @@ import { IconUpload } from '@tabler/icons-react';
 import useTracks from '../Hook/useTracks';
 import useTags from '../Hook/useTags';
 import useMediaPreview from '../Hook/useMediaPreview';
+import useNavigationGuard from '../Hook/useNavigationGuard';
 import TagMultiSelect from '../Tag/TagMultiSelect';
 import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
 
 const EMPTY_FORM = { name: '', tags: [], startOffsetMs: 0 };
 
-function MusiqueScreen() {
+function MusiqueScreen({ guardRef }) {
     const { t } = useTranslation();
     const tracks = useTracks();
     const tags = useTags();
     const [activeTag, setActiveTag] = useState('all');
     const [value, setValue] = useState(EMPTY_FORM);
     const [errors, setErrors] = useState({});
+    const [dirty, setDirty] = useState(false);
     const { mediaRef: previewRef, play } = useMediaPreview();
 
     function testPlayback() {
@@ -32,6 +34,7 @@ function MusiqueScreen() {
         const file = e.target.files[0];
         if (!file) return;
         const name = resolveAutoFillName(value.name, undefined, file.name);
+        setDirty(true);
         setValue({ ...value, file, name });
         if (errors.src) setErrors({ ...errors, src: undefined });
     }
@@ -47,21 +50,30 @@ function MusiqueScreen() {
         return errors;
     }
 
-    function onSubmit(e) {
-        e.preventDefault();
+    function save() {
         const validationErrors = validate(value);
         if (Object.keys(validationErrors).length) {
             setErrors(validationErrors);
-            return;
+            return false;
         }
         setErrors({});
         window.electronAPI.trackSave(value);
         setValue(EMPTY_FORM);
+        setDirty(false);
+        return true;
     }
+
+    function onSubmit(e) {
+        e.preventDefault();
+        save();
+    }
+
+    useNavigationGuard(guardRef, { isDirty: () => dirty, save });
 
     function edit(track) {
         setValue(track);
         setErrors({});
+        setDirty(false);
     }
 
     function remove(track) {
@@ -82,6 +94,7 @@ function MusiqueScreen() {
                     className={errors.name ? 'is-invalid' : ''}
                     value={value.name}
                     onChange={(e) => {
+                        setDirty(true);
                         setValue({ ...value, name: e.target.value });
                         if (errors.name) setErrors({ ...errors, name: undefined });
                     }}
@@ -95,6 +108,7 @@ function MusiqueScreen() {
                     tags={tags}
                     value={value.tags}
                     onChange={(newTags) => {
+                        setDirty(true);
                         setValue({ ...value, tags: newTags });
                         if (errors.tags) setErrors({ ...errors, tags: undefined });
                     }}
@@ -124,6 +138,7 @@ function MusiqueScreen() {
                     className={errors.startOffsetMs ? 'is-invalid' : ''}
                     value={value.startOffsetMs ?? ''}
                     onChange={(e) => {
+                        setDirty(true);
                         setValue({ ...value, startOffsetMs: e.target.value });
                         if (errors.startOffsetMs) setErrors({ ...errors, startOffsetMs: undefined });
                     }}

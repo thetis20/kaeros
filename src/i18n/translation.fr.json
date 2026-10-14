@@ -2,6 +2,13 @@
   "app": {
     "name": "Kaeros"
   },
+  "unsavedChanges": {
+    "title": "Modifications non enregistrées",
+    "message": "Vous avez des modifications en cours. Voulez-vous les enregistrer avant de continuer ?",
+    "save": "Continuer en enregistrant",
+    "discard": "Continuer sans enregistrer",
+    "cancel": "Annuler"
+  },
   "nav": {
     "playlists": "Sessions",
     "folders": "Musique",

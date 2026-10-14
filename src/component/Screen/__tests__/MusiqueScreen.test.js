@@ -232,4 +232,39 @@ describe('MusiqueScreen', () => {
 
         expect(window.electronAPI.trackRemove).toHaveBeenCalledWith('t1');
     });
+
+    describe('navigation guard', () => {
+        it('is dirty after typing, and clean again after edit(track)', () => {
+            const guardRef = {current: null};
+            render(<MusiqueScreen guardRef={guardRef}/>);
+            expect(guardRef.current.isDirty()).toBe(false);
+
+            fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
+            expect(guardRef.current.isDirty()).toBe(true);
+
+            seedTracks([{id: 't1', name: 'Autre', src: '/tmp/t1.mp3', tags: ['tag1']}]);
+            fireEvent.click(screen.getByRole('button', {name: 'Modifier'}));
+            expect(guardRef.current.isDirty()).toBe(false);
+        });
+
+        it('is clean after a successful submit and save() returns false when invalid', () => {
+            const guardRef = {current: null};
+            render(<MusiqueScreen guardRef={guardRef}/>);
+            seedTags(TAGS);
+
+            fireEvent.change(screen.getByLabelText('Nom'), {target: {value: 'Générique'}});
+            let result;
+            act(() => { result = guardRef.current.save(); });
+            expect(result).toBe(false);
+            expect(guardRef.current.isDirty()).toBe(true);
+
+            selectTag('Disco');
+            const file = new File(['sound'], 'track.mp3', {type: 'audio/mpeg'});
+            fireEvent.change(screen.getByLabelText('Fichier audio'), {target: {files: [file]}});
+            fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+            expect(window.electronAPI.trackSave).toHaveBeenCalledTimes(1);
+            expect(guardRef.current.isDirty()).toBe(false);
+        });
+    });
 });

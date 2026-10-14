@@ -330,3 +330,88 @@ describe('SessionCreationScreen - media issue highlighting', () => {
         consoleError.mockRestore();
     });
 });
+
+describe('SessionCreationScreen - navigation guard', () => {
+    beforeEach(() => {
+        window.electronAPI = {
+            workflowFetch: jest.fn(),
+            stepFetch: jest.fn(),
+            workflowSave: jest.fn(),
+            stepSave: jest.fn(),
+            stepRemove: jest.fn(),
+        };
+        checkLocalSteps.mockReset().mockResolvedValue([]);
+    });
+
+    function seedExisting() {
+        act(() => {
+            document.dispatchEvent(new CustomEvent('workflow-onchange', {detail: [{id: 'wf-1', name: 'Remise des diplômes', color: '#378ADD', createdAt: '2026-01-01'}]}));
+        });
+        act(() => {
+            document.dispatchEvent(new CustomEvent('step-onchange', {detail: [{id: 'step-1', type: 'time', name: 'Impro', impro: '1', minutes: '2', createdAt: '2026-01-01'}]}));
+        });
+    }
+
+    it('is not dirty after loading an existing workflow', () => {
+        const guardRef = {current: null};
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}} guardRef={guardRef}/>);
+        seedExisting();
+
+        expect(guardRef.current.isDirty()).toBe(false);
+    });
+
+    it('is dirty after renaming the session', () => {
+        const guardRef = {current: null};
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}} guardRef={guardRef}/>);
+        seedExisting();
+        fireEvent.change(screen.getByLabelText('Nom de la session'), {target: {value: 'Autre nom'}});
+
+        expect(guardRef.current.isDirty()).toBe(true);
+    });
+
+    it('is dirty after adding a step', () => {
+        const guardRef = {current: null};
+        render(<SessionCreationScreen workflowId={null} onDone={() => {}} guardRef={guardRef}/>);
+        expect(guardRef.current.isDirty()).toBe(false);
+        fireEvent.click(screen.getByRole('button', {name: 'Image'}));
+
+        expect(guardRef.current.isDirty()).toBe(true);
+    });
+
+    it('stays clean when a step is only toggled open', () => {
+        const guardRef = {current: null};
+        render(<SessionCreationScreen workflowId="wf-1" onDone={() => {}} guardRef={guardRef}/>);
+        seedExisting();
+        fireEvent.click(screen.getByRole('button', {name: "Modifier l'étape"}));
+
+        expect(guardRef.current.isDirty()).toBe(false);
+    });
+
+    it('save() returns false when the session is invalid and true (clearing dirty) when valid', () => {
+        const guardRef = {current: null};
+        const onDone = jest.fn();
+        render(<SessionCreationScreen workflowId={null} onDone={onDone} guardRef={guardRef}/>);
+        fireEvent.click(screen.getByRole('button', {name: 'Time'}));
+
+        let result;
+        act(() => { result = guardRef.current.save(); });
+        expect(result).toBe(false);
+        expect(window.electronAPI.workflowSave).not.toHaveBeenCalled();
+
+        fireEvent.change(screen.getByLabelText('Nom de la session'), {target: {value: 'Remise des diplômes'}});
+        act(() => { result = guardRef.current.save(); });
+        expect(result).toBe(true);
+        expect(window.electronAPI.workflowSave).toHaveBeenCalledTimes(1);
+        expect(guardRef.current.isDirty()).toBe(false);
+        expect(onDone).not.toHaveBeenCalled();
+    });
+
+    it('the Enregistrer button still calls onDone after a valid save', () => {
+        const onDone = jest.fn();
+        render(<SessionCreationScreen workflowId={null} onDone={onDone}/>);
+        fireEvent.change(screen.getByLabelText('Nom de la session'), {target: {value: 'Remise des diplômes'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Enregistrer'}));
+
+        expect(onDone).toHaveBeenCalledTimes(1);
+    });
+});

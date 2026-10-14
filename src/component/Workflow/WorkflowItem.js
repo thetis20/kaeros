@@ -1,8 +1,8 @@
-import {IconEdit, IconPlayerPlay, IconTrash} from '@tabler/icons-react';
+import {IconEdit, IconFileExport, IconPlayerPlay, IconTrash} from '@tabler/icons-react';
 import {useTranslation} from 'react-i18next';
 import moment from 'moment';
 
-function WorkflowItem({workflow, onPlay, onEdit, onRemove, checking}) {
+function WorkflowItem({workflow, onPlay, onEdit, onRemove, onExport, checking, disabled}) {
     const {t} = useTranslation();
     const updatedAt = moment(workflow.updatedAt);
 
@@ -26,6 +26,13 @@ function WorkflowItem({workflow, onPlay, onEdit, onRemove, checking}) {
                 style={{flex: 1, display: 'flex', justifyContent: 'center'}}
                 aria-label={t('workflow.edit')}
                 onClick={() => onEdit(workflow)}><IconEdit/></button>
+            <button
+                type="button"
+                className="btn btn-sm"
+                style={{flex: 1, display: 'flex', justifyContent: 'center'}}
+                aria-label={t('workflow.export')}
+                disabled={disabled}
+                onClick={() => onExport(workflow)}><IconFileExport/></button>
             <button
                 type="button"
                 className="btn btn-sm"

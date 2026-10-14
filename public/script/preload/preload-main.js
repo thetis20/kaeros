@@ -67,4 +67,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     tagCreate: (value) => ipcRenderer.send('tag-create', value),
     mediaCheckWorkflow: (workflowId) => ipcRenderer.invoke('media-check-workflow', workflowId),
     mediaCheckPaths: (items) => ipcRenderer.invoke('media-check-paths', items),
+    workflowExport: (id) => ipcRenderer.invoke('workflow-export', id),
+    workflowImport: () => ipcRenderer.invoke('workflow-import'),
 })

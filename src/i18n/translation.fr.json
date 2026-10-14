@@ -29,6 +29,21 @@
     "remove": "Supprimer",
     "edit": "Modifier",
     "play": "Démarrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "exporting": "Export en cours…",
+    "importing": "Import en cours…",
+    "exportSuccess": "Session exportée : {{path}}",
+    "importSuccess": "Session importée.",
+    "error": {
+      "export": "L'export de la session a échoué.",
+      "import": {
+        "invalid": "Le fichier n'est pas une archive de session valide.",
+        "version": "Cette archive a été créée avec une version incompatible de Kaeros.",
+        "step": "Une étape de l'archive est invalide ou de type inconnu.",
+        "generic": "L'import de la session a échoué."
+      }
+    },
     "form": {
       "title": "Formulaire de session",
       "name": "Nom",

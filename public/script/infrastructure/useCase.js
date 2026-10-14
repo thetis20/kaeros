@@ -1,3 +1,6 @@
+const path = require('path');
+const {app} = require('electron');
+
 const ListTrackUseCase = require('../application/useCase/track/ListTrackUseCase.js');
 const CreateTrackUseCase = require('../application/useCase/track/CreateTrackUseCase.js');
 const UpdateTrackUseCase = require('../application/useCase/track/UpdateTrackUseCase.js');
@@ -21,6 +24,12 @@ const CleanTagUseCase = require('../application/useCase/tag/CleanTagUseCase.js')
 
 const CheckMediaFilesUseCase = require('../application/useCase/media/CheckMediaFilesUseCase.js');
 const CheckWorkflowMediaUseCase = require('../application/useCase/media/CheckWorkflowMediaUseCase.js');
+
+const ExportWorkflowUseCase = require('../application/useCase/workflow/ExportWorkflowUseCase.js');
+const ImportWorkflowUseCase = require('../application/useCase/workflow/ImportWorkflowUseCase.js');
+
+const ArchiverZipWriter = require('./zip/ArchiverZipWriter.js');
+const ExtractZipReader = require('./zip/ExtractZipReader.js');
 
 const TrackStoreRespository = require('./repository/TrackStoreRepository.js');
 const WorkflowStoreRespository = require('./repository/WorkflowStoreRepository.js');
@@ -56,6 +65,20 @@ const createSessionUseCase = new CreateSessionUseCase(stepStoreRespository);
 const checkMediaFilesUseCase = new CheckMediaFilesUseCase();
 const checkWorkflowMediaUseCase = new CheckWorkflowMediaUseCase(listStepByWorkflowUseCase, listTrackUseCase, checkMediaFilesUseCase);
 
+const exportWorkflowUseCase = new ExportWorkflowUseCase(
+    listWorkflowUseCase,
+    listStepByWorkflowUseCase,
+    checkMediaFilesUseCase,
+    new ArchiverZipWriter(),
+    () => app.getVersion()
+);
+const importWorkflowUseCase = new ImportWorkflowUseCase(
+    new ExtractZipReader(),
+    createWorkflowUseCase,
+    createStepUseCase,
+    deleteWorkflowUseCase,
+    (workflowId) => path.join(app.getPath('userData'), 'media', workflowId)
+);
 
 module.exports = {
     listTrackUseCase,
@@ -79,5 +102,8 @@ module.exports = {
     createTagUseCase,
 
     checkMediaFilesUseCase,
-    checkWorkflowMediaUseCase
+    checkWorkflowMediaUseCase,
+
+    exportWorkflowUseCase,
+    importWorkflowUseCase
 }

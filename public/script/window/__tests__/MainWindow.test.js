@@ -1,6 +1,7 @@
 jest.mock('electron', () => ({
     app: {isPackaged: false},
     BrowserWindow: jest.fn(),
+    dialog: {showSaveDialog: jest.fn(), showOpenDialog: jest.fn()},
     ipcMain: {
         addListener: jest.fn(),
         removeListener: jest.fn(),
@@ -12,6 +13,9 @@ jest.mock('electron', () => ({
 jest.mock('../../infrastructure/useCase.js', () => ({
     checkWorkflowMediaUseCase: {execute: jest.fn()},
     checkMediaFilesUseCase: {execute: jest.fn()},
+    listWorkflowUseCase: {execute: jest.fn()},
+    exportWorkflowUseCase: {execute: jest.fn()},
+    importWorkflowUseCase: {execute: jest.fn()},
 }));
 jest.mock('../../application/entity/Workflow.js', () => ({}));
 jest.mock('../../application/entity/step/StepFactory.js', () => ({}));
@@ -107,5 +111,103 @@ describe('MainWindow media-check IPC channels', () => {
 
         expect(ipcMain.removeHandler).toHaveBeenCalledWith('media-check-workflow');
         expect(ipcMain.removeHandler).toHaveBeenCalledWith('media-check-paths');
+    });
+});
+
+describe('MainWindow workflow export/import IPC channels', () => {
+    const {dialog} = require('electron');
+    const useCases = require('../../infrastructure/useCase.js');
+
+    const handlerFor = (channel) => {
+        const mw = new MainWindow();
+        mw.window = {webContents: {send: jest.fn()}};
+        mw.initHandle();
+        return {mw, handler: ipcMain.handle.mock.calls.find(([c]) => c === channel)[1]};
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        useCases.listWorkflowUseCase.execute.mockResolvedValue([{id: 'wf1', name: 'My session'}]);
+    });
+
+    it('registers both handlers on initHandle()', () => {
+        new MainWindow().initHandle();
+
+        expect(ipcMain.handle).toHaveBeenCalledWith('workflow-export', expect.any(Function));
+        expect(ipcMain.handle).toHaveBeenCalledWith('workflow-import', expect.any(Function));
+    });
+
+    it('export asks for a destination and delegates to the use case', async () => {
+        dialog.showSaveDialog.mockResolvedValue({canceled: false, filePath: '/tmp/out.zip'});
+        useCases.exportWorkflowUseCase.execute.mockResolvedValue({ok: true, path: '/tmp/out.zip'});
+        const {mw, handler} = handlerFor('workflow-export');
+
+        const result = await handler({}, 'wf1');
+
+        expect(dialog.showSaveDialog).toHaveBeenCalledWith(mw.window, {
+            defaultPath: 'My session.zip',
+            filters: [{name: 'Zip', extensions: ['zip']}],
+        });
+        expect(useCases.exportWorkflowUseCase.execute).toHaveBeenCalledWith('wf1', '/tmp/out.zip');
+        expect(result).toEqual({ok: true, path: '/tmp/out.zip'});
+    });
+
+    it('export returns canceled when the dialog is dismissed', async () => {
+        dialog.showSaveDialog.mockResolvedValue({canceled: true});
+        const {handler} = handlerFor('workflow-export');
+
+        expect(await handler({}, 'wf1')).toEqual({ok: false, canceled: true});
+        expect(useCases.exportWorkflowUseCase.execute).not.toHaveBeenCalled();
+    });
+
+    it('import returns canceled when the dialog is dismissed', async () => {
+        dialog.showOpenDialog.mockResolvedValue({canceled: true, filePaths: []});
+        const {handler} = handlerFor('workflow-import');
+
+        expect(await handler({})).toEqual({ok: false, canceled: true});
+        expect(useCases.importWorkflowUseCase.execute).not.toHaveBeenCalled();
+    });
+
+    it('import delegates to the use case and notifies workflow-onchange on success', async () => {
+        dialog.showOpenDialog.mockResolvedValue({canceled: false, filePaths: ['/tmp/in.zip']});
+        useCases.importWorkflowUseCase.execute.mockResolvedValue({ok: true, workflowId: 'new'});
+        const {mw, handler} = handlerFor('workflow-import');
+
+        const result = await handler({});
+
+        expect(dialog.showOpenDialog).toHaveBeenCalledWith(mw.window, {
+            properties: ['openFile'],
+            filters: [{name: 'Zip', extensions: ['zip']}],
+        });
+        expect(useCases.importWorkflowUseCase.execute).toHaveBeenCalledWith('/tmp/in.zip');
+        expect(result).toEqual({ok: true, workflowId: 'new'});
+        expect(mw.window.webContents.send).toHaveBeenCalledWith('workflow-onchange', [{id: 'wf1', name: 'My session'}]);
+    });
+
+    it('import does not notify on failure', async () => {
+        dialog.showOpenDialog.mockResolvedValue({canceled: false, filePaths: ['/tmp/in.zip']});
+        useCases.importWorkflowUseCase.execute.mockResolvedValue({ok: false, error: 'invalid'});
+        const {mw, handler} = handlerFor('workflow-import');
+
+        expect(await handler({})).toEqual({ok: false, error: 'invalid'});
+        expect(mw.window.webContents.send).not.toHaveBeenCalled();
+    });
+
+    it('removes both handlers when the window is closed', () => {
+        const {BrowserWindow} = require('electron');
+        let closedCallback;
+        BrowserWindow.mockImplementation(() => ({
+            on: jest.fn((event, cb) => {
+                if (event === 'closed') closedCallback = cb;
+            }),
+            loadURL: jest.fn(),
+            webContents: {send: jest.fn()},
+        }));
+
+        new MainWindow().open();
+        closedCallback();
+
+        expect(ipcMain.removeHandler).toHaveBeenCalledWith('workflow-export');
+        expect(ipcMain.removeHandler).toHaveBeenCalledWith('workflow-import');
     });
 });

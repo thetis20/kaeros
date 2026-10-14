@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow, dialog, ipcMain} = require('electron');
 const path = require('path');
 const {
     listTrackUseCase,
@@ -17,7 +17,9 @@ const {
     listTagUseCase,
     createTagUseCase,
     checkMediaFilesUseCase,
-    checkWorkflowMediaUseCase
+    checkWorkflowMediaUseCase,
+    exportWorkflowUseCase,
+    importWorkflowUseCase
 } = require('../infrastructure/useCase.js');
 const Workflow = require('../application/entity/Workflow.js');
 const StepFactory = require('../application/entity/step/StepFactory.js');
@@ -83,6 +85,8 @@ class MainWindow {
             ipcMain.removeListener('tag-create', this.tagCreate)
             ipcMain.removeHandler('media-check-workflow')
             ipcMain.removeHandler('media-check-paths')
+            ipcMain.removeHandler('workflow-export')
+            ipcMain.removeHandler('workflow-import')
         });
 
         this.initHandle()
@@ -106,6 +110,35 @@ class MainWindow {
         ipcMain.addListener('tag-create', this.tagCreate)
         ipcMain.handle('media-check-workflow', (event, workflowId) => checkWorkflowMediaUseCase.execute(workflowId))
         ipcMain.handle('media-check-paths', (event, items) => checkMediaFilesUseCase.execute(items))
+        ipcMain.handle('workflow-export', async (event, id) => {
+            const workflows = await listWorkflowUseCase.execute();
+            const workflow = workflows.find((w) => w.id === id);
+            if (!workflow) {
+                return {ok: false, error: 'not-found'};
+            }
+            const {canceled, filePath} = await dialog.showSaveDialog(this.window, {
+                defaultPath: `${workflow.name}.zip`,
+                filters: [{name: 'Zip', extensions: ['zip']}],
+            });
+            if (canceled || !filePath) {
+                return {ok: false, canceled: true};
+            }
+            return exportWorkflowUseCase.execute(id, filePath);
+        })
+        ipcMain.handle('workflow-import', async () => {
+            const {canceled, filePaths} = await dialog.showOpenDialog(this.window, {
+                properties: ['openFile'],
+                filters: [{name: 'Zip', extensions: ['zip']}],
+            });
+            if (canceled || !filePaths || filePaths.length === 0) {
+                return {ok: false, canceled: true};
+            }
+            const result = await importWorkflowUseCase.execute(filePaths[0]);
+            if (result.ok && this.window) {
+                this.window.webContents.send('workflow-onchange', await listWorkflowUseCase.execute());
+            }
+            return result;
+        })
     }
 
     async workflowFetch() {

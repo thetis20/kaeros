@@ -63,3 +63,28 @@ describe('preload-main media check IPC methods', () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith('media-check-paths', items);
     });
 });
+
+describe('preload-main workflow export/import IPC methods', () => {
+    beforeEach(() => {
+        jest.resetModules();
+        capturedApi = undefined;
+    });
+
+    it('invokes workflow-export with the workflow id', () => {
+        require('../preload-main.js');
+        const {ipcRenderer} = require('electron');
+
+        capturedApi.workflowExport('wf1');
+
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith('workflow-export', 'wf1');
+    });
+
+    it('invokes workflow-import with no argument', () => {
+        require('../preload-main.js');
+        const {ipcRenderer} = require('electron');
+
+        capturedApi.workflowImport();
+
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith('workflow-import');
+    });
+});

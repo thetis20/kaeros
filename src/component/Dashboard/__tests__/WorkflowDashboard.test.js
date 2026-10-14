@@ -1,5 +1,5 @@
 import '../../../lib/i18n';
-import {act, render, screen, fireEvent} from '@testing-library/react';
+import {act, render, screen, fireEvent, waitFor} from '@testing-library/react';
 import WorkflowDashboard from '../WorkflowDashboard';
 
 describe('WorkflowDashboard', () => {
@@ -8,6 +8,8 @@ describe('WorkflowDashboard', () => {
             workflowFetch: jest.fn(),
             workflowRemove: jest.fn(),
             sessionPlay: jest.fn(),
+            workflowExport: jest.fn(),
+            workflowImport: jest.fn(),
         };
     });
 
@@ -72,5 +74,107 @@ describe('WorkflowDashboard', () => {
         seedWorkflows([workflow]);
 
         expect(screen.getByRole('button', {name: 'Vérification des médias…'})).toBeDisabled();
+    });
+
+    describe('export / import', () => {
+        const workflow = {id: 'wf-1', name: 'Soirée', color: '#1D9E75'};
+
+        function setup() {
+            render(<WorkflowDashboard onCreateNew={() => {}} onEditWorkflow={() => {}}/>);
+            seedWorkflows([workflow]);
+        }
+
+        it('calls workflowExport with the id and shows the success path', async () => {
+            window.electronAPI.workflowExport.mockResolvedValue({ok: true, path: '/tmp/soiree.zip'});
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Exporter'}));
+
+            expect(window.electronAPI.workflowExport).toHaveBeenCalledWith('wf-1');
+            expect(await screen.findByText(/\/tmp\/soiree\.zip/)).toBeInTheDocument();
+        });
+
+        it('shows nothing when the export is canceled', async () => {
+            window.electronAPI.workflowExport.mockResolvedValue({ok: false, canceled: true});
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Exporter'}));
+
+            await waitFor(() => expect(screen.getByRole('button', {name: 'Exporter'})).not.toBeDisabled());
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+            expect(screen.queryByText(/exportée/)).not.toBeInTheDocument();
+        });
+
+        it('shows the media error dialog when export returns issues', async () => {
+            window.electronAPI.workflowExport.mockResolvedValue({
+                ok: false,
+                issues: [{id: 'e1', kind: 'step', name: 'Etape 1', src: '/a.mp4', code: 'missing'}],
+            });
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Exporter'}));
+
+            expect(await screen.findByRole('dialog')).toBeInTheDocument();
+            expect(screen.getByText(/Etape 1/)).toBeInTheDocument();
+        });
+
+        it('shows a generic error when export fails or rejects', async () => {
+            window.electronAPI.workflowExport.mockRejectedValue(new Error('boom'));
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Exporter'}));
+
+            expect(await screen.findByRole('alert')).toHaveTextContent("L'export de la session a échoué.");
+        });
+
+        it('shows the import success message', async () => {
+            window.electronAPI.workflowImport.mockResolvedValue({ok: true, workflowId: 'new'});
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Importer'}));
+
+            expect(await screen.findByText('Session importée.')).toBeInTheDocument();
+        });
+
+        it('shows nothing when the import is canceled', async () => {
+            window.electronAPI.workflowImport.mockResolvedValue({ok: false, canceled: true});
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Importer'}));
+
+            await waitFor(() => expect(screen.getByRole('button', {name: 'Importer'})).not.toBeDisabled());
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+            expect(screen.queryByText('Session importée.')).not.toBeInTheDocument();
+        });
+
+        it.each([
+            ['invalid', /pas une archive de session valide/],
+            ['version', /version incompatible/],
+            ['step', /étape de l'archive est invalide/],
+            ['other', /L'import de la session a échoué/],
+        ])('shows the import error for %s', async (error, expected) => {
+            window.electronAPI.workflowImport.mockResolvedValue({ok: false, error});
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Importer'}));
+
+            expect(await screen.findByRole('alert')).toHaveTextContent(expected);
+        });
+
+        it('shows a generic error when import rejects', async () => {
+            window.electronAPI.workflowImport.mockRejectedValue(new Error('boom'));
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Importer'}));
+
+            expect(await screen.findByRole('alert')).toHaveTextContent("L'import de la session a échoué.");
+        });
+
+        it('disables export and import buttons while an operation is running', async () => {
+            let resolve;
+            window.electronAPI.workflowExport.mockReturnValue(new Promise((r) => { resolve = r; }));
+            setup();
+            fireEvent.click(screen.getByRole('button', {name: 'Exporter'}));
+
+            expect(screen.getByRole('button', {name: 'Exporter'})).toBeDisabled();
+            expect(screen.getByRole('button', {name: 'Importer'})).toBeDisabled();
+
+            await act(async () => { resolve({ok: false, canceled: true}); });
+            expect(screen.getByRole('button', {name: 'Exporter'})).not.toBeDisabled();
+            expect(screen.getByRole('button', {name: 'Importer'})).not.toBeDisabled();
+        });
     });
 });

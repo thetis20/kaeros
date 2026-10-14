@@ -1,25 +1,33 @@
 import 'react';
 import {toFileUrl} from '../../lib/mediaUrl';
 
-function ImageTrack({track}) {
-
+export function ImageStage({url, scale = 100, alt, width = '100vw', height = '100vh'}) {
     return (
         <div style={{
             display: 'flex',
-            height: '100vh',
-            width: '100vw',
+            height,
+            width,
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            backgroundImage: 'url(image/presentation-dubbing.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
         }}>
             <img
                 style={{
-                    width: '100%',
+                    width: `${scale}%`,
+                    height: `${scale}%`,
                     objectFit: 'contain'
                 }}
-                src={toFileUrl(track.src)}
-                alt={track.name}/>
+                src={url}
+                alt={alt}/>
         </div>
     );
+}
+
+function ImageTrack({track}) {
+    return <ImageStage url={toFileUrl(track.src)} scale={track.scale ?? 100} alt={track.name}/>;
 }
 
 export default ImageTrack;

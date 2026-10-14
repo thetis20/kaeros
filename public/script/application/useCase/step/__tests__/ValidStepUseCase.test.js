@@ -120,6 +120,24 @@ describe('ValidStepUseCase', () => {
         });
     });
 
+    describe('image scale', () => {
+        it('defaults scale to 100 when omitted, null or empty', () => {
+            expect(validStepUseCase.execute({name: 'Step One', type: 'image'}).scale).toBe(100);
+            expect(validStepUseCase.execute({name: 'Step One', type: 'image', scale: null}).scale).toBe(100);
+            expect(validStepUseCase.execute({name: 'Step One', type: 'image', scale: ''}).scale).toBe(100);
+        });
+
+        it('coerces a numeric string scale to a number', () => {
+            expect(validStepUseCase.execute({name: 'Step One', type: 'image', scale: '40'}).scale).toBe(40);
+        });
+
+        it('rejects out-of-range or non-integer scale', () => {
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'image', scale: -1})).toThrow('Invalid image scale');
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'image', scale: 101})).toThrow('Invalid image scale');
+            expect(() => validStepUseCase.execute({name: 'Step One', type: 'image', scale: 12.5})).toThrow('Invalid image scale');
+        });
+    });
+
     describe('dubbing-video fadeInMs', () => {
         it('defaults fadeInMs to 1000 when omitted, null or empty', () => {
             const step = {name: 'Step One', type: 'dubbing-video'};

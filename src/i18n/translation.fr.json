@@ -38,6 +38,10 @@
       "title": "Formulaire une étape",
       "name": "Nom",
       "time": "Durée de l'extrait",
+      "scale": {
+        "label": "Taille de l'image",
+        "value": "{{percent}} %"
+      },
       "description": "Description de l'extrait",
       "type": {
         "label": "Type",

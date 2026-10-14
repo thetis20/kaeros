@@ -57,6 +57,18 @@ class ValidStepUseCase {
             }
         }
 
+        if (step.type === 'image') {
+            if (step.scale === undefined || step.scale === null || step.scale === '') {
+                step.scale = 100;
+            } else {
+                const scale = Number(step.scale);
+                if (!Number.isInteger(scale) || scale < 0 || scale > 100) {
+                    throw new Error('Invalid image scale');
+                }
+                step.scale = scale;
+            }
+        }
+
         return step;
     }
 }

@@ -58,6 +58,18 @@ describe('StepFactory', () => {
         expect(step.src).toBe('/tmp/img.png');
     });
 
+    it('preserves the scale of an image step', () => {
+        const step = StepFactory.fromData({type: 'image', id: 's1', name: 'Step One', src: '/tmp/img.png', scale: 40, createdAt, updatedAt});
+        expect(step.scale).toBe(40);
+        expect(step.createdAt).toBe(createdAt);
+        expect(step.updatedAt).toBe(updatedAt);
+    });
+
+    it('defaults the scale of an image step to 100', () => {
+        const step = StepFactory.fromData({type: 'image', id: 's1', name: 'Step One', src: '/tmp/img.png', createdAt, updatedAt});
+        expect(step.scale).toBe(100);
+    });
+
     it('reconstructs a video step', () => {
         const step = StepFactory.fromData({type: 'video', id: 's1', name: 'Step One', src: '/tmp/video.mp4', loop: true, createdAt, updatedAt});
         expect(step).toBeInstanceOf(VideoStep);

@@ -4,6 +4,7 @@ class ImageTrack extends Track {
     constructor(step) {
         super(step);
         this.src = step.src
+        this.scale = step.scale
     }
 }
 

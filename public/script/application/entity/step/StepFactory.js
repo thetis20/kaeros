@@ -9,7 +9,7 @@ class StepFactory {
     static fromData(data) {
         switch (data.type) {
             case 'image':
-                return new ImageStep(data.id, data.name, data.src, data.createdAt, data.updatedAt)
+                return new ImageStep(data.id, data.name, data.src, data.scale, data.createdAt, data.updatedAt)
             case 'dubbing-video':
                 return new DubbingVideoStep(data.id, data.name, data.src, data.description, data.time, data.startOffsetMs, data.endOffsetMs, data.fadeOutMs, data.fadeInMs, data.createdAt, data.updatedAt)
             case 'video':

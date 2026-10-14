@@ -28,6 +28,40 @@ describe('ImageStep component', () => {
         expect(screen.getByText('Rechercher dans mes fichiers')).toBeTruthy();
     });
 
+    it('shows a range input defaulting to 100', () => {
+        renderStep();
+        const range = screen.getByLabelText("Taille de l'image");
+        expect(range.type).toBe('range');
+        expect(range.value).toBe('100');
+        expect(screen.getByText('100 %')).toBeTruthy();
+    });
+
+    it('changing the range calls setValue with a numeric scale', () => {
+        const {setValue} = renderStep();
+        fireEvent.change(screen.getByLabelText("Taille de l'image"), {target: {value: '45'}});
+        expect(setValue).toHaveBeenCalledWith(expect.objectContaining({scale: 45}));
+    });
+
+    it('disables the test button without file or src', () => {
+        renderStep();
+        expect(screen.getByRole('button', {name: 'Tester'}).disabled).toBe(true);
+    });
+
+    it('opens the preview dialog with src, closes it with Close and Escape', () => {
+        renderStep({src: '/tmp/photo.png', name: 'Photo'});
+        const button = screen.getByRole('button', {name: 'Tester'});
+        expect(button.disabled).toBe(false);
+
+        fireEvent.click(button);
+        expect(screen.getByRole('dialog')).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', {name: 'Fermer'}));
+        expect(screen.queryByRole('dialog')).toBeNull();
+
+        fireEvent.click(button);
+        fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
+        expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
     it('picking a file updates the value and clears the file error', () => {
         const {setValue, setErrors} = renderStep({errors: {file: 'missing'}});
         const file = new File(['img'], 'photo.png', {type: 'image/png'});

@@ -7,7 +7,7 @@
   "repository": "github:thetis20/kaeros",
   "scripts": {
     "start": "concurrently \"npm run react-start\" \"npm run electron-start\"",
-    "build": "npm run react-build && npm run electron-build:mac",
+    "build": "npm run react-build && npm run electron-build:mac && npm run electron-build:win",
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "electron-start": "wait-on http://localhost:3000 && electron .",

@@ -88,3 +88,19 @@ describe('preload-main workflow export/import IPC methods', () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith('workflow-import');
     });
 });
+
+describe('preload-main appUninstall', () => {
+    beforeEach(() => {
+        jest.resetModules();
+        capturedApi = undefined;
+    });
+
+    it('invokes app-uninstall with no argument', () => {
+        require('../preload-main.js');
+        const {ipcRenderer} = require('electron');
+
+        capturedApi.appUninstall();
+
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith('app-uninstall');
+    });
+});

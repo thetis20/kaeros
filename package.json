@@ -90,6 +90,9 @@
         }
       ]
     },
+    "nsis": {
+      "include": "assets/installer.nsh"
+    },
     "linux": {
       "target": [
         {

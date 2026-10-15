@@ -69,4 +69,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     mediaCheckPaths: (items) => ipcRenderer.invoke('media-check-paths', items),
     workflowExport: (id) => ipcRenderer.invoke('workflow-export', id),
     workflowImport: () => ipcRenderer.invoke('workflow-import'),
+    appUninstall: () => ipcRenderer.invoke('app-uninstall'),
 })

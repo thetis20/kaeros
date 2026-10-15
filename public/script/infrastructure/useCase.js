@@ -1,5 +1,7 @@
+const fs = require('fs');
 const path = require('path');
-const {app} = require('electron');
+const {spawn} = require('child_process');
+const {app, shell} = require('electron');
 
 const ListTrackUseCase = require('../application/useCase/track/ListTrackUseCase.js');
 const CreateTrackUseCase = require('../application/useCase/track/CreateTrackUseCase.js');
@@ -27,6 +29,10 @@ const CheckWorkflowMediaUseCase = require('../application/useCase/media/CheckWor
 
 const ExportWorkflowUseCase = require('../application/useCase/workflow/ExportWorkflowUseCase.js');
 const ImportWorkflowUseCase = require('../application/useCase/workflow/ImportWorkflowUseCase.js');
+
+const UninstallAppUseCase = require('../application/useCase/app/UninstallAppUseCase.js');
+
+const store = require('./repository/store.js');
 
 const ArchiverZipWriter = require('./zip/ArchiverZipWriter.js');
 const ExtractZipReader = require('./zip/ExtractZipReader.js');
@@ -79,6 +85,18 @@ const importWorkflowUseCase = new ImportWorkflowUseCase(
     deleteWorkflowUseCase,
     (workflowId) => path.join(app.getPath('userData'), 'media', workflowId)
 );
+const uninstallAppUseCase = new UninstallAppUseCase(
+    () => store.clear(),
+    () => fs.promises.rm(path.join(app.getPath('userData'), 'media'), {recursive: true, force: true}),
+    process.platform,
+    app.isPackaged,
+    process.platform === 'darwin' ? path.resolve(app.getAppPath(), '../../..') : null,
+    (itemPath) => shell.trashItem(itemPath),
+    () => {
+        const uninstaller = path.join(path.dirname(process.execPath), 'Uninstall Kaeros.exe');
+        spawn(uninstaller, [], {detached: true, stdio: 'ignore'}).unref();
+    }
+);
 
 module.exports = {
     listTrackUseCase,
@@ -105,5 +123,7 @@ module.exports = {
     checkWorkflowMediaUseCase,
 
     exportWorkflowUseCase,
-    importWorkflowUseCase
+    importWorkflowUseCase,
+
+    uninstallAppUseCase
 }

@@ -1,7 +1,8 @@
 jest.mock('electron', () => ({
-    app: {isPackaged: false},
+    app: {isPackaged: false, exit: jest.fn()},
+    shell: {trashItem: jest.fn()},
     BrowserWindow: jest.fn(),
-    dialog: {showSaveDialog: jest.fn(), showOpenDialog: jest.fn()},
+    dialog: {showSaveDialog: jest.fn(), showOpenDialog: jest.fn(), showMessageBox: jest.fn()},
     ipcMain: {
         addListener: jest.fn(),
         removeListener: jest.fn(),
@@ -16,6 +17,7 @@ jest.mock('../../infrastructure/useCase.js', () => ({
     listWorkflowUseCase: {execute: jest.fn()},
     exportWorkflowUseCase: {execute: jest.fn()},
     importWorkflowUseCase: {execute: jest.fn()},
+    uninstallAppUseCase: {execute: jest.fn()},
 }));
 jest.mock('../../application/entity/Workflow.js', () => ({}));
 jest.mock('../../application/entity/step/StepFactory.js', () => ({}));
@@ -209,5 +211,86 @@ describe('MainWindow workflow export/import IPC channels', () => {
 
         expect(ipcMain.removeHandler).toHaveBeenCalledWith('workflow-export');
         expect(ipcMain.removeHandler).toHaveBeenCalledWith('workflow-import');
+    });
+});
+
+describe('MainWindow app-uninstall IPC channel', () => {
+    const {app, dialog} = require('electron');
+    const useCases = require('../../infrastructure/useCase.js');
+
+    const handlerFor = (channel) => {
+        const mw = new MainWindow();
+        mw.window = {webContents: {send: jest.fn()}};
+        mw.closeSecondaryWindows = jest.fn().mockResolvedValue(undefined);
+        mw.initHandle();
+        return {mw, handler: ipcMain.handle.mock.calls.find(([c]) => c === channel)[1]};
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('registers the handler on initHandle()', () => {
+        new MainWindow().initHandle();
+
+        expect(ipcMain.handle).toHaveBeenCalledWith('app-uninstall', expect.any(Function));
+    });
+
+    it('returns canceled without running the use case when the user cancels', async () => {
+        dialog.showMessageBox.mockResolvedValue({response: 0});
+        const {mw, handler} = handlerFor('app-uninstall');
+
+        expect(await handler({})).toEqual({ok: false, canceled: true});
+        expect(dialog.showMessageBox).toHaveBeenCalledWith(mw.window, expect.objectContaining({
+            type: 'warning',
+            buttons: ['Annuler', 'Désinstaller'],
+            defaultId: 0,
+            cancelId: 0,
+        }));
+        expect(mw.closeSecondaryWindows).not.toHaveBeenCalled();
+        expect(useCases.uninstallAppUseCase.execute).not.toHaveBeenCalled();
+        expect(app.exit).not.toHaveBeenCalled();
+    });
+
+    it('runs the use case and quits the app once confirmed', async () => {
+        dialog.showMessageBox.mockResolvedValue({response: 1});
+        useCases.uninstallAppUseCase.execute.mockResolvedValue({ok: true, mode: 'mac-trash'});
+        const {mw, handler} = handlerFor('app-uninstall');
+
+        const result = await handler({});
+
+        expect(mw.closeSecondaryWindows).toHaveBeenCalledTimes(1);
+        expect(useCases.uninstallAppUseCase.execute).toHaveBeenCalledTimes(1);
+        expect(result).toEqual({ok: true, mode: 'mac-trash'});
+        expect(app.exit).not.toHaveBeenCalled();
+        await new Promise((resolve) => setImmediate(resolve));
+        expect(app.exit).toHaveBeenCalledWith(0);
+    });
+
+    it('does not quit when the use case fails', async () => {
+        dialog.showMessageBox.mockResolvedValue({response: 1});
+        useCases.uninstallAppUseCase.execute.mockResolvedValue({ok: false, error: 'boom'});
+        const {handler} = handlerFor('app-uninstall');
+
+        expect(await handler({})).toEqual({ok: false, error: 'boom'});
+        await new Promise((resolve) => setImmediate(resolve));
+        expect(app.exit).not.toHaveBeenCalled();
+    });
+
+    it('removes the handler when the window is closed', () => {
+        const {BrowserWindow} = require('electron');
+        let closedCallback;
+        BrowserWindow.mockImplementation(() => ({
+            on: jest.fn((event, cb) => {
+                if (event === 'closed') closedCallback = cb;
+            }),
+            loadURL: jest.fn(),
+            webContents: {send: jest.fn()},
+        }));
+
+        new MainWindow().open();
+        closedCallback();
+
+        expect(ipcMain.removeHandler).toHaveBeenCalledWith('app-uninstall');
     });
 });

@@ -46,6 +46,29 @@ body {
   gap: 2px;
 }
 
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.nav-item-discreet {
+  width: 100%;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.nav-item-discreet:hover:not(:disabled) { opacity: 1; }
+
+.nav-item-discreet:disabled { cursor: default; }
+
+.sidebar-message {
+  margin: 6px 10px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.sidebar-message-error { color: var(--danger-dark); }
+
 .brand {
   font-size: 15px;
   font-weight: 600;

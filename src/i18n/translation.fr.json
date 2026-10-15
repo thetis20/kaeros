@@ -22,6 +22,11 @@
       "music": "Musique en cours"
     }
   },
+  "uninstall": {
+    "button": "Désinstaller…",
+    "error": "La désinstallation a échoué",
+    "dataOnly": "Les données de Kaeros ont été effacées. Pour supprimer l'application sous Linux, exécutez : sudo apt remove kaeros"
+  },
   "workflow": {
     "name": "Sessions",
     "create": "Créer une session",

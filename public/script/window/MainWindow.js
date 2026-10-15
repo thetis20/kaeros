@@ -19,7 +19,8 @@ const {
     checkMediaFilesUseCase,
     checkWorkflowMediaUseCase,
     exportWorkflowUseCase,
-    importWorkflowUseCase
+    importWorkflowUseCase,
+    uninstallAppUseCase
 } = require('../infrastructure/useCase.js');
 const Workflow = require('../application/entity/Workflow.js');
 const StepFactory = require('../application/entity/step/StepFactory.js');
@@ -87,6 +88,7 @@ class MainWindow {
             ipcMain.removeHandler('media-check-paths')
             ipcMain.removeHandler('workflow-export')
             ipcMain.removeHandler('workflow-import')
+            ipcMain.removeHandler('app-uninstall')
         });
 
         this.initHandle()
@@ -136,6 +138,25 @@ class MainWindow {
             const result = await importWorkflowUseCase.execute(filePaths[0]);
             if (result.ok && this.window) {
                 this.window.webContents.send('workflow-onchange', await listWorkflowUseCase.execute());
+            }
+            return result;
+        })
+        ipcMain.handle('app-uninstall', async () => {
+            const {response} = await dialog.showMessageBox(this.window, {
+                type: 'warning',
+                buttons: ['Annuler', 'Désinstaller'],
+                defaultId: 0,
+                cancelId: 0,
+                message: 'Désinstaller Kaeros ?',
+                detail: 'Vos sessions et médias seront supprimés. Cette action est irréversible.',
+            });
+            if (response !== 1) {
+                return {ok: false, canceled: true};
+            }
+            await this.closeSecondaryWindows();
+            const result = await uninstallAppUseCase.execute();
+            if (result.ok) {
+                setImmediate(() => app.exit(0));
             }
             return result;
         })

@@ -1,7 +1,10 @@
 import '../../../lib/i18n';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, waitFor, act} from '@testing-library/react';
 import DubbingVideoStep, {validate} from '../DubbingVideoStep';
 import {previewWindow} from '../../../lib/mediaWindow';
+import {probeDurationMs} from '../../../lib/mediaProbe';
+
+jest.mock('../../../lib/mediaProbe');
 
 const mockPlay = jest.fn();
 jest.mock('../../Hook/useMediaPreview', () => () => ({mediaRef: {current: null}, play: mockPlay}));
@@ -97,6 +100,11 @@ describe('DubbingVideoStep validate()', () => {
 });
 
 describe('DubbingVideoStep component', () => {
+    beforeEach(() => {
+        probeDurationMs.mockReset();
+        probeDurationMs.mockResolvedValue(null);
+    });
+
     function renderStep(overrides = {}) {
         const value = {id: 'step-1', ...overrides};
         const setValue = jest.fn();
@@ -281,6 +289,66 @@ describe('DubbingVideoStep component', () => {
         const resolveWindow = mockPlay.mock.calls[0][1];
         expect(resolveWindow(12)).toEqual(previewWindow(value, 'end', 12));
         expect(resolveWindow(12)).toEqual({startSec: 7, endSec: 12});
+    });
+
+    it('prefills the end offset with the probed media duration when opening the end popin with none set', async () => {
+        probeDurationMs.mockResolvedValue(12345);
+        const {value, setValue} = renderStep({file: {name: 'clip.mp4'}, time: '15s', endOffsetMs: ''});
+        await waitFor(() => expect(probeDurationMs).toHaveBeenCalledWith(value));
+        await act(async () => {});
+        setValue.mockClear();
+
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+        expect(setValue).toHaveBeenCalledWith({...value, endOffsetMs: 12345});
+    });
+
+    it('does not prefill the end offset when the probe returns null', async () => {
+        probeDurationMs.mockResolvedValue(null);
+        const {setValue} = renderStep({file: {name: 'clip.mp4'}});
+        await waitFor(() => expect(probeDurationMs).toHaveBeenCalled());
+        await act(async () => {});
+
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+        expect(setValue).not.toHaveBeenCalled();
+    });
+
+    it('does not overwrite an end offset that is already set', async () => {
+        probeDurationMs.mockResolvedValue(12345);
+        const {setValue} = renderStep({file: {name: 'clip.mp4'}, time: '15s', endOffsetMs: '9000'});
+        await act(async () => {});
+
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+        expect(setValue).not.toHaveBeenCalled();
+    });
+
+    it('does not probe when there is no source', () => {
+        renderStep({endOffsetMs: ''});
+        fireEvent.click(screen.getByLabelText("Configurer la fin de l'extrait"));
+
+        expect(probeDurationMs).not.toHaveBeenCalled();
+    });
+
+    it('fills the time with the extract duration rounded to 15 s when the step has no time yet', async () => {
+        probeDurationMs.mockResolvedValue(200000);
+        const {value, setValue, setErrors} = renderStep({
+            file: {name: 'clip.mp4'}, time: '', startOffsetMs: '30000', endOffsetMs: '', errors: {time: 'missing'},
+        });
+
+        await waitFor(() => expect(setValue).toHaveBeenCalledWith({...value, time: '2min45'}));
+        expect(setErrors).toHaveBeenCalledWith(expect.objectContaining({time: undefined}));
+    });
+
+    it('keeps the saved time of an existing step until its offsets change', async () => {
+        probeDurationMs.mockResolvedValue(200000);
+        const setValue = jest.fn();
+        const base = {id: 'step-1', file: {name: 'clip.mp4'}, time: '5min', startOffsetMs: '0', endOffsetMs: ''};
+        const {rerender} = render(<DubbingVideoStep value={base} setValue={setValue}/>);
+        await act(async () => {});
+        expect(setValue).not.toHaveBeenCalled();
+
+        const moved = {...base, startOffsetMs: '110000'};
+        rerender(<DubbingVideoStep value={moved} setValue={setValue}/>);
+        expect(setValue).toHaveBeenCalledWith({...moved, time: '1min30'});
     });
 
     it('shows the default fade-out recap of 1000 ms when fadeOutMs is not set', () => {

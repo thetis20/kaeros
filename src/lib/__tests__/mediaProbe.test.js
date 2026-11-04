@@ -1,4 +1,4 @@
-import {probeOne, probeAll} from '../mediaProbe';
+import {probeOne, probeAll, probeDurationMs} from '../mediaProbe';
 
 class FakeElement {
     constructor() {
@@ -124,6 +124,75 @@ describe('mediaProbe', () => {
             });
 
             await expect(probeOne({src: '/tmp/img.png', type: 'image'})).resolves.toEqual({code: 'decode-failed'});
+        });
+    });
+
+    describe('probeDurationMs', () => {
+        let fakeVideo;
+
+        beforeEach(() => {
+            fakeVideo = new FakeElement();
+            jest.spyOn(document, 'createElement').mockImplementation((tag) => (
+                tag === 'video' ? fakeVideo : realCreateElement(tag)
+            ));
+        });
+
+        it('resolves the rounded duration in milliseconds on loadedmetadata', async () => {
+            const promise = probeDurationMs({src: '/tmp/video.mp4'});
+            fakeVideo.duration = 12.3456;
+            fakeVideo.trigger('loadedmetadata');
+
+            await expect(promise).resolves.toBe(12346);
+            expect(fakeVideo.preload).toBe('metadata');
+        });
+
+        it.each([[Infinity], [NaN], [0]])('resolves null when the duration is %s', async (duration) => {
+            const promise = probeDurationMs({src: '/tmp/video.mp4'});
+            fakeVideo.duration = duration;
+            fakeVideo.trigger('loadedmetadata');
+
+            await expect(promise).resolves.toBeNull();
+        });
+
+        it('resolves null on error', async () => {
+            const promise = probeDurationMs({src: '/tmp/video.mp4'});
+            fakeVideo.trigger('error');
+
+            await expect(promise).resolves.toBeNull();
+        });
+
+        it('resolves null on timeout', async () => {
+            jest.useFakeTimers();
+            const promise = probeDurationMs({src: '/tmp/video.mp4'}, {timeoutMs: 500});
+            jest.advanceTimersByTime(500);
+
+            await expect(promise).resolves.toBeNull();
+            jest.useRealTimers();
+        });
+
+        it('probes a File via a blob URL and cleans up once settled', async () => {
+            const file = new File(['vid'], 'clip.mp4', {type: 'video/mp4'});
+            const promise = probeDurationMs({file});
+
+            expect(global.URL.createObjectURL).toHaveBeenCalledWith(file);
+            expect(fakeVideo.src).toBe('blob:mock-url');
+
+            fakeVideo.duration = 2;
+            fakeVideo.trigger('loadedmetadata');
+            await promise;
+
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
+            expect(fakeVideo.listeners.loadedmetadata).toBeUndefined();
+            expect(fakeVideo.listeners.error).toBeUndefined();
+            expect(fakeVideo.src).toBe('');
+        });
+
+        it('never rejects, even when element creation throws', async () => {
+            document.createElement.mockImplementation(() => {
+                throw new Error('boom');
+            });
+
+            await expect(probeDurationMs({src: '/tmp/video.mp4'})).resolves.toBeNull();
         });
     });
 

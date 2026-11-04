@@ -1,7 +1,9 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { IconUpload, IconSettings } from '@tabler/icons-react';
 import { getFilename, hasSource, resolveAutoFillName } from '../../lib/filename';
+import { probeDurationMs } from '../../lib/mediaProbe';
+import { extractDurationMs, formatRoundedDuration } from '../../lib/duration';
 import OffsetDialog from './OffsetDialog';
 
 export function validate(value, t) {
@@ -26,6 +28,32 @@ export function validate(value, t) {
 function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }) {
     const { t } = useTranslation();
     const [dialog, setDialog] = useState(null);
+    const [mediaDurationMs, setMediaDurationMs] = useState(null);
+    // An existing step keeps its saved time until the user changes the source or the offsets.
+    const autoTimeArmed = useRef(!value.time);
+
+    useEffect(() => {
+        setMediaDurationMs(null);
+        if (!hasSource(value)) return;
+        let cancelled = false;
+        probeDurationMs(value).then((ms) => {
+            if (!cancelled) setMediaDurationMs(ms);
+        });
+        return () => { cancelled = true; };
+    }, [value.file, value.src]);
+
+    useEffect(() => {
+        if (mediaDurationMs === null) return;
+        if (!autoTimeArmed.current) {
+            autoTimeArmed.current = true;
+            return;
+        }
+        const time = formatRoundedDuration(extractDurationMs(value, mediaDurationMs));
+        if (time && time !== value.time) {
+            setValue({...value, time});
+            if (errors.time) setErrors({...errors, time: undefined});
+        }
+    }, [mediaDurationMs, value.startOffsetMs, value.endOffsetMs]);
 
     function handleFile(e) {
         const file = e.target.files[0];
@@ -47,6 +75,14 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
             [name]: e.target.value
         })
         if (errors[name]) setErrors({...errors, [name]: undefined})
+    }
+
+    function openEnd() {
+        setDialog('end');
+        const endUnset = value.endOffsetMs === '' || value.endOffsetMs === null || value.endOffsetMs === undefined;
+        if (endUnset && mediaDurationMs) {
+            setValue({...value, endOffsetMs: mediaDurationMs});
+        }
     }
 
     return <Fragment>
@@ -84,7 +120,7 @@ function DubbingVideoStep({ value, setValue, errors = {}, setErrors = () => {} }
                 type="button"
                 className="btn btn-icon"
                 aria-label={t('step.form.configureEnd')}
-                onClick={() => setDialog('end')}
+                onClick={openEnd}
             ><IconSettings/></button>
         </div>
         {errors.endOffsetMs && <div className="invalid-feedback">{errors.endOffsetMs}</div>}

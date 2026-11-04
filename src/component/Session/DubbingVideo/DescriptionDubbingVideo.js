@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { blue, white } from '../../../enum/COLOR'
 
-function DescriptionDubbingVideo({ track }) {
+function DescriptionDubbingVideo({ track, index }) {
 
     return (
         <div
@@ -25,6 +25,7 @@ function DescriptionDubbingVideo({ track }) {
             }}>
                 <div style={{ textAlign: 'right' }}>{track?.time}</div>
                 <div>{track?.description}</div>
+                <div style={{ position: 'absolute', right: 20, bottom: 10, fontSize: '0.5em' }}>{index}</div>
             </div>
             <img src="image/presentation-dubbing.png" className='width-full' />
         </div>

@@ -14,11 +14,15 @@ function Session() {
         return <div className="with-full height-full" style={{backgroundColor: '#000'}} />
     }
 
+    const dubbingIndex = session.steps
+        .slice(0, session.index + 1)
+        .filter(step => step.type === 'dubbing-video').length
+
     return (
         <div className="with-full height-full" style={{backgroundColor: '#000'}}>
             <SessionController display={false} />
             {session.track.type === 'image' && <ImageTrack track={session.track} />}
-            {session.track.type === 'dubbing-video' && <DubbingVideoTrack track={session.track} />}
+            {session.track.type === 'dubbing-video' && <DubbingVideoTrack track={session.track} index={dubbingIndex} />}
             {session.track.type === 'video' && <RunningVideo track={session.track} />}
             {session.track.type === 'time' && <TimeTrack track={session.track} />}
             {session.track.type === 'battle-royal' && <BattleRoyalTrack track={session.track} />}

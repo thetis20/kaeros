@@ -91,6 +91,7 @@ function OffsetDialog({ anchor, value, onChange, error, fadeError, onClose }) {
                 <div style={{marginBottom: 10, position: 'relative', width: 320}}>
                     <video
                         ref={previewRef}
+                        muted
                         style={{width: 320}}
                         onLoadedMetadata={handleLoadedMetadata}
                         onTimeUpdate={handleTimeUpdate}

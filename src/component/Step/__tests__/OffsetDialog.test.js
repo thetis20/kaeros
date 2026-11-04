@@ -102,6 +102,11 @@ describe('OffsetDialog', () => {
         expect(video.hasAttribute('controls')).toBe(false);
     });
 
+    it('mutes the preview video so test playback is silent', () => {
+        render(<OffsetDialog anchor="start" value={{}} onChange={() => {}} onClose={() => {}}/>);
+        expect(document.querySelector('video').muted).toBe(true);
+    });
+
     it('shows the error message when error is provided', () => {
         render(<OffsetDialog anchor="start" value={{}} onChange={() => {}} error="Invalide" onClose={() => {}}/>);
         expect(screen.getByText('Invalide')).toBeTruthy();

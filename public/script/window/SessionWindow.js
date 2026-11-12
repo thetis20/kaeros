@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow, ipcMain, powerSaveBlocker} = require('electron');
 const path = require('path');
 const TrackFactory = require('../application/entity/track/TrackFactory');
 
@@ -40,6 +40,7 @@ class SessionWindow {
             });
 
             this.initHandle()
+            this.powerSaveBlockerId = powerSaveBlocker.start('prevent-display-sleep')
         })
 
     }
@@ -86,6 +87,10 @@ class SessionWindow {
         ipcMain.removeListener('session-previous', this.sessionPrevious)
         ipcMain.removeListener('session-toStep', this.sessionToStep)
         ipcMain.removeListener('track-change', this.trackChange)
+        if (this.powerSaveBlockerId !== undefined && powerSaveBlocker.isStarted(this.powerSaveBlockerId)) {
+            powerSaveBlocker.stop(this.powerSaveBlockerId)
+        }
+        this.powerSaveBlockerId = undefined
         this.window = null;
         this.onClose();
     }

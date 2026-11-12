@@ -1,7 +1,15 @@
 import 'react';
 import {toFileUrl} from '../../lib/mediaUrl';
 
-export function ImageStage({url, scale = 100, alt, width = '100vw', height = '100vh'}) {
+export function ImageStage({url, scale = 100, background = true, alt, width = '100vw', height = '100vh'}) {
+    const backgroundStyle = background ? {
+        backgroundImage: 'url(image/presentation-dubbing.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+    } : {
+        backgroundColor: 'black'
+    };
     return (
         <div style={{
             display: 'flex',
@@ -9,10 +17,7 @@ export function ImageStage({url, scale = 100, alt, width = '100vw', height = '10
             width,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundImage: 'url(image/presentation-dubbing.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            ...backgroundStyle
         }}>
             <img
                 style={{
@@ -27,7 +32,11 @@ export function ImageStage({url, scale = 100, alt, width = '100vw', height = '10
 }
 
 function ImageTrack({track}) {
-    return <ImageStage url={toFileUrl(track.src)} scale={track.scale ?? 100} alt={track.name}/>;
+    return <ImageStage
+        url={toFileUrl(track.src)}
+        scale={track.scale ?? 100}
+        background={track.background !== false}
+        alt={track.name}/>;
 }
 
 export default ImageTrack;

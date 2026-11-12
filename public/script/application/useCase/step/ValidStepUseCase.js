@@ -67,6 +67,7 @@ class ValidStepUseCase {
                 }
                 step.scale = scale;
             }
+            step.background = step.background !== false;
         }
 
         return step;

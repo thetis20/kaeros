@@ -55,6 +55,15 @@ function ImageStep({ value, setValue, errors = {}, setErrors = () => {} }) {
             <span>{t('step.form.scale.value', {percent: value.scale ?? 100})}</span>
             <button type="button" className="btn btn-sm" disabled={!hasSource(value)} onClick={() => setPreview(true)}>{t('step.form.test')}</button>
         </div>
+        <label htmlFor={`step-background-${value.id}`} className="field-label">
+            <input
+                type="checkbox"
+                id={`step-background-${value.id}`}
+                checked={value.background !== false}
+                onChange={e => setValue({...value, background: e.target.checked})}
+            />
+            {' '}{t('step.form.background.label')}
+        </label>
         {preview && <ImagePreviewDialog
             value={value}
             onChange={scale => setValue({...value, scale})}

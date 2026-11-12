@@ -43,7 +43,7 @@ function ImagePreviewDialog({ value, onChange, onClose }) {
                 <h3>{value.name}</h3>
 
                 <div style={{width: 'min(80vw, 142vh)', aspectRatio: '16 / 9', marginBottom: 10}}>
-                    <ImageStage url={url} scale={scale} alt={value.name} width="100%" height="100%"/>
+                    <ImageStage url={url} scale={scale} background={value.background !== false} alt={value.name} width="100%" height="100%"/>
                 </div>
 
                 <div className="file-row">

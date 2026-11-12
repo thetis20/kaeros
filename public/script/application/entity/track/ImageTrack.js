@@ -5,6 +5,7 @@ class ImageTrack extends Track {
         super(step);
         this.src = step.src
         this.scale = step.scale
+        this.background = step.background !== false
     }
 }
 

@@ -70,6 +70,13 @@ describe('StepFactory', () => {
         expect(step.scale).toBe(100);
     });
 
+    it('preserves the background flag of an image step, defaulting to true', () => {
+        expect(StepFactory.fromData({type: 'image', id: 's1', name: 'Step One', src: '/tmp/img.png', background: false, createdAt, updatedAt}).background).toBe(false);
+        const step = StepFactory.fromData({type: 'image', id: 's1', name: 'Step One', src: '/tmp/img.png', createdAt, updatedAt});
+        expect(step.background).toBe(true);
+        expect(step.createdAt).toBe(createdAt);
+    });
+
     it('reconstructs a video step', () => {
         const step = StepFactory.fromData({type: 'video', id: 's1', name: 'Step One', src: '/tmp/video.mp4', loop: true, createdAt, updatedAt});
         expect(step).toBeInstanceOf(VideoStep);

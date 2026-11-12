@@ -42,6 +42,17 @@ describe('ImageStep component', () => {
         expect(setValue).toHaveBeenCalledWith(expect.objectContaining({scale: 45}));
     });
 
+    it('checks the background checkbox by default', () => {
+        renderStep();
+        expect(screen.getByLabelText("Afficher l'image de fond").checked).toBe(true);
+    });
+
+    it('unchecking the background checkbox calls setValue with background false', () => {
+        const {setValue} = renderStep();
+        fireEvent.click(screen.getByLabelText("Afficher l'image de fond"));
+        expect(setValue).toHaveBeenCalledWith(expect.objectContaining({background: false}));
+    });
+
     it('disables the test button without file or src', () => {
         renderStep();
         expect(screen.getByRole('button', {name: 'Tester'}).disabled).toBe(true);

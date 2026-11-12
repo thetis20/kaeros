@@ -5,5 +5,6 @@ export default class ImageTrack extends Track {
         super(track)
         this.src = track.src
         this.scale = track.scale === undefined ? 100 : track.scale
+        this.background = track.background !== false
     }
 }

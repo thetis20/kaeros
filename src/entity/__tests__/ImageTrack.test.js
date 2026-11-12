@@ -15,6 +15,11 @@ describe('ImageTrack', () => {
         expect(track.scale).toBe(100);
     });
 
+    it('defaults background to true and preserves false', () => {
+        expect(new ImageTrack({type: 'image', src: 'a.png'}).background).toBe(true);
+        expect(new ImageTrack({type: 'image', src: 'a.png', background: false}).background).toBe(false);
+    });
+
     it('preserves a given scale, including 0', () => {
         expect(new ImageTrack({type: 'image', src: 'a.png', scale: 40}).scale).toBe(40);
         expect(new ImageTrack({type: 'image', src: 'a.png', scale: 0}).scale).toBe(0);

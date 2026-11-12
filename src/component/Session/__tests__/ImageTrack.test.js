@@ -11,6 +11,13 @@ describe('Session ImageTrack', () => {
         expect(root.style.backgroundRepeat).toBe('no-repeat');
     });
 
+    it('drops the background image when background is false', () => {
+        const {container} = render(<ImageTrack track={{name: 'Slide', src: '/tmp/slide.png', background: false}}/>);
+        const root = container.firstChild;
+        expect(root.style.backgroundImage).toBe('');
+        expect(root.style.backgroundColor).toBe('black');
+    });
+
     it('sizes the image at 100% by default', () => {
         render(<ImageTrack track={{name: 'Slide', src: '/tmp/slide.png'}}/>);
         const img = screen.getByAltText('Slide');

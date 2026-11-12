@@ -69,6 +69,9 @@
         "label": "Taille de l'image",
         "value": "{{percent}} %"
       },
+      "background": {
+        "label": "Afficher l'image de fond"
+      },
       "description": "Description de l'extrait",
       "type": {
         "label": "Type",
